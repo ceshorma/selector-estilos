@@ -5,12 +5,13 @@
 document.addEventListener("DOMContentLoaded", function () {
   SE.loadState();
 
-  /* Deep-linking opcional: #landing,dark,calido — pantalla, modo y/o
-     preset separados por comas. Útil para compartir un estado. */
+  /* Deep-linking: #landing,dark,calido — pantalla, modo y/o preset;
+     y #s=<base64url> con una dirección completa compartida. */
   var hash = location.hash.replace(/^#/, "");
   if (hash) {
     hash.split(",").forEach(function (tok) {
-      if (["dashboard", "landing", "blog", "colores"].indexOf(tok) >= 0) SE.state.screen = tok;
+      if (tok.indexOf("s=") === 0) SE.applyEncodedState(tok.slice(2), { silent: true });
+      else if (["dashboard", "landing", "blog", "colores"].indexOf(tok) >= 0) SE.state.screen = tok;
       else if (tok === "dark" || tok === "light") SE.state.mode = tok;
       else if (SE.findIn(SE.data.presets, tok)) {
         SE.state.decisions = SE.clone(SE.findPreset(tok).decisions);

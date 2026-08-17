@@ -158,13 +158,28 @@ SE.computeScale = function (ratio, base) {
   return out;
 };
 
-/* Decisiones efectivas: las consolidadas, con la dimensión en
-   comparación A/B sobreescrita por el candidato visible. */
-SE.effectiveDecisions = function () {
-  var d = SE.clone(SE.state.decisions);
-  var ab = SE.state.ab;
-  if (ab && ab[ab.showing] != null) d[ab.dimension] = SE.clone(ab[ab.showing]);
+/* Dimensión especial: la comparación abarca la dirección completa
+   (las 7 decisiones a la vez), no una sola dimensión. */
+SE.AB_ALL = "__all__";
+
+/* Aplica un candidato A/B sobre unas decisiones base. En modo dirección
+   completa el candidato ES el juego de decisiones; si no, solo pisa
+   su dimensión. */
+SE.withCandidate = function (base, ab, which) {
+  var cand = ab[which];
+  if (cand == null) return base;
+  if (ab.dimension === SE.AB_ALL) return SE.clone(cand);
+  var d = SE.clone(base);
+  d[ab.dimension] = SE.clone(cand);
   return d;
+};
+
+/* Decisiones efectivas: las consolidadas, con la comparación A/B
+   en curso sobreescrita por el candidato visible. */
+SE.effectiveDecisions = function () {
+  var ab = SE.state.ab;
+  if (!ab) return SE.clone(SE.state.decisions);
+  return SE.withCandidate(SE.state.decisions, ab, ab.showing);
 };
 
 function camelToToken(k) {
@@ -226,23 +241,15 @@ SE.applyTokens = function () {
   var ab = SE.state.ab;
   var split = !!(ab && ab.split && ab.b != null);
 
-  var d;
-  if (split) {
-    /* En vista dividida el viewport base muestra siempre A… */
-    d = SE.clone(SE.state.decisions);
-    d[ab.dimension] = SE.clone(ab.a);
-  } else {
-    d = SE.effectiveDecisions();
-  }
+  /* En vista dividida el viewport base muestra siempre A… */
+  var d = split ? SE.withCandidate(SE.state.decisions, ab, "a") : SE.effectiveDecisions();
   SE.writeTokens(vp, d, SE.state.mode);
   vp.dataset.mode = SE.state.mode;
 
   /* …y el overlay recortado muestra siempre B. */
   var overlay = document.getElementById("split-overlay");
   if (split && overlay) {
-    var db = SE.clone(SE.state.decisions);
-    db[ab.dimension] = SE.clone(ab.b);
-    SE.writeTokens(overlay, db, SE.state.mode);
+    SE.writeTokens(overlay, SE.withCandidate(SE.state.decisions, ab, "b"), SE.state.mode);
   }
 
   if (SE.ui && SE.ui.ready) SE.ui.afterApply();
@@ -298,6 +305,13 @@ SE.redo = function () {
 
 SE.setDecision = function (dim, value, opts) {
   var ab = SE.state.ab;
+  /* Editar una dimensión durante una comparación de direcciones equivale
+     a quedarse con la que estás viendo: se consolida y sigue la edición. */
+  if (ab && ab.dimension === SE.AB_ALL) {
+    SE.commitAB();
+    if (SE.ui && SE.ui.ready) SE.ui.syncABChrome();
+    ab = null;
+  }
   if (ab && ab.dimension === dim) {
     /* En A/B: el valor elegido se convierte en candidato B */
     ab.b = SE.clone(value);
@@ -361,6 +375,33 @@ SE.startAB = function (dim) {
   SE.applyTokens();
 };
 
+/* Comparación de direcciones completas: A es el estado actual y B una
+   dirección guardada. Ambos candidatos existen desde el inicio, así que
+   el flip y la vista dividida están disponibles de inmediato. */
+SE.startABDirections = function (snapshotId) {
+  var snap = SE.findIn(SE.loadSnapshots(), snapshotId);
+  if (!snap) return false;
+  if (SE.state.ab) SE.cancelAB();
+  /* La guardada se revalida contra los catálogos actuales, como al cargarla */
+  var clean = SE.clone(SE.findPreset(SE.data.defaultPresetId).decisions);
+  SE.mergeValidDecisions(clean, snap.decisions);
+  SE.state.ab = {
+    dimension: SE.AB_ALL,
+    snapshotId: snap.id,
+    a: SE.clone(SE.state.decisions),
+    b: clean,
+    showing: "a",
+    split: false,
+    labelA: "Actual",
+    labelB: snap.name,
+    presetA: SE.state.presetId,
+    presetB: typeof snap.presetId === "string" ? snap.presetId : "custom"
+  };
+  SE.fonts.ensureDecision(clean.fontPair);
+  SE.applyTokens();
+  return true;
+};
+
 SE.toggleSplit = function () {
   var ab = SE.state.ab;
   if (!ab || ab.b == null) return;
@@ -385,11 +426,16 @@ SE.toggleAB = function () {
 SE.commitAB = function () {
   var ab = SE.state.ab;
   if (!ab) return;
-  var chosen = ab[ab.showing] != null ? ab[ab.showing] : ab.a;
+  var which = ab[ab.showing] != null ? ab.showing : "a";
   SE.state.ab = null;
   SE.pushHistory();
-  SE.state.decisions[ab.dimension] = SE.clone(chosen);
-  SE.state.presetId = "custom";
+  if (ab.dimension === SE.AB_ALL) {
+    SE.state.decisions = SE.clone(ab[which]);
+    SE.state.presetId = (which === "a" ? ab.presetA : ab.presetB) || "custom";
+  } else {
+    SE.state.decisions[ab.dimension] = SE.clone(ab[which]);
+    SE.state.presetId = "custom";
+  }
   SE.saveState();
   SE.applyTokens();
 };
@@ -405,6 +451,47 @@ SE.cancelAB = function () {
   if (!SE.state.ab) return;
   SE.state.ab = null;
   SE.applyTokens();
+};
+
+/* ---------- estado en la URL (compartir) ---------- */
+
+/* Serializa las decisiones a base64url para viajar en el hash.
+   escape/unescape mantienen los acentos a salvo en btoa. */
+SE.encodeState = function () {
+  var payload = JSON.stringify({ v: 1, p: SE.state.presetId, d: SE.state.decisions });
+  return btoa(unescape(encodeURIComponent(payload)))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+};
+
+SE.decodeState = function (token) {
+  try {
+    var b64 = String(token).replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    var obj = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    if (!obj || obj.v !== 1 || !obj.d) return null;
+    return obj;
+  } catch (e) { return null; }
+};
+
+/* Aplica un estado recibido por URL. Apila historial: un enlace ajeno
+   nunca debe destruir tu trabajo sin vuelta atrás. */
+SE.applyEncodedState = function (token, opts) {
+  var obj = SE.decodeState(token);
+  if (!obj) return false;
+  var clean = SE.clone(SE.findPreset(SE.data.defaultPresetId).decisions);
+  SE.mergeValidDecisions(clean, obj.d);
+  if (!opts || !opts.silent) {
+    if (SE.state.ab) SE.cancelAB();
+    SE.pushHistory();
+  }
+  SE.state.decisions = clean;
+  SE.state.presetId = typeof obj.p === "string" ? obj.p : "custom";
+  SE.saveState();
+  if (!opts || !opts.silent) {
+    SE.applyTokens();
+    if (SE.ui && SE.ui.ready) SE.ui.refreshAll();
+  }
+  return true;
 };
 
 /* ---------- direcciones guardadas (snapshots) ---------- */

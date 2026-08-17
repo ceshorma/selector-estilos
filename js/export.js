@@ -471,12 +471,49 @@ SE.exporter = (function () {
     return { ok: true };
   }
 
+  /* ---------- compartir por enlace ---------- */
+
+  function buildShareUrl() {
+    var base = location.href.split("#")[0];
+    return base + "#s=" + SE.encodeState();
+  }
+
+  function refreshShareUrl() {
+    var input = document.getElementById("share-url");
+    var note = document.getElementById("share-note");
+    if (!input) return;
+    input.value = buildShareUrl();
+    if (note) {
+      note.textContent = location.protocol === "file:"
+        ? "Abriendo la herramienta como archivo local, el enlace solo funciona en tu equipo. Publicada en la web, sirve para compartir la dirección con cualquiera."
+        : "Quien lo abra verá exactamente estas decisiones; su trabajo anterior queda a un Ctrl+Z de distancia.";
+    }
+  }
+
+  function copyShareUrl() {
+    var input = document.getElementById("share-url");
+    var btn = document.getElementById("share-copy");
+    input.select();
+    function done(ok) {
+      btn.textContent = ok ? "Copiado" : "Copia manual";
+      setTimeout(function () { btn.textContent = "Copiar"; }, 1800);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(input.value).then(function () { done(true); }, function () { done(false); });
+    } else {
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      done(ok);
+    }
+  }
+
   /* ---------- modal ---------- */
 
   var lastFocus = null;
 
   function openModal() {
     lastFocus = document.activeElement;
+    refreshShareUrl();
     document.getElementById("export-modal").hidden = false;
     document.getElementById("export-close").focus();
   }
@@ -495,11 +532,13 @@ SE.exporter = (function () {
       btn.addEventListener("click", function () { exportOne(btn.dataset.export); });
     });
     document.getElementById("export-all").addEventListener("click", exportAll);
+    document.getElementById("share-copy").addEventListener("click", copyShareUrl);
   }
 
   return {
     openModal: openModal, closeModal: closeModal, bind: bind, exportOne: exportOne,
     buildTokensCss: buildTokensCss, buildTokensJson: buildTokensJson, buildDoc: buildDoc,
-    context: context, exportEstado: exportEstado, importEstado: importEstado, buildEstado: buildEstado
+    context: context, exportEstado: exportEstado, importEstado: importEstado, buildEstado: buildEstado,
+    buildShareUrl: buildShareUrl
   };
 })();

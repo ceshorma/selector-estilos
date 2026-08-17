@@ -70,14 +70,16 @@ SE.ui = (function () {
   }
 
   function updatePresetUI() {
-    var id = SE.state.presetId;
+    var ab = SE.state.ab;
+    var comparing = ab && ab.dimension === SE.AB_ALL;
+    var id = comparing ? (ab.showing === "a" ? ab.presetA : ab.presetB) : SE.state.presetId;
     $all(".preset-card").forEach(function (el) {
       el.classList.toggle("active", el.dataset.preset === id);
     });
-    var label;
-    if (id === "custom") label = "Preset: personalizado";
-    else label = "Preset: " + SE.findPreset(id).name;
-    $("#panel-preset-label").textContent = label;
+    var name = id === "custom" ? "personalizado" : SE.findPreset(id).name;
+    $("#panel-preset-label").textContent = comparing
+      ? "Viendo: " + (ab.showing === "a" ? ab.labelA : ab.labelB)
+      : "Preset: " + name;
   }
 
   /* ================= TIPOGRAFÍA ================= */
@@ -325,8 +327,7 @@ SE.ui = (function () {
       '<div class="p-field"><div class="p-field-head"><label>Interlineado</label><span class="p-val" data-role="lh-val">' + d.lineHeight.toFixed(2) + "</span></div>" +
       '<input type="range" class="p-range" min="1.3" max="1.9" step="0.05" value="' + d.lineHeight + '" data-role="lh"></div>' +
       '<div class="p-field"><div class="p-field-head"><label>Ancho de línea</label><span class="p-val" data-role="ms-val">' + d.measure + " ch</span></div>" +
-      '<input type="range" class="p-range" min="50" max="80" step="1" value="' + d.measure + '" data-role="ms"></div>' +
-      '<p class="p-hint">Se aprecia mejor en el <a data-role="go-blog">Artículo</a>.</p>';
+      '<input type="range" class="p-range" min="50" max="80" step="1" value="' + d.measure + '" data-role="ms"></div>';
   }
 
   function bindReading() {
@@ -339,9 +340,6 @@ SE.ui = (function () {
       SE.setDecision("reading", { lineHeight: lh, measure: ms }, { silent: true });
       $('[data-role="lh-val"]').textContent = lh.toFixed(2);
       $('[data-role="ms-val"]').textContent = ms + " ch";
-    });
-    body.addEventListener("click", function (e) {
-      if (e.target.dataset.role === "go-blog") switchScreen("blog");
     });
   }
 
@@ -393,6 +391,7 @@ SE.ui = (function () {
       return '<div class="snap-row">' +
         '<button type="button" class="snap-apply" data-snap="' + s.id + '" title="Aplicar esta dirección">' +
         "<strong>" + esc(s.name) + "</strong><span>" + s.fecha + " · " + esc(presetName) + "</span></button>" +
+        '<button type="button" class="snap-cmp" data-snapcmp="' + s.id + '" title="Comparar con la dirección actual" aria-label="Comparar ' + esc(s.name) + ' con la actual">A/B</button>' +
         '<button type="button" class="snap-del" data-snapdel="' + s.id + '" title="Eliminar" aria-label="Eliminar ' + esc(s.name) + '">' + ICONS.x + "</button></div>";
     }).join("");
   }
@@ -403,6 +402,12 @@ SE.ui = (function () {
       if (del) {
         SE.deleteSnapshot(del.dataset.snapdel);
         renderSnapshots();
+        return;
+      }
+      var cmp = e.target.closest("[data-snapcmp]");
+      if (cmp) {
+        if (SE.state.ab && SE.state.ab.dimension === SE.AB_ALL) cancelABUI();
+        else if (SE.startABDirections(cmp.dataset.snapcmp)) syncABChrome();
         return;
       }
       var apply = e.target.closest("[data-snap]");
@@ -520,8 +525,6 @@ SE.ui = (function () {
 
   function endABUI() {
     updateSplitUI();
-    updateABMarks();
-    updateABPill();
     refreshAll();
   }
 
@@ -540,6 +543,19 @@ SE.ui = (function () {
     $all(".ab-btn").forEach(function (el) {
       el.classList.toggle("active", !!ab && el.dataset.dim === ab.dimension);
     });
+    var cmpId = ab && ab.dimension === SE.AB_ALL ? ab.snapshotId : null;
+    $all(".snap-cmp").forEach(function (el) {
+      el.classList.toggle("active", el.dataset.snapcmp === cmpId);
+    });
+  }
+
+  /* Resincroniza todo el chrome de comparación tras un cambio de modo A/B */
+  function syncABChrome() {
+    updateSplitUI();
+    updateABMarks();
+    updateABPill();
+    refreshDims();
+    updatePresetUI();
   }
 
   function updateABPill() {
@@ -547,7 +563,8 @@ SE.ui = (function () {
     var ab = SE.state.ab;
     if (!ab) { pill.hidden = true; return; }
     pill.hidden = false;
-    $("#ab-dim-label").textContent = DIM_LABELS[ab.dimension] || ab.dimension;
+    var isAll = ab.dimension === SE.AB_ALL;
+    $("#ab-dim-label").textContent = isAll ? "Dirección" : (DIM_LABELS[ab.dimension] || ab.dimension);
     var hasB = ab.b != null;
     var split = !!(ab.split && hasB);
     var btnA = $("#ab-a"), btnB = $("#ab-b");
@@ -555,9 +572,16 @@ SE.ui = (function () {
     btnB.classList.toggle("showing", !split && ab.showing === "b");
     btnA.disabled = split;
     btnB.disabled = !hasB || split;
+    btnA.title = isAll ? ab.labelA : "Opción A";
+    btnB.title = isAll ? ab.labelB : "Opción B";
+    var shortB = isAll ? (ab.labelB.length > 16 ? ab.labelB.slice(0, 15) + "…" : ab.labelB) : "";
+    $("#ab-commit-a").textContent = isAll ? "Elegir " + ab.labelA : "Elegir A";
+    $("#ab-commit-b").textContent = isAll ? "Elegir " + shortB : "Elegir B";
+    /* En vista dividida los nombres ya están en los botones de elección */
+    var names = isAll && !split ? "A: " + ab.labelA + " · B: " + shortB + " · " : "";
     $("#ab-hint").textContent = split
       ? "Arrastra el divisor · ←/→ lo mueven"
-      : (hasB ? "Espacio alterna · ⏎ elige · Esc cancela" : "Elige la opción B en el panel →");
+      : (hasB ? names + "Espacio alterna · ⏎ elige · Esc cancela" : "Elige la opción B en el panel →");
     $("#ab-split").hidden = !hasB;
     $("#ab-split").classList.toggle("active", split);
     $("#ab-commit").hidden = !hasB || split;
@@ -627,7 +651,9 @@ SE.ui = (function () {
   function abSync() {
     updateABPill();
     var ab = SE.state.ab;
-    if (ab) refreshDim(ab.dimension);
+    if (!ab) return;
+    if (ab.dimension === SE.AB_ALL) { refreshDims(); updatePresetUI(); }
+    else refreshDim(ab.dimension);
   }
 
   function commitABUI() {
@@ -720,8 +746,38 @@ SE.ui = (function () {
     spacing: renderSpacing, radius: renderRadius, shadow: renderShadow, reading: renderReading
   };
 
+  /* Cada dimensión tiene una pantalla donde de verdad se juzga.
+     La pista la hace explícita y lleva allí de un click. */
+  var SCREEN_NAMES = { dashboard: "Panel", landing: "Landing", blog: "Artículo", colores: "Colores" };
+
+  var DIM_PURPOSE = {
+    fontPair: { screen: "blog", text: "La armonía entre título y cuerpo se juzga leyendo; los titulares grandes, en la Landing." },
+    typeScale: { screen: "blog", text: "El Artículo recorre la escala entera, del pie de foto al titular." },
+    palette: { screen: "colores", text: "Colores enfrenta toda la paleta; el Panel prueba los semánticos en uso real." },
+    spacing: { screen: "dashboard", text: "La densidad se siente en la pantalla más apretada." },
+    radius: { screen: "landing", text: "El radio se lee en los botones y tarjetas grandes." },
+    shadow: { screen: "landing", text: "La elevación se aprecia en tarjetas sobre fondo amplio." },
+    reading: { screen: "blog", text: "Interlineado y ancho de línea solo se juzgan con texto largo." }
+  };
+
+  function appendPurpose(dim) {
+    var p = DIM_PURPOSE[dim];
+    var body = $("#body-" + dim);
+    if (!p || !body) return;
+    var el = document.createElement("p");
+    el.className = "p-hint p-purpose";
+    el.innerHTML = p.text + ' <a data-goto="' + p.screen + '">Ver en ' + SCREEN_NAMES[p.screen] + " →</a>";
+    body.appendChild(el);
+  }
+
   function refreshDim(dim) {
-    if (RENDERERS[dim]) RENDERERS[dim]();
+    if (!RENDERERS[dim]) return;
+    RENDERERS[dim]();
+    appendPurpose(dim);
+  }
+
+  function refreshDims() {
+    for (var dim in RENDERERS) refreshDim(dim);
   }
 
   function updateUndoUI() {
@@ -744,7 +800,7 @@ SE.ui = (function () {
     syncFpMode();
     renderPresets();
     renderSnapshots();
-    for (var dim in RENDERERS) RENDERERS[dim]();
+    refreshDims();
     renderA11y();
     updatePresetUI();
     updateModeUI();
@@ -765,6 +821,11 @@ SE.ui = (function () {
   /* ================= INIT ================= */
 
   function init() {
+    /* Los enlaces "Ver en …" de las pistas de propósito */
+    $(".panel-scroll").addEventListener("click", function (e) {
+      var go = e.target.closest("[data-goto]");
+      if (go) switchScreen(go.dataset.goto);
+    });
     bindTopbar();
     bindFontPair();
     bindTypeScale();
@@ -785,6 +846,7 @@ SE.ui = (function () {
     ready: ready,
     refreshAll: refreshAll,
     refreshDim: refreshDim,
+    syncABChrome: syncABChrome,
     updatePresetUI: updatePresetUI,
     updateABPill: updateABPill,
     updateUndoUI: updateUndoUI,

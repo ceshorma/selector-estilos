@@ -89,6 +89,15 @@
   padding: var(--space-1) var(--space-3);
 }
 
+.btn:disabled {
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
 /* ---------- Tarjetas ---------- */
 
 .card {
@@ -158,6 +167,24 @@
 }
 
 select.input { appearance: auto; }
+
+.input-error {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.input-error:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px var(--color-danger-soft);
+}
+
+.field-invalid > span:first-child { color: var(--color-danger); }
+
+.field-error {
+  font-size: var(--text-xs);
+  line-height: var(--leading-body);
+  color: var(--color-danger);
+}
 
 .form {
   display: flex;

@@ -7,19 +7,19 @@ Ordenadas por impacto dentro de cada bloque.
 
 - [x] **Vista dividida A|B** (M) — además del flip instantáneo, partir el viewport en dos
   mitades con A y B renderizados a la vez. Útil cuando el cambio es sutil (espaciado, sombras).
-- [ ] **A/B de presets completos** (M) — comparar dos direcciones enteras, no solo una
-  dimensión. La máquina A/B ya lo soporta casi gratis: el "dim" sería `decisions` completo.
+- [x] **A/B de direcciones completas** (M) — comparar dos direcciones enteras, no solo
+  una dimensión. Implementado con la dimensión especial `__all__`: A es el estado
+  actual y B una dirección guardada.
 - [x] **Deshacer** (S) — `Ctrl+Z` sobre una pila de estados de `decisions`. Hoy un click
   accidental en un preset pisa todo sin vuelta atrás (salvo el confirm de Restablecer).
 - [x] **Snapshots con nombre** (M) — guardar varias direcciones ("propuesta sobria",
   "propuesta cálida") en localStorage, listarlas, recuperarlas y compararlas entre sí.
 - [x] **Importar estado** (S) — cargar un `tokens.json` exportado (o un JSON de snapshot)
   para retomar decisiones en otra máquina. Hoy el flujo es de una sola dirección: exportar.
-- [ ] **Compartir por URL** (S) — codificar el estado completo en el hash (JSON en
-  base64url, sin dependencias) para enviar una dirección como enlace. Brilla combinado
-  con GitHub Pages.
-- [ ] **GitHub Pages** (S) — activar Pages en el repo para que la herramienta viva online;
-  cero código, convierte los deep-links y el compartir-por-URL en colaboración real.
+- [x] **Compartir por URL** (S) — estado completo en el hash (`#s=<base64url>`), con
+  botón "Copiar enlace" en el modal de exportación.
+- [ ] **GitHub Pages** (S) — bloqueado: Pages sobre repo privado exige plan de pago.
+  Se desbloquea haciendo público el repo (o publicando el sitio en otro hosting estático).
 - [ ] **Comparador de snapshots** (S) — tabla diff entre dos direcciones guardadas:
   qué dimensiones difieren y en qué valor. Documenta el porqué de la elección.
 - [ ] **"Sorpréndeme"** (S/M) — dirección coherente al azar (pareja armónica, paleta
@@ -57,8 +57,8 @@ Ordenadas por impacto dentro de cada bloque.
   completas en los tres mocks.
 - [ ] **Mock de email/newsletter** (M) — tipografía y color en un contexto de restricciones
   distintas; muy útil si el proyecto real incluye correos.
-- [ ] **Estados incómodos** (S) — añadir al dashboard un estado vacío, un error de formulario
-  y un banner de aviso: los colores semánticos se juzgan mejor en su peor día.
+- [x] **Estados incómodos** (S) — el Panel ya trae banner de aviso, error de formulario
+  con botón deshabilitado y estado vacío.
 
 ## Export
 

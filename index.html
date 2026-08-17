@@ -53,10 +53,10 @@
       <div class="tb-left">
         <span class="tb-brand">Selector<em>de</em>Estilos</span>
         <nav class="tb-tabs" id="screen-tabs" aria-label="Pantalla mock">
-          <button type="button" data-screen="dashboard" class="active">Panel <kbd>1</kbd></button>
-          <button type="button" data-screen="landing">Landing <kbd>2</kbd></button>
-          <button type="button" data-screen="blog">Artículo <kbd>3</kbd></button>
-          <button type="button" data-screen="colores">Colores <kbd>4</kbd></button>
+          <button type="button" data-screen="dashboard" class="active" title="Densidad, colores semánticos, tamaños pequeños y estados (alerta, error, vacío)">Panel <kbd>1</kbd></button>
+          <button type="button" data-screen="landing" title="Tamaños display, jerarquía, botones grandes, radios y sombras">Landing <kbd>2</kbd></button>
+          <button type="button" data-screen="blog" title="Escala tipográfica completa, armonía título/cuerpo, interlineado y medida">Artículo <kbd>3</kbd></button>
+          <button type="button" data-screen="colores" title="Convivencia de la paleta: formas, proporciones y pares de uso">Colores <kbd>4</kbd></button>
         </nav>
       </div>
       <div class="tb-right">
@@ -101,6 +101,15 @@
             </aside>
 
             <div class="db-main">
+              <div class="db-banner">
+                <svg class="db-banner-icon" aria-hidden="true" viewBox="0 0 20 20"><path d="M10 2.5 18 17H2Z"/><path d="M10 8v3.5"/><circle cx="10" cy="14" r="0.6" fill="currentColor" stroke="none"/></svg>
+                <div class="db-banner-text">
+                  <strong>Dos invernaderos llevan más de 40 min fuera de rango</strong>
+                  <span>Invernadero 3 (pimiento rojo) e Invernadero 7 (tomate pera). El riego automático está en pausa hasta que lo revises.</span>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm">Ver detalle</button>
+              </div>
+
               <header class="db-header">
                 <div>
                   <h1>Panel general</h1>
@@ -169,12 +178,16 @@
                       </label>
                       <div class="field-row">
                         <label class="field"><span>Hora de inicio</span><input class="input" type="time" value="22:30"></label>
-                        <label class="field"><span>Duración</span><input class="input" type="text" value="25 min"></label>
+                        <label class="field field-invalid">
+                          <span>Duración</span>
+                          <input class="input input-error" type="text" value="2 min" aria-invalid="true" aria-describedby="err-dur">
+                          <span class="field-error" id="err-dur">Mínimo 5 minutos: por debajo, el agua no llega a la zona de raíces.</span>
+                        </label>
                       </div>
                       <label class="check"><input type="checkbox" checked><span>Pausar si la humedad supera el 70 %</span></label>
                       <div class="form-actions">
                         <button type="button" class="btn btn-ghost">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Guardar programación</button>
+                        <button type="submit" class="btn btn-primary" disabled>Guardar programación</button>
                       </div>
                     </form>
                   </div>
@@ -182,6 +195,7 @@
                   <div class="card db-chart-card">
                     <div class="card-head"><h2>Riego semanal <span class="unit">(litros)</span></h2></div>
                     <div class="chart">
+                      <div class="chart-avg" style="--avg:65%" aria-hidden="true"><i data-label="media"></i><span>&nbsp;</span></div>
                       <div class="chart-bar" style="--h:58%"><i></i><span>L</span></div>
                       <div class="chart-bar" style="--h:72%"><i></i><span>M</span></div>
                       <div class="chart-bar" style="--h:64%"><i></i><span>X</span></div>
@@ -190,6 +204,17 @@
                       <div class="chart-bar" style="--h:47%"><i></i><span>S</span></div>
                       <div class="chart-bar" style="--h:39%"><i></i><span>D</span></div>
                     </div>
+                  </div>
+
+                  <div class="card db-empty">
+                    <svg class="db-empty-art" aria-hidden="true" viewBox="0 0 48 32">
+                      <rect x="6.5" y="8.5" width="35" height="20" rx="3"/>
+                      <path d="M6.5 14.5h35"/><path d="M13 20h9M13 24h16"/>
+                      <circle cx="10.5" cy="11.5" r="1.1"/>
+                    </svg>
+                    <strong>Sin notas del turno de noche</strong>
+                    <p>Cuando alguien deje una nota, aparecerá aquí para todo el equipo.</p>
+                    <button type="button" class="btn btn-ghost btn-sm">Escribir la primera</button>
                   </div>
                 </div>
               </div>
@@ -212,7 +237,7 @@
           </nav>
 
           <header class="ld-hero">
-            <h1>Cultiva con datos,<br>no con corazonadas.</h1>
+            <h1>Cultiva con <span class="ld-mark">datos</span>,<br>no con corazonadas.</h1>
             <p class="ld-sub">Terrena conecta tus invernaderos, aprende de cada cultivo y te dice exactamente cuándo regar, ventilar o actuar. Menos agua, más cosecha.</p>
             <div class="ld-hero-ctas">
               <button type="button" class="btn btn-primary btn-lg">Empieza gratis</button>
@@ -313,7 +338,7 @@
 
             <div class="bg-body">
               <p>Durante décadas, regar fue un acto de fe. Se abría la válvula a la misma hora, durante los mismos minutos, porque «siempre se ha hecho así». Y funcionaba, más o menos, porque el agua era barata y el margen de error, generoso. Ninguna de las dos cosas sigue siendo cierta.</p>
-              <p>El precio del agua para uso agrícola ha subido de forma sostenida en los últimos cinco años, y los planes de sequía imponen recortes justo en los meses de mayor demanda. La buena noticia: en la mayoría de los invernaderos que auditamos, entre el 25 % y el 35 % del agua aplicada <em>no la usa la planta</em>. Se filtra por debajo de la zona de raíces o se evapora antes de llegar a ellas. Es margen puro.</p>
+              <p>El precio del agua para uso agrícola ha subido de forma sostenida en los últimos cinco años, y los <a href="#">planes de sequía</a> imponen recortes justo en los meses de mayor demanda. La buena noticia: en la mayoría de los invernaderos que auditamos, entre el 25 % y el 35 % del agua aplicada <em>no la usa la planta</em>. Se filtra por debajo de la zona de raíces o se evapora antes de llegar a ellas. Es margen puro.</p>
 
               <h2>El problema del riego a ojo</h2>
               <p>El riego por calendario tiene un defecto estructural: aplica la misma receta a días distintos. Un martes nublado de 19 °C y un martes despejado de 31 °C reciben los mismos litros. En el primero, la mitad sobra; en el segundo, quizá falta. El error no se ve, porque la planta tarda días en mostrar estrés, y para entonces nadie recuerda qué riego lo causó.</p>
@@ -321,6 +346,11 @@
                 <p>El dato más barato de toda la agricultura de precisión es una sonda de humedad de suelo. Cuesta menos que una temporada de agua desperdiciada.</p>
               </blockquote>
               <p>La alternativa no es regar menos: es regar <em>cuando toca</em>. Y para saber cuándo toca, hay que medir dónde están las raíces, no mirar el cielo.</p>
+
+              <aside class="bg-stat">
+                <strong>27 %</strong>
+                <span>menos agua en la primera temporada de <a href="#">Finca Roble</a>, con el mismo calibre de fruto y un 40 % menos de tratamientos fungicidas.</span>
+              </aside>
 
               <h2>Medir antes de mover una válvula</h2>
               <p>Una estrategia razonable para empezar, sin cambiar ninguna instalación, tiene tres pasos:</p>
@@ -336,6 +366,9 @@
 
               <h2>La regla de oro</h2>
               <p>Si solo te llevas una idea de este artículo, que sea esta: <strong>ningún riego debería ejecutarse sin un dato que lo justifique</strong>. No hace falta automatizarlo todo el primer día; hace falta dejar de decidir a ciegas. La automatización llega sola cuando los datos te dan la confianza para soltar la válvula.</p>
+
+              <p class="bg-note">Metodología: los datos proceden de 34 invernaderos auditados entre marzo de 2025 y junio de 2026, con sondas calibradas cada 60 días. Los porcentajes comparan temporadas equivalentes en superficie y cultivo.</p>
+              <p class="bg-footnote">Publicado el 14 de agosto de 2026 · Actualizado el 16 de agosto de 2026 · <a href="#">Cómo trabajamos los datos</a></p>
             </div>
 
             <aside class="bg-author card">
@@ -401,6 +434,7 @@
                   <div class="cl-chip" style="background:var(--color-primary);color:var(--color-on-primary)">Botón primario</div>
                   <div class="cl-chip" style="background:var(--color-bg);color:var(--color-primary);border:1px solid var(--color-border)">Enlace sobre fondo</div>
                   <div class="cl-chip" style="background:var(--color-primary-soft);color:var(--color-primary)">Primario suave</div>
+                  <div class="cl-chip" style="background:var(--color-bg);color:var(--color-accent);border:1px solid var(--color-border)">Acento sobre fondo</div>
                   <div class="cl-chip" style="background:var(--color-success-soft);color:var(--color-success)">Éxito</div>
                   <div class="cl-chip" style="background:var(--color-warning-soft);color:var(--color-warning)">Alerta</div>
                   <div class="cl-chip" style="background:var(--color-danger-soft);color:var(--color-danger)">Peligro</div>
@@ -545,7 +579,18 @@
 <div id="export-modal" class="modal-backdrop" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="export-title">
     <button type="button" class="modal-close" id="export-close" aria-label="Cerrar"><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
-    <h2 id="export-title">Exportar documento de diseño</h2>
+    <h2 id="export-title">Exportar y compartir</h2>
+
+    <section class="share-block">
+      <h3>Enlace a esta dirección</h3>
+      <div class="share-row">
+        <input type="text" id="share-url" readonly aria-label="Enlace con las decisiones actuales">
+        <button type="button" id="share-copy">Copiar</button>
+      </div>
+      <p class="share-note" id="share-note"></p>
+    </section>
+
+    <h3 class="modal-h3">Archivos</h3>
     <p class="modal-sub">Tres archivos generados con tus decisiones actuales. El documento HTML es autónomo e incluye los tokens embebidos.</p>
     <div class="export-rows">
       <button type="button" class="export-row" data-export="doc">

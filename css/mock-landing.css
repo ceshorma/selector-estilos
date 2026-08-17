@@ -78,6 +78,15 @@
   font-size: var(--text-4xl);
 }
 
+/* Subrayado de acento: el único momento en que el color secundario
+   aparece a tamaño display, contra el fondo. */
+.ld-mark {
+  background-image: linear-gradient(var(--color-accent), var(--color-accent));
+  background-size: 100% 0.09em;
+  background-position: 0 92%;
+  background-repeat: no-repeat;
+}
+
 .ld-sub {
   font-size: var(--text-lg);
   line-height: var(--leading-body);

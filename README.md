@@ -25,9 +25,18 @@ Los 5 **presets** ("direcciones") son puntos de partida completos; cualquier aju
 posterior los convierte en "personalizado". Todo es reversible con **Ctrl+Z** /
 **Ctrl+Mayús+Z** (o los botones ↶↷ del panel).
 
-Las cuatro pantallas mock: **Panel** (web app densa), **Landing** (marketing),
-**Artículo** (lectura larga) y **Colores** (la paleta conviviendo en formas puras,
-proporciones 60·30·10 y tiras estilo Coolors).
+## Cada pantalla decide algo
+
+Las cuatro mock no son variaciones del mismo contenido: cada una es *el* lugar donde
+una decisión concreta se puede juzgar. El panel lo dice en cada dimensión ("se juzga
+mejor en…") y lleva allí de un click.
+
+| Pantalla | Sirve para decidir |
+|---|---|
+| **Panel** | Densidad y espaciado, colores semánticos en uso, tamaños pequeños, y los estados difíciles: banner de alerta, error de formulario, botón deshabilitado, estado vacío |
+| **Landing** | Tamaños display, jerarquía de titulares, botones grandes, radios, sombras y el color de acento a gran escala |
+| **Artículo** | La escala tipográfica **completa** (los 8 peldaños, del pie de foto al titular), la armonía título/cuerpo, el interlineado y el ancho de línea |
+| **Colores** | La convivencia de toda la paleta: formas puras, proporción 60·30·10, pares de uso y tiras con hex |
 
 ## Comparación A/B
 
@@ -39,12 +48,24 @@ Con ambos candidatos elegidos, **Dividir** parte la pantalla en una cortina a es
 real: A a la izquierda, B a la derecha, con divisor arrastrable (o ←/→). "Elegir A" /
 "Elegir B" consolidan.
 
-## Direcciones guardadas
+### Comparar direcciones enteras
+
+El botón **A/B** de una dirección guardada compara las 7 decisiones a la vez: A es tu
+estado actual, B la dirección guardada. Mismo flip instantáneo y misma cortina, pero
+cambiando el diseño completo. Si empiezas a editar una dimensión durante la
+comparación, se consolida la que estabas viendo (y sigue siendo deshacible).
+
+## Direcciones guardadas y compartir
 
 **Guardar actual…** archiva la dirección completa con nombre para volver a ella o
-comparar propuestas. **Exportar estado** descarga un `estado.json` portable;
-**Importar…** acepta tanto un `estado.json` como un `tokens.json` exportado
-(reconstruye las decisiones a partir de los tokens).
+compararla. **Exportar estado** descarga un `estado.json` portable; **Importar…**
+acepta tanto un `estado.json` como un `tokens.json` exportado (reconstruye las
+decisiones a partir de los tokens).
+
+**Exportar → Copiar enlace** genera una URL con todas las decisiones codificadas en el
+hash: quien la abra verá exactamente esa dirección, y su trabajo previo queda a un
+Ctrl+Z de distancia. Publicada la herramienta en la web, es la forma más rápida de
+enseñar una propuesta.
 
 ## Accesibilidad
 
@@ -58,7 +79,8 @@ comparar propuestas. **Exportar estado** descarga un `estado.json` portable;
 `1 · 2 · 3 · 4` pantallas · `D` claro/oscuro · `P` ocultar panel · `Ctrl+Z` deshacer ·
 en A/B: `Espacio` / `←` `→` / `Enter` / `Esc`
 
-También admite deep-links: `index.html#landing,dark,calido` (pantalla, modo, preset).
+También admite deep-links: `index.html#landing,dark,calido` (pantalla, modo, preset) y
+`#s=<código>` con una dirección completa compartida.
 
 ## Exportar
 

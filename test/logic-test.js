@@ -196,6 +196,76 @@ check("snapshot borrado", SE.loadSnapshots().length === 1);
 SE.undo();
 check("undo tras snapshot", SE.state.decisions.fontPair.id === "space-inter");
 
+/* ---------- 8b. A/B de direcciones completas ---------- */
+localStorage.removeItem(SE.STORAGE_KEY);
+localStorage.removeItem(SE.SNAP_KEY);
+SE.loadState();
+SE.applyPreset("calido");
+SE.saveSnapshot("Cálida");
+SE.applyPreset("corporativo");
+var snapId = SE.loadSnapshots()[0].id;
+check("startABDirections ok", SE.startABDirections(snapId) === true);
+var abAll = SE.state.ab;
+check("dirección: dimensión especial", abAll.dimension === SE.AB_ALL);
+check("dirección: A es el estado actual", abAll.a.fontPair.id === "plex-plex");
+check("dirección: B es la guardada", abAll.b.fontPair.id === "fraunces-nunito");
+check("dirección: etiquetas", abAll.labelA === "Actual" && abAll.labelB === "Cálida");
+check("dirección: B disponible desde el inicio", abAll.b != null);
+check("dirección: efectivo = A", SE.effectiveDecisions().spacing === "compacta");
+SE.toggleAB();
+check("dirección: flip a B cambia TODO", SE.effectiveDecisions().spacing === "amplia" &&
+  SE.effectiveDecisions().radius === "redondeado" && SE.effectiveDecisions().shadow === "difusa");
+check("dirección: decisiones reales intactas", SE.state.decisions.spacing === "compacta");
+/* withCandidate en modo dirección devuelve el juego completo */
+var wc = SE.withCandidate(SE.state.decisions, SE.state.ab, "b");
+check("withCandidate dirección", wc.fontPair.id === "fraunces-nunito" && wc.radius === "redondeado");
+SE.commitAB();
+check("dirección: commit aplica todo B", SE.state.decisions.fontPair.id === "fraunces-nunito" && SE.state.decisions.spacing === "amplia");
+check("dirección: commit restaura presetId", SE.state.presetId === "calido");
+SE.undo();
+check("dirección: undo vuelve a la anterior", SE.state.decisions.fontPair.id === "plex-plex" && SE.state.presetId === "corporativo");
+/* Cancelar deja el estado intacto */
+SE.startABDirections(snapId);
+SE.toggleAB();
+SE.cancelAB();
+check("dirección: cancel no toca decisiones", SE.state.decisions.fontPair.id === "plex-plex");
+/* Editar una dimensión durante la comparación consolida lo que se ve */
+SE.startABDirections(snapId);
+SE.toggleAB();
+SE.setDecision("radius", "recto");
+check("dirección: editar consolida B", SE.state.decisions.fontPair.id === "fraunces-nunito");
+check("dirección: editar aplica el cambio", SE.state.decisions.radius === "recto");
+check("dirección: editar cierra la comparación", SE.state.ab === null);
+/* Snapshot inexistente */
+check("dirección: id inválido", SE.startABDirections("nope") === false);
+
+/* ---------- 8c. Estado en URL ---------- */
+localStorage.removeItem(SE.STORAGE_KEY);
+SE.loadState();
+SE.applyPreset("audaz");
+SE.setDecision("reading", { lineHeight: 1.75, measure: 58 });
+var token = SE.encodeState();
+check("encode produce base64url", /^[A-Za-z0-9_-]+$/.test(token), token.slice(0, 24));
+var decoded = SE.decodeState(token);
+check("decode devuelve v1", decoded && decoded.v === 1);
+check("decode conserva preset", decoded.p === "custom");
+SE.applyPreset("tech-minimal");
+check("applyEncodedState ok", SE.applyEncodedState(token) === true);
+check("URL roundtrip fuentes", SE.state.decisions.fontPair.id === "space-inter");
+check("URL roundtrip lectura", SE.state.decisions.reading.lineHeight === 1.75 && SE.state.decisions.reading.measure === 58);
+SE.undo();
+check("URL: undo recupera lo anterior", SE.state.decisions.fontPair.id === "inter-inter");
+/* Acentos y paleta generada sobreviven al viaje */
+SE.setDecision("palette", { type: "generated", rule: "analoga", primaryHex: "#c2571b", colors: SE.color.generate("#c2571b", "analoga") });
+var tok2 = SE.encodeState();
+SE.applyPreset("tech-minimal");
+SE.applyEncodedState(tok2);
+check("URL roundtrip paleta generada", SE.state.decisions.palette.type === "generated" && SE.state.decisions.palette.primaryHex === "#c2571b");
+/* Tokens corruptos no rompen */
+check("decode basura", SE.decodeState("no-es-base64!!") === null);
+check("decode vacío", SE.decodeState("") === null);
+check("applyEncodedState basura", SE.applyEncodedState("###") === false);
+
 /* ---------- 9. Exportadores ---------- */
 localStorage.removeItem(SE.STORAGE_KEY);
 SE.loadState();
