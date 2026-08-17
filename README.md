@@ -3,11 +3,13 @@
 Herramienta local para tomar decisiones de diseño viéndolas aplicadas en vivo sobre
 cuatro páginas mock realistas, y exportarlas como documento de diseño + tokens de código.
 
+**En línea: https://ceshorma.github.io/selector-estilos/**
+
 ## Cómo usar
 
-Abre `index.html` directamente en el navegador (doble click). No hay build ni dependencias;
-lo único externo son las fuentes de Google Fonts (sin conexión, la app funciona con fuentes
-de sistema de respaldo).
+Ábrela en la web con el enlace de arriba, o `index.html` directamente en el navegador
+(doble click). No hay build ni dependencias; lo único externo son las fuentes de Google
+Fonts (sin conexión, la app funciona con fuentes de sistema de respaldo).
 
 ## Qué se decide
 

@@ -18,8 +18,8 @@ Ordenadas por impacto dentro de cada bloque.
   para retomar decisiones en otra máquina. Hoy el flujo es de una sola dirección: exportar.
 - [x] **Compartir por URL** (S) — estado completo en el hash (`#s=<base64url>`), con
   botón "Copiar enlace" en el modal de exportación.
-- [ ] **GitHub Pages** (S) — bloqueado: Pages sobre repo privado exige plan de pago.
-  Se desbloquea haciendo público el repo (o publicando el sitio en otro hosting estático).
+- [x] **GitHub Pages** (S) — publicada en https://ceshorma.github.io/selector-estilos/
+  (el repo pasó a público: Pages sobre privado exige plan de pago).
 - [ ] **Comparador de snapshots** (S) — tabla diff entre dos direcciones guardadas:
   qué dimensiones difieren y en qué valor. Documenta el porqué de la elección.
 - [ ] **"Sorpréndeme"** (S/M) — dirección coherente al azar (pareja armónica, paleta
