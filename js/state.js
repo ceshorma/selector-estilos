@@ -1,0 +1,459 @@
+/* ============================================================
+   state.js — estado central, persistencia y applyTokens(),
+   el punto único por el que pasa toda mutación de diseño.
+   ============================================================ */
+
+window.SE = window.SE || {};
+
+SE.STORAGE_KEY = "selectorEstilos.v1";
+
+SE.clone = function (v) { return JSON.parse(JSON.stringify(v)); };
+
+/* ---------- estado ---------- */
+
+SE.defaultState = function () {
+  var preset = SE.findPreset(SE.data.defaultPresetId);
+  return {
+    version: 1,
+    screen: "dashboard",
+    mode: "light",
+    presetId: preset.id,
+    decisions: SE.clone(preset.decisions),
+    ab: null,      // transitorio: comparación A/B en curso
+    vision: "normal" // transitorio: simulador de visión
+  };
+};
+
+SE.findPreset = function (id) {
+  for (var i = 0; i < SE.data.presets.length; i++)
+    if (SE.data.presets[i].id === id) return SE.data.presets[i];
+  return SE.data.presets[0];
+};
+
+SE.findIn = function (list, id) {
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+  return null;
+};
+
+/* ---------- persistencia ---------- */
+
+SE.saveState = function () {
+  var s = SE.state;
+  var persist = {
+    version: 1, screen: s.screen, mode: s.mode,
+    presetId: s.presetId, decisions: s.decisions
+  };
+  try { localStorage.setItem(SE.STORAGE_KEY, JSON.stringify(persist)); } catch (e) { /* sin almacenamiento */ }
+};
+
+SE.loadState = function () {
+  var state = SE.defaultState();
+  var raw = null;
+  try { raw = localStorage.getItem(SE.STORAGE_KEY); } catch (e) { /* sin almacenamiento */ }
+  if (raw) {
+    try {
+      var saved = JSON.parse(raw);
+      if (saved && saved.version === 1) {
+        if (["dashboard", "landing", "blog", "colores"].indexOf(saved.screen) >= 0) state.screen = saved.screen;
+        if (saved.mode === "light" || saved.mode === "dark") state.mode = saved.mode;
+        if (typeof saved.presetId === "string") state.presetId = saved.presetId;
+        if (saved.decisions) SE.mergeValidDecisions(state.decisions, saved.decisions);
+      }
+    } catch (e) { /* JSON corrupto: se ignora y quedan los defaults */ }
+  }
+  SE.state = state;
+};
+
+function clampNum(v, min, max, fallback) {
+  var n = Number(v);
+  if (!isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
+}
+
+/* Copia sobre `base` solo los valores de `saved` que siguen siendo
+   válidos contra los catálogos actuales. */
+SE.mergeValidDecisions = function (base, saved) {
+  var fp = saved.fontPair;
+  if (fp && fp.type === "pair" && SE.findIn(SE.data.pairs, fp.id)) base.fontPair = { type: "pair", id: fp.id };
+  else if (fp && fp.type === "custom" && SE.data.fonts[fp.heading] && SE.data.fonts[fp.body]) base.fontPair = { type: "custom", heading: fp.heading, body: fp.body };
+
+  var ts = saved.typeScale;
+  if (ts) base.typeScale = { ratio: clampNum(ts.ratio, 1.05, 1.6, base.typeScale.ratio), base: Math.round(clampNum(ts.base, 13, 20, base.typeScale.base)) };
+
+  var pl = saved.palette;
+  if (pl && pl.type === "curated" && SE.findIn(SE.data.palettes, pl.id)) base.palette = { type: "curated", id: pl.id };
+  else if (pl && pl.type === "generated" && pl.colors && pl.colors.light && pl.colors.dark &&
+           pl.colors.light.bg && pl.colors.light.text && pl.colors.light.primary &&
+           pl.colors.dark.bg && pl.colors.dark.text && pl.colors.dark.primary) {
+    base.palette = { type: "generated", rule: String(pl.rule || "complementaria"), primaryHex: String(pl.primaryHex || pl.colors.light.primary), colors: SE.normalizePaletteColors(pl.colors) };
+  }
+  else if (pl && pl.type === "custom" && pl.colors && pl.colors.light && pl.colors.dark) {
+    base.palette = { type: "custom", colors: SE.normalizePaletteColors(pl.colors) };
+  }
+
+  if (SE.findIn(SE.data.spacings, saved.spacing)) base.spacing = saved.spacing;
+  if (SE.findIn(SE.data.radii, saved.radius)) base.radius = saved.radius;
+  if (SE.findIn(SE.data.shadows, saved.shadow)) base.shadow = saved.shadow;
+
+  var rd = saved.reading;
+  if (rd) base.reading = { lineHeight: clampNum(rd.lineHeight, 1.3, 1.9, base.reading.lineHeight), measure: Math.round(clampNum(rd.measure, 50, 80, base.reading.measure)) };
+};
+
+/* ---------- resolución de decisiones ---------- */
+
+SE.resolvePairIds = function (decision) {
+  if (decision.type === "custom") return { heading: decision.heading, body: decision.body };
+  var pair = SE.findIn(SE.data.pairs, decision.id) || SE.data.pairs[0];
+  return { heading: pair.heading, body: pair.body };
+};
+
+SE.resolvePair = function (decision) {
+  var ids = SE.resolvePairIds(decision);
+  return { heading: SE.data.fonts[ids.heading], body: SE.data.fonts[ids.body] };
+};
+
+/* Garantiza que un juego de colores importado tenga los 17 tokens por
+   modo, rellenando ausencias o valores inválidos con la paleta Grafito. */
+SE.normalizePaletteColors = function (colors) {
+  var ref = SE.findIn(SE.data.palettes, "grafito") || SE.data.palettes[0];
+  var out = { light: {}, dark: {} };
+  ["light", "dark"].forEach(function (mode) {
+    var src = (colors && colors[mode]) || {};
+    for (var k in ref[mode]) {
+      out[mode][k] = /^#[0-9a-fA-F]{6}$/.test(String(src[k])) ? String(src[k]).toLowerCase() : ref[mode][k];
+    }
+  });
+  return out;
+};
+
+SE.resolvePalette = function (decision) {
+  if (decision.type === "custom") {
+    return {
+      name: "Personalizada",
+      rationale: "Paleta ajustada a mano token a token, validada en vivo contra la tabla de contraste.",
+      light: decision.colors.light, dark: decision.colors.dark
+    };
+  }
+  if (decision.type === "generated") {
+    var rule = SE.findIn(SE.color.RULES, decision.rule);
+    return {
+      name: "Generada · " + (rule ? rule.name.toLowerCase() : decision.rule) + " de " + decision.primaryHex,
+      rationale: (rule ? rule.rationale : "") + " Neutros derivados del matiz del primario y ajustados a contraste AA.",
+      light: decision.colors.light, dark: decision.colors.dark
+    };
+  }
+  var pal = SE.findIn(SE.data.palettes, decision.id) || SE.data.palettes[0];
+  return { name: pal.name, rationale: pal.rationale, light: pal.light, dark: pal.dark };
+};
+
+/* Escala modular calculada en JS: valores px redondeados y con topes
+   para que los extremos no rompan el layout. */
+SE.computeScale = function (ratio, base) {
+  var steps = { xs: -2, sm: -1, base: 0, lg: 1, xl: 2, "2xl": 3, "3xl": 4, "4xl": 5 };
+  var out = {};
+  for (var k in steps) out[k] = Math.round(base * Math.pow(ratio, steps[k]));
+  out.xs = Math.max(11, out.xs);
+  out.sm = Math.max(12, out.sm);
+  out["4xl"] = Math.min(76, out["4xl"]);
+  return out;
+};
+
+/* Decisiones efectivas: las consolidadas, con la dimensión en
+   comparación A/B sobreescrita por el candidato visible. */
+SE.effectiveDecisions = function () {
+  var d = SE.clone(SE.state.decisions);
+  var ab = SE.state.ab;
+  if (ab && ab[ab.showing] != null) d[ab.dimension] = SE.clone(ab[ab.showing]);
+  return d;
+};
+
+function camelToToken(k) {
+  return k.replace(/[A-Z]/g, function (c) { return "-" + c.toLowerCase(); });
+}
+
+/* ---------- aplicación de tokens (punto único) ---------- */
+
+/* Escribe todos los tokens de un juego de decisiones sobre un elemento.
+   Se usa sobre el viewport principal y, en vista dividida, también
+   sobre el overlay con el candidato B. */
+SE.writeTokens = function (el, d, mode) {
+  var set = function (name, value) { el.style.setProperty(name, value); };
+
+  /* Tipografía */
+  SE.fonts.ensureDecision(d.fontPair);
+  var pair = SE.resolvePair(d.fontPair);
+  set("--font-heading", '"' + pair.heading.family + '", ' + pair.heading.fallback);
+  set("--font-body", '"' + pair.body.family + '", ' + pair.body.fallback);
+  set("--weight-heading", String(pair.heading.headingWeight));
+  set("--tracking-heading", pair.heading.tracking);
+  set("--leading-tight", pair.heading.cat === "display" ? "1.12" : (pair.heading.cat === "serif" ? "1.18" : "1.2"));
+
+  /* Escala */
+  var scale = SE.computeScale(d.typeScale.ratio, d.typeScale.base);
+  for (var s in scale) set("--text-" + s, scale[s] + "px");
+
+  /* Color */
+  var palette = SE.resolvePalette(d.palette);
+  var colors = palette[mode];
+  for (var c in colors) set("--color-" + camelToToken(c), colors[c]);
+
+  /* Espaciado */
+  var spacing = SE.findIn(SE.data.spacings, d.spacing);
+  var mult = [0.5, 1, 1.5, 2, 3, 4, 6, 8];
+  for (var i = 0; i < 8; i++) set("--space-" + (i + 1), Math.round(spacing.unit * mult[i]) + "px");
+
+  /* Radio */
+  var radius = SE.findIn(SE.data.radii, d.radius);
+  set("--radius-sm", radius.values[0] + "px");
+  set("--radius-md", radius.values[1] + "px");
+  set("--radius-lg", radius.values[2] + "px");
+
+  /* Sombras */
+  var shadow = SE.findIn(SE.data.shadows, d.shadow);
+  var sh = shadow[mode];
+  set("--shadow-sm", sh.sm);
+  set("--shadow-md", sh.md);
+  set("--shadow-lg", sh.lg);
+
+  /* Lectura */
+  set("--leading-body", String(d.reading.lineHeight));
+  set("--measure", d.reading.measure + "ch");
+};
+
+SE.applyTokens = function () {
+  var vp = document.getElementById("mock-viewport");
+  if (!vp) return;
+  var ab = SE.state.ab;
+  var split = !!(ab && ab.split && ab.b != null);
+
+  var d;
+  if (split) {
+    /* En vista dividida el viewport base muestra siempre A… */
+    d = SE.clone(SE.state.decisions);
+    d[ab.dimension] = SE.clone(ab.a);
+  } else {
+    d = SE.effectiveDecisions();
+  }
+  SE.writeTokens(vp, d, SE.state.mode);
+  vp.dataset.mode = SE.state.mode;
+
+  /* …y el overlay recortado muestra siempre B. */
+  var overlay = document.getElementById("split-overlay");
+  if (split && overlay) {
+    var db = SE.clone(SE.state.decisions);
+    db[ab.dimension] = SE.clone(ab.b);
+    SE.writeTokens(overlay, db, SE.state.mode);
+  }
+
+  if (SE.ui && SE.ui.ready) SE.ui.afterApply();
+};
+
+/* ---------- historial (deshacer / rehacer) ---------- */
+
+SE.history = [];
+SE.future = [];
+SE._lastPush = { tag: null, t: 0 };
+
+/* Guarda el estado previo a una mutación. `tag` coalesce ráfagas de la
+   misma dimensión (arrastre de un slider o de un picker) en una sola
+   entrada; las acciones puntuales pasan tag null y siempre apilan. */
+SE.pushHistory = function (tag) {
+  var now = Date.now();
+  if (tag && SE._lastPush.tag === tag && now - SE._lastPush.t < 1200) {
+    SE._lastPush.t = now;
+    return;
+  }
+  SE.history.push(SE.clone({ decisions: SE.state.decisions, presetId: SE.state.presetId }));
+  if (SE.history.length > 60) SE.history.shift();
+  SE.future.length = 0;
+  SE._lastPush = { tag: tag || null, t: now };
+};
+
+function restoreHistoryEntry(entry) {
+  SE.state.decisions = SE.clone(entry.decisions);
+  SE.state.presetId = entry.presetId;
+  SE._lastPush = { tag: null, t: 0 };
+  SE.saveState();
+  SE.applyTokens();
+  if (SE.ui && SE.ui.ready) SE.ui.refreshAll();
+}
+
+SE.undo = function () {
+  if (!SE.history.length) return false;
+  if (SE.state.ab) SE.cancelAB();
+  SE.future.push(SE.clone({ decisions: SE.state.decisions, presetId: SE.state.presetId }));
+  restoreHistoryEntry(SE.history.pop());
+  return true;
+};
+
+SE.redo = function () {
+  if (!SE.future.length) return false;
+  if (SE.state.ab) SE.cancelAB();
+  SE.history.push(SE.clone({ decisions: SE.state.decisions, presetId: SE.state.presetId }));
+  restoreHistoryEntry(SE.future.pop());
+  return true;
+};
+
+/* ---------- mutaciones ---------- */
+
+SE.setDecision = function (dim, value, opts) {
+  var ab = SE.state.ab;
+  if (ab && ab.dimension === dim) {
+    /* En A/B: el valor elegido se convierte en candidato B */
+    ab.b = SE.clone(value);
+    ab.showing = "b";
+    SE.applyTokens();
+    if (SE.ui && SE.ui.ready) {
+      SE.ui.updateABPill();
+      if (!opts || !opts.silent) SE.ui.refreshDim(dim);
+    }
+    return;
+  }
+  /* Solo los cambios de arrastre (silent) se coalescen en el historial */
+  SE.pushHistory(opts && opts.silent ? dim : null);
+  SE.state.decisions[dim] = SE.clone(value);
+  SE.state.presetId = "custom";
+  SE.saveState();
+  SE.applyTokens();
+  if (SE.ui && SE.ui.ready) {
+    if (!opts || !opts.silent) SE.ui.refreshDim(dim);
+    SE.ui.updatePresetUI();
+    SE.ui.updateUndoUI();
+  }
+};
+
+SE.applyPreset = function (id) {
+  var preset = SE.findPreset(id);
+  if (SE.state.ab) SE.cancelAB();
+  SE.pushHistory();
+  SE.state.decisions = SE.clone(preset.decisions);
+  SE.state.presetId = preset.id;
+  SE.saveState();
+  SE.applyTokens();
+  if (SE.ui && SE.ui.ready) SE.ui.refreshAll();
+};
+
+SE.setMode = function (mode) {
+  SE.state.mode = mode;
+  SE.saveState();
+  SE.applyTokens();
+};
+
+SE.setScreen = function (screen) {
+  SE.state.screen = screen;
+  SE.saveState();
+};
+
+SE.reset = function () {
+  if (SE.state.ab) SE.cancelAB();
+  SE.pushHistory();
+  try { localStorage.removeItem(SE.STORAGE_KEY); } catch (e) { /* sin almacenamiento */ }
+  SE.state = SE.defaultState();
+  SE.applyTokens();
+  if (SE.ui && SE.ui.ready) SE.ui.refreshAll();
+};
+
+/* ---------- comparación A/B ---------- */
+
+SE.startAB = function (dim) {
+  if (SE.state.ab) SE.cancelAB();
+  SE.state.ab = { dimension: dim, a: SE.clone(SE.state.decisions[dim]), b: null, showing: "a", split: false };
+  SE.applyTokens();
+};
+
+SE.toggleSplit = function () {
+  var ab = SE.state.ab;
+  if (!ab || ab.b == null) return;
+  ab.split = !ab.split;
+  SE.applyTokens();
+};
+
+SE.showAB = function (which) {
+  var ab = SE.state.ab;
+  if (!ab) return;
+  if (which === "b" && ab.b == null) return;
+  ab.showing = which;
+  SE.applyTokens();
+};
+
+SE.toggleAB = function () {
+  var ab = SE.state.ab;
+  if (!ab || ab.b == null) return;
+  SE.showAB(ab.showing === "a" ? "b" : "a");
+};
+
+SE.commitAB = function () {
+  var ab = SE.state.ab;
+  if (!ab) return;
+  var chosen = ab[ab.showing] != null ? ab[ab.showing] : ab.a;
+  SE.state.ab = null;
+  SE.pushHistory();
+  SE.state.decisions[ab.dimension] = SE.clone(chosen);
+  SE.state.presetId = "custom";
+  SE.saveState();
+  SE.applyTokens();
+};
+
+/* Consolida explícitamente A o B (usado por la vista dividida) */
+SE.commitABChoice = function (which) {
+  if (!SE.state.ab) return;
+  SE.state.ab.showing = which;
+  SE.commitAB();
+};
+
+SE.cancelAB = function () {
+  if (!SE.state.ab) return;
+  SE.state.ab = null;
+  SE.applyTokens();
+};
+
+/* ---------- direcciones guardadas (snapshots) ---------- */
+
+SE.SNAP_KEY = "selectorEstilos.snapshots.v1";
+
+SE.loadSnapshots = function () {
+  try {
+    var v = JSON.parse(localStorage.getItem(SE.SNAP_KEY) || "[]");
+    return Array.isArray(v) ? v : [];
+  } catch (e) { return []; }
+};
+
+function persistSnapshots(snaps) {
+  try { localStorage.setItem(SE.SNAP_KEY, JSON.stringify(snaps)); } catch (e) { /* sin almacenamiento */ }
+}
+
+SE.saveSnapshot = function (name) {
+  var snaps = SE.loadSnapshots();
+  snaps.unshift({
+    id: "s" + Date.now(),
+    name: String(name).slice(0, 40),
+    fecha: new Date().toLocaleDateString("es-ES"),
+    presetId: SE.state.presetId,
+    decisions: SE.clone(SE.state.decisions)
+  });
+  if (snaps.length > 20) snaps.length = 20;
+  persistSnapshots(snaps);
+  return snaps;
+};
+
+SE.deleteSnapshot = function (id) {
+  var snaps = SE.loadSnapshots().filter(function (s) { return s.id !== id; });
+  persistSnapshots(snaps);
+  return snaps;
+};
+
+SE.applySnapshot = function (id) {
+  var snap = SE.findIn(SE.loadSnapshots(), id);
+  if (!snap) return false;
+  if (SE.state.ab) SE.cancelAB();
+  SE.pushHistory();
+  /* Se revalida contra los catálogos actuales, como al cargar de disco */
+  var clean = SE.defaultState().decisions;
+  SE.mergeValidDecisions(clean, snap.decisions);
+  SE.state.decisions = clean;
+  SE.state.presetId = typeof snap.presetId === "string" ? snap.presetId : "custom";
+  SE.saveState();
+  SE.applyTokens();
+  if (SE.ui && SE.ui.ready) SE.ui.refreshAll();
+  return true;
+};

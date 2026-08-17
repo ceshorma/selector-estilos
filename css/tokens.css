@@ -1,0 +1,67 @@
+/* ============================================================
+   tokens.css — valores por defecto de todos los tokens de diseño.
+   JS los sobreescribe en #mock-viewport con style.setProperty();
+   estos valores solo actúan como fallback antes de que corra JS.
+   (Default: preset "Tech minimal")
+   ============================================================ */
+
+#mock-viewport {
+  /* Tipografía */
+  --font-heading: "Inter", system-ui, -apple-system, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --weight-heading: 700;
+  --tracking-heading: -0.02em;
+  --leading-tight: 1.2;
+  --leading-body: 1.5;
+  --measure: 70ch;
+
+  /* Escala tipográfica (1.25 sobre 16px) */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 25px;
+  --text-2xl: 31px;
+  --text-3xl: 39px;
+  --text-4xl: 49px;
+
+  /* Color (paleta "Grafito", modo claro) */
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f4f4f5;
+  --color-text: #18181b;
+  --color-text-muted: #52525b;
+  --color-border: #e4e4e7;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-soft: #dbeafe;
+  --color-on-primary: #ffffff;
+  --color-accent: #0891b2;
+  --color-success: #15803d;
+  --color-success-soft: #dcfce7;
+  --color-warning: #a16207;
+  --color-warning-soft: #fef3c7;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fee2e2;
+
+  /* Espaciado (unidad 8px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Radio (set "medio") */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* Sombras (set "sutil") */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

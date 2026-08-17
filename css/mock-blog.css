@@ -1,0 +1,169 @@
+/* ============================================================
+   mock-blog.css — layout del mock "Artículo" (lectura larga).
+   Ejercita: medida de línea, interlineado, armonía título/cuerpo,
+   jerarquía editorial h2/h3, citas y listas.
+   ============================================================ */
+
+.bg-nav { position: sticky; top: 0; z-index: 5; }
+
+.bg-article {
+  max-width: 100%;
+  padding: var(--space-7) var(--space-5) var(--space-8);
+}
+
+/* --- Cabecera del artículo --- */
+
+.bg-head {
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+
+.bg-category {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+}
+
+.bg-head h1 {
+  font-size: var(--text-3xl);
+  max-width: 24ch;
+}
+
+.bg-standfirst {
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+  color: var(--color-text-muted);
+  margin-top: var(--space-3);
+}
+
+.bg-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.bg-meta-text { display: flex; flex-direction: column; }
+
+.bg-meta-text strong { font-size: var(--text-sm); }
+
+.bg-meta-text span {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* --- Figura --- */
+
+.bg-figure {
+  max-width: calc(var(--measure) + 12ch);
+  margin: var(--space-6) auto;
+}
+
+.bg-figure-art {
+  height: 300px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  background:
+    radial-gradient(circle at 78% 22%, var(--color-primary-soft) 0%, transparent 46%),
+    radial-gradient(circle at 15% 85%, var(--color-primary) 0%, transparent 55%),
+    linear-gradient(160deg, var(--color-surface-alt) 0%, var(--color-primary-soft) 100%);
+}
+
+.bg-figure figcaption {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+  text-align: center;
+}
+
+/* --- Cuerpo del artículo --- */
+
+.bg-body {
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+
+.bg-body p {
+  margin: var(--space-4) 0;
+  line-height: var(--leading-body);
+}
+
+.bg-body h2 {
+  font-size: var(--text-xl);
+  margin: var(--space-6) 0 var(--space-2);
+}
+
+.bg-body h3 {
+  font-size: var(--text-lg);
+  margin: var(--space-5) 0 var(--space-2);
+}
+
+.bg-body blockquote {
+  position: relative;
+  margin: var(--space-6) 0;
+  padding: 0 0 0 var(--space-6);
+}
+
+.bg-body blockquote::before {
+  content: "“";
+  position: absolute;
+  left: 0;
+  top: -0.08em;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.bg-body blockquote p {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
+  letter-spacing: var(--tracking-heading);
+  font-size: var(--text-lg);
+  line-height: 1.45;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.bg-body ul {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bg-body li {
+  line-height: var(--leading-body);
+}
+
+.bg-body li::marker { color: var(--color-primary); }
+
+/* --- Caja de autor --- */
+
+.bg-author {
+  max-width: var(--measure);
+  margin: var(--space-7) auto 0;
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.bg-author > div:nth-child(2) { flex: 1; }
+
+.bg-author strong { font-size: var(--text-base); }
+
+.bg-author p {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}

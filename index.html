@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selector de Estilos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/mock-base.css">
+<link rel="stylesheet" href="css/mock-dashboard.css">
+<link rel="stylesheet" href="css/mock-landing.css">
+<link rel="stylesheet" href="css/mock-blog.css">
+<link rel="stylesheet" href="css/mock-colores.css">
+</head>
+<body>
+
+<!-- Filtros SVG para simulación de deficiencias visuales (matrices estándar) -->
+<svg class="sr-only" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="flt-protanopia">
+      <feColorMatrix type="matrix" values="0.567 0.433 0     0 0
+                                           0.558 0.442 0     0 0
+                                           0     0.242 0.758 0 0
+                                           0     0     0     1 0"/>
+    </filter>
+    <filter id="flt-deuteranopia">
+      <feColorMatrix type="matrix" values="0.625 0.375 0     0 0
+                                           0.700 0.300 0     0 0
+                                           0     0.300 0.700 0 0
+                                           0     0     0     1 0"/>
+    </filter>
+    <filter id="flt-tritanopia">
+      <feColorMatrix type="matrix" values="0.950 0.050 0     0 0
+                                           0     0.433 0.567 0 0
+                                           0     0.475 0.525 0 0
+                                           0     0     0     1 0"/>
+    </filter>
+    <filter id="flt-acromatopsia">
+      <feColorMatrix type="matrix" values="0.299 0.587 0.114 0 0
+                                           0.299 0.587 0.114 0 0
+                                           0.299 0.587 0.114 0 0
+                                           0     0     0     1 0"/>
+    </filter>
+  </defs>
+</svg>
+
+<div id="app">
+  <div id="stage">
+
+    <header id="topbar">
+      <div class="tb-left">
+        <span class="tb-brand">Selector<em>de</em>Estilos</span>
+        <nav class="tb-tabs" id="screen-tabs" aria-label="Pantalla mock">
+          <button type="button" data-screen="dashboard" class="active">Panel <kbd>1</kbd></button>
+          <button type="button" data-screen="landing">Landing <kbd>2</kbd></button>
+          <button type="button" data-screen="blog">Artículo <kbd>3</kbd></button>
+          <button type="button" data-screen="colores">Colores <kbd>4</kbd></button>
+        </nav>
+      </div>
+      <div class="tb-right">
+        <button type="button" id="mode-toggle" title="Alternar claro/oscuro (D)">Oscuro</button>
+        <div class="tb-menu">
+          <button type="button" id="vision-btn" aria-haspopup="true" aria-expanded="false">Visión: Normal</button>
+          <div class="tb-dropdown" id="vision-dropdown" hidden>
+            <button type="button" data-vision="normal" class="active">Normal</button>
+            <button type="button" data-vision="protanopia">Protanopia <small>sin rojo</small></button>
+            <button type="button" data-vision="deuteranopia">Deuteranopia <small>sin verde</small></button>
+            <button type="button" data-vision="tritanopia">Tritanopia <small>sin azul</small></button>
+            <button type="button" data-vision="acromatopsia">Acromatopsia <small>sin color</small></button>
+            <button type="button" data-vision="borrosa">Visión borrosa <small>baja agudeza</small></button>
+            <button type="button" data-vision="baja-vision">Baja visión <small>borroso + poco contraste</small></button>
+          </div>
+        </div>
+        <button type="button" id="panel-toggle" title="Mostrar u ocultar el panel (P)">Ocultar panel</button>
+        <button type="button" id="export-btn" class="tb-primary">Exportar</button>
+      </div>
+    </header>
+
+    <div id="viewport-wrap">
+      <div id="mock-viewport" data-mode="light">
+
+        <!-- ============ MOCK 1 · DASHBOARD ============ -->
+        <section class="mock-screen active" data-screen="dashboard">
+          <div class="db-layout">
+            <aside class="db-sidenav">
+              <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
+              <nav class="db-nav">
+                <a href="#" class="active"><svg aria-hidden="true" viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1"/><rect x="9" y="9" width="5.5" height="5.5" rx="1"/></svg>Panel general</a>
+                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M8 14V8M8 8C8 5 6 3 2.5 2.5 3 6 5 8 8 8ZM8 8c0-3 2-5 5.5-5.5C13 6 11 8 8 8Z"/></svg>Cultivos</a>
+                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M8 2C8 2 3.5 7 3.5 10a4.5 4.5 0 0 0 9 0C12.5 7 8 2 8 2Z"/></svg>Riego</a>
+                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M2 12l3-4 3 2 3-5 3 4"/><path d="M1.5 14.5h13"/></svg>Sensores</a>
+                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M3 1.5h7l3 3v10H3z"/><path d="M5.5 8h5M5.5 11h5"/></svg>Informes</a>
+                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4"/></svg>Ajustes</a>
+              </nav>
+              <div class="db-sidenav-foot">
+                <div class="avatar">MV</div>
+                <div class="db-user"><strong>Marta Vidal</strong><span>Agrónoma jefa</span></div>
+              </div>
+            </aside>
+
+            <div class="db-main">
+              <header class="db-header">
+                <div>
+                  <h1>Panel general</h1>
+                  <p class="db-sub">Resumen de los 8 invernaderos · actualizado hace 4 min</p>
+                </div>
+                <div class="db-header-tools">
+                  <input class="input db-search" type="search" placeholder="Buscar invernadero, cultivo…">
+                  <button type="button" class="btn btn-ghost">Esta semana</button>
+                  <button type="button" class="btn btn-primary">+ Nueva programación</button>
+                </div>
+              </header>
+
+              <div class="db-stats">
+                <div class="card stat-card">
+                  <span class="stat-label">Humedad media del suelo</span>
+                  <div class="stat-row"><span class="stat-value">64<small>%</small></span><span class="badge badge-success">▲ 2,1 %</span></div>
+                  <span class="stat-note">Objetivo: 60–70 %</span>
+                </div>
+                <div class="card stat-card">
+                  <span class="stat-label">Temperatura media</span>
+                  <div class="stat-row"><span class="stat-value">23,4<small>°C</small></span><span class="badge badge-success">▼ 0,8 °C</span></div>
+                  <span class="stat-note">Dentro del rango óptimo</span>
+                </div>
+                <div class="card stat-card">
+                  <span class="stat-label">Consumo de agua · hoy</span>
+                  <div class="stat-row"><span class="stat-value">1.240<small>L</small></span><span class="badge badge-warning">▲ 5,4 %</span></div>
+                  <span class="stat-note">Por encima de la media semanal</span>
+                </div>
+                <div class="card stat-card">
+                  <span class="stat-label">Alertas activas</span>
+                  <div class="stat-row"><span class="stat-value">3</span><span class="badge badge-danger">2 críticas</span></div>
+                  <span class="stat-note">Invernaderos 3 y 7</span>
+                </div>
+              </div>
+
+              <div class="db-grid">
+                <div class="card db-table-card">
+                  <div class="card-head">
+                    <h2>Estado por invernadero</h2>
+                    <button type="button" class="btn btn-ghost btn-sm">Ver todos</button>
+                  </div>
+                  <table class="table">
+                    <thead>
+                      <tr><th>Invernadero</th><th>Cultivo</th><th>Estado</th><th>Última lectura</th><th class="num">Rendimiento</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td><strong>Invernadero 1</strong></td><td>Tomate cherry</td><td><span class="badge badge-success">Óptimo</span></td><td>hace 2 min</td><td class="num">98 %</td></tr>
+                      <tr><td><strong>Invernadero 2</strong></td><td>Lechuga batavia</td><td><span class="badge badge-success">Óptimo</span></td><td>hace 4 min</td><td class="num">95 %</td></tr>
+                      <tr><td><strong>Invernadero 3</strong></td><td>Pimiento rojo</td><td><span class="badge badge-danger">Crítico</span></td><td>hace 1 min</td><td class="num">61 %</td></tr>
+                      <tr><td><strong>Invernadero 4</strong></td><td>Albahaca</td><td><span class="badge badge-success">Óptimo</span></td><td>hace 6 min</td><td class="num">97 %</td></tr>
+                      <tr><td><strong>Invernadero 5</strong></td><td>Fresa</td><td><span class="badge badge-warning">Atención</span></td><td>hace 3 min</td><td class="num">84 %</td></tr>
+                      <tr><td><strong>Invernadero 6</strong></td><td>Pepino</td><td><span class="badge badge-success">Óptimo</span></td><td>hace 5 min</td><td class="num">93 %</td></tr>
+                      <tr><td><strong>Invernadero 7</strong></td><td>Tomate pera</td><td><span class="badge badge-danger">Crítico</span></td><td>hace 2 min</td><td class="num">58 %</td></tr>
+                      <tr><td><strong>Invernadero 8</strong></td><td>Espinaca</td><td><span class="badge badge-warning">Atención</span></td><td>hace 8 min</td><td class="num">82 %</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="db-side-col">
+                  <div class="card db-form-card">
+                    <div class="card-head"><h2>Nueva programación de riego</h2></div>
+                    <form class="form" onsubmit="return false">
+                      <label class="field"><span>Nombre</span><input class="input" type="text" placeholder="Riego nocturno · fresas"></label>
+                      <label class="field"><span>Invernadero</span>
+                        <select class="input"><option>Invernadero 5 · Fresa</option><option>Invernadero 1 · Tomate cherry</option><option>Invernadero 3 · Pimiento rojo</option></select>
+                      </label>
+                      <div class="field-row">
+                        <label class="field"><span>Hora de inicio</span><input class="input" type="time" value="22:30"></label>
+                        <label class="field"><span>Duración</span><input class="input" type="text" value="25 min"></label>
+                      </div>
+                      <label class="check"><input type="checkbox" checked><span>Pausar si la humedad supera el 70 %</span></label>
+                      <div class="form-actions">
+                        <button type="button" class="btn btn-ghost">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar programación</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div class="card db-chart-card">
+                    <div class="card-head"><h2>Riego semanal <span class="unit">(litros)</span></h2></div>
+                    <div class="chart">
+                      <div class="chart-bar" style="--h:58%"><i></i><span>L</span></div>
+                      <div class="chart-bar" style="--h:72%"><i></i><span>M</span></div>
+                      <div class="chart-bar" style="--h:64%"><i></i><span>X</span></div>
+                      <div class="chart-bar" style="--h:81%"><i></i><span>J</span></div>
+                      <div class="chart-bar is-max" style="--h:96%"><i></i><span>V</span></div>
+                      <div class="chart-bar" style="--h:47%"><i></i><span>S</span></div>
+                      <div class="chart-bar" style="--h:39%"><i></i><span>D</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ MOCK 2 · LANDING ============ -->
+        <section class="mock-screen" data-screen="landing">
+          <div class="ld-announce"><span>Nuevo · Sensores Terrena v2 ya disponibles</span><a href="#">Conócelos →</a></div>
+          <nav class="ld-nav">
+            <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
+            <div class="ld-nav-links">
+              <a href="#">Producto</a><a href="#">Precios</a><a href="#">Clientes</a><a href="#">Recursos</a>
+            </div>
+            <div class="ld-nav-cta">
+              <a href="#" class="ld-signin">Entrar</a>
+              <button type="button" class="btn btn-primary">Prueba gratis</button>
+            </div>
+          </nav>
+
+          <header class="ld-hero">
+            <h1>Cultiva con datos,<br>no con corazonadas.</h1>
+            <p class="ld-sub">Terrena conecta tus invernaderos, aprende de cada cultivo y te dice exactamente cuándo regar, ventilar o actuar. Menos agua, más cosecha.</p>
+            <div class="ld-hero-ctas">
+              <button type="button" class="btn btn-primary btn-lg">Empieza gratis</button>
+              <button type="button" class="btn btn-ghost btn-lg">Ver demo de 3 min</button>
+            </div>
+            <p class="ld-hero-note">Sin tarjeta · Configuración en 15 minutos · Cancela cuando quieras</p>
+          </header>
+
+          <div class="ld-logos">
+            <span class="ld-logos-label">Confían en Terrena</span>
+            <div class="ld-logos-row">
+              <span class="ld-logo-item">AgroSur</span>
+              <span class="ld-logo-item">Vivero Lume</span>
+              <span class="ld-logo-item">Campo Alto</span>
+              <span class="ld-logo-item">Hidropónica Rica</span>
+              <span class="ld-logo-item">Finca Roble</span>
+            </div>
+          </div>
+
+          <section class="ld-features">
+            <h2>Todo tu invernadero, en una pantalla</h2>
+            <p class="ld-features-sub">Tres piezas que trabajan juntas para que tú no tengas que estar en tres sitios a la vez.</p>
+            <div class="ld-feature-grid">
+              <div class="card ld-feature">
+                <span class="ld-feature-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3C12 3 5.5 10 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 10 12 3 12 3Z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/></svg></span>
+                <h3>Riego inteligente</h3>
+                <p>Programaciones que se ajustan solas según humedad, clima y etapa del cultivo. El agua justa, ni una gota más.</p>
+                <a class="ld-feature-link" href="#">Cómo funciona →</a>
+              </div>
+              <div class="card ld-feature">
+                <span class="ld-feature-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4a6 6 0 0 0-6 6v3.5L4.5 16h15L18 13.5V10a6 6 0 0 0-6-6Z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span>
+                <h3>Alertas al instante</h3>
+                <p>Si una válvula falla o la temperatura se dispara de madrugada, lo sabes en segundos, no al día siguiente.</p>
+                <a class="ld-feature-link" href="#">Ver ejemplo →</a>
+              </div>
+              <div class="card ld-feature">
+                <span class="ld-feature-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19l4.5-6 4 3 4-6.5 3.5 5"/><path d="M3 21.5h18"/></svg></span>
+                <h3>Informes claros</h3>
+                <p>Consumo, rendimiento y costes por cultivo, listos para compartir con tu equipo o tu cooperativa.</p>
+                <a class="ld-feature-link" href="#">Ver informe →</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="ld-quote">
+            <blockquote>
+              <p>«Bajamos el consumo de agua un 27 % la primera temporada. Ahora riego cuando la planta lo pide, no cuando a mí me parece.»</p>
+              <footer>
+                <div class="avatar">RC</div>
+                <div><strong>Rosa Castaño</strong><span>Finca Roble · 12 invernaderos</span></div>
+              </footer>
+            </blockquote>
+          </section>
+
+          <section class="ld-cta-band">
+            <h2>Empieza a cultivar con datos hoy</h2>
+            <p>Prueba Terrena gratis en tu primer invernadero. Sin compromiso.</p>
+            <button type="button" class="btn btn-inverted btn-lg">Crear cuenta gratis</button>
+          </section>
+
+          <footer class="ld-footer">
+            <div class="ld-footer-cols">
+              <div class="ld-footer-brand">
+                <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
+                <p>Gestión inteligente de invernaderos.</p>
+              </div>
+              <div><h4>Producto</h4><a href="#">Sensores</a><a href="#">Riego</a><a href="#">Informes</a><a href="#">Precios</a></div>
+              <div><h4>Empresa</h4><a href="#">Sobre nosotros</a><a href="#">Blog</a><a href="#">Empleo</a></div>
+              <div><h4>Soporte</h4><a href="#">Documentación</a><a href="#">Contacto</a><a href="#">Estado del servicio</a></div>
+            </div>
+            <p class="ld-footer-legal">© 2026 Terrena · Privacidad · Términos</p>
+          </footer>
+        </section>
+
+        <!-- ============ MOCK 3 · BLOG ============ -->
+        <section class="mock-screen" data-screen="blog">
+          <nav class="ld-nav bg-nav">
+            <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
+            <div class="ld-nav-links"><a href="#">Blog</a><a href="#">Guías</a><a href="#">Casos</a></div>
+            <button type="button" class="btn btn-primary">Prueba gratis</button>
+          </nav>
+
+          <article class="bg-article">
+            <header class="bg-head">
+              <a class="bg-category" href="#">Riego eficiente</a>
+              <h1>Cómo reducir un 30 % el consumo de agua sin sacrificar rendimiento</h1>
+              <p class="bg-standfirst">La mayoría de los invernaderos riegan por calendario. Las plantas no viven en un calendario: viven en el suelo. Medirlo lo cambia todo.</p>
+              <div class="bg-meta">
+                <div class="avatar">JO</div>
+                <div class="bg-meta-text"><strong>Julián Obando</strong><span>Ingeniero agrónomo · 14 de agosto de 2026 · 7 min de lectura</span></div>
+              </div>
+            </header>
+
+            <figure class="bg-figure">
+              <div class="bg-figure-art"></div>
+              <figcaption>Sonda de humedad a 20 cm de profundidad en un cultivo de tomate. La lectura continua sustituye a la intuición.</figcaption>
+            </figure>
+
+            <div class="bg-body">
+              <p>Durante décadas, regar fue un acto de fe. Se abría la válvula a la misma hora, durante los mismos minutos, porque «siempre se ha hecho así». Y funcionaba, más o menos, porque el agua era barata y el margen de error, generoso. Ninguna de las dos cosas sigue siendo cierta.</p>
+              <p>El precio del agua para uso agrícola ha subido de forma sostenida en los últimos cinco años, y los planes de sequía imponen recortes justo en los meses de mayor demanda. La buena noticia: en la mayoría de los invernaderos que auditamos, entre el 25 % y el 35 % del agua aplicada <em>no la usa la planta</em>. Se filtra por debajo de la zona de raíces o se evapora antes de llegar a ellas. Es margen puro.</p>
+
+              <h2>El problema del riego a ojo</h2>
+              <p>El riego por calendario tiene un defecto estructural: aplica la misma receta a días distintos. Un martes nublado de 19 °C y un martes despejado de 31 °C reciben los mismos litros. En el primero, la mitad sobra; en el segundo, quizá falta. El error no se ve, porque la planta tarda días en mostrar estrés, y para entonces nadie recuerda qué riego lo causó.</p>
+              <blockquote>
+                <p>El dato más barato de toda la agricultura de precisión es una sonda de humedad de suelo. Cuesta menos que una temporada de agua desperdiciada.</p>
+              </blockquote>
+              <p>La alternativa no es regar menos: es regar <em>cuando toca</em>. Y para saber cuándo toca, hay que medir dónde están las raíces, no mirar el cielo.</p>
+
+              <h2>Medir antes de mover una válvula</h2>
+              <p>Una estrategia razonable para empezar, sin cambiar ninguna instalación, tiene tres pasos:</p>
+              <ul>
+                <li><strong>Instala dos sondas por invernadero</strong>, una a 10 cm y otra a 20–30 cm según el cultivo. La superficial te dice cuándo regar; la profunda, cuándo parar.</li>
+                <li><strong>Registra una semana sin cambiar nada.</strong> Verás el patrón real: casi siempre, picos de saturación tras cada riego y drenaje que se pierde por debajo de las raíces.</li>
+                <li><strong>Recorta la duración, no la frecuencia.</strong> Riegos más cortos y algo más frecuentes mantienen la humedad en banda sin empujar agua fuera del alcance de la planta.</li>
+              </ul>
+
+              <h3>Qué esperar las primeras semanas</h3>
+              <p>Los primeros días, la tentación de volver al calendario es fuerte: el suelo «se ve» seco en superficie aunque la sonda profunda marque humedad de sobra. Confía en el dato. En los ensayos de Finca Roble, el equipo tardó dos semanas en dejar de añadir riegos manuales «por si acaso»; a la cuarta semana, el consumo había caído un 27 % y el calibre del fruto no se había movido.</p>
+              <p>A partir del primer mes, el sistema empieza a pagar la segunda parte del beneficio, la que casi nadie anticipa: menos hongos. Un suelo que no se encharca es un suelo que ventila, y la presión de botritis y mildiu baja con él. Menos agua, menos fungicida, misma cosecha.</p>
+
+              <h2>La regla de oro</h2>
+              <p>Si solo te llevas una idea de este artículo, que sea esta: <strong>ningún riego debería ejecutarse sin un dato que lo justifique</strong>. No hace falta automatizarlo todo el primer día; hace falta dejar de decidir a ciegas. La automatización llega sola cuando los datos te dan la confianza para soltar la válvula.</p>
+            </div>
+
+            <aside class="bg-author card">
+              <div class="avatar avatar-lg">JO</div>
+              <div>
+                <strong>Julián Obando</strong>
+                <p>Ingeniero agrónomo. Escribe sobre riego de precisión y gestión de cultivos protegidos. Antes de Terrena, 9 años asesorando cooperativas hortícolas.</p>
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm">Seguir</button>
+            </aside>
+          </article>
+        </section>
+
+        <!-- ============ MOCK 4 · COLORES (convivencia de la paleta) ============ -->
+        <section class="mock-screen" data-screen="colores">
+          <div class="cl-page">
+            <header class="cl-head">
+              <h1>Convivencia de color</h1>
+              <p>La paleta elegida en formas puras, proporciones y pares de uso real. Si algo desentona aquí, desentonará en la interfaz.</p>
+            </header>
+
+            <div class="cl-grid">
+              <figure class="cl-art card" aria-label="Composición geométrica con la paleta actual">
+                <svg viewBox="0 0 840 500" role="img">
+                  <rect width="840" height="500" fill="var(--color-surface-alt)"/>
+                  <!-- diagonales de borde -->
+                  <g stroke="var(--color-border)" stroke-width="6" stroke-linecap="round">
+                    <line x1="330" y1="60" x2="450" y2="180"/>
+                    <line x1="370" y1="48" x2="490" y2="168"/>
+                    <line x1="410" y1="36" x2="530" y2="156"/>
+                  </g>
+                  <!-- letra grande en fuente de títulos -->
+                  <text x="60" y="230" font-family="var(--font-heading)" font-weight="var(--weight-heading)" font-size="190" fill="var(--color-text)">Aa</text>
+                  <!-- barra de tinta -->
+                  <rect x="300" y="210" width="52" height="180" fill="var(--color-text)"/>
+                  <!-- círculo primario con texto de botón -->
+                  <circle cx="620" cy="180" r="125" fill="var(--color-primary)"/>
+                  <text x="620" y="196" text-anchor="middle" font-family="var(--font-body)" font-weight="600" font-size="46" fill="var(--color-on-primary)">Aa</text>
+                  <!-- anillo de acento solapado -->
+                  <circle cx="500" cy="280" r="78" fill="none" stroke="var(--color-accent)" stroke-width="20"/>
+                  <!-- cuarto de círculo suave -->
+                  <path d="M0 500 L0 260 A240 240 0 0 1 240 500 Z" fill="var(--color-primary-soft)"/>
+                  <!-- semicírculo de acento -->
+                  <path d="M300 500 A90 90 0 0 1 480 500 Z" fill="var(--color-accent)"/>
+                  <!-- retícula de puntos atenuados -->
+                  <g fill="var(--color-text-muted)">
+                    <circle cx="560" cy="380" r="4"/><circle cx="588" cy="380" r="4"/><circle cx="616" cy="380" r="4"/><circle cx="644" cy="380" r="4"/><circle cx="672" cy="380" r="4"/><circle cx="700" cy="380" r="4"/>
+                    <circle cx="560" cy="408" r="4"/><circle cx="588" cy="408" r="4"/><circle cx="616" cy="408" r="4"/><circle cx="644" cy="408" r="4"/><circle cx="672" cy="408" r="4"/><circle cx="700" cy="408" r="4"/>
+                    <circle cx="560" cy="436" r="4"/><circle cx="588" cy="436" r="4"/><circle cx="616" cy="436" r="4"/><circle cx="644" cy="436" r="4"/><circle cx="672" cy="436" r="4"/><circle cx="700" cy="436" r="4"/>
+                  </g>
+                  <!-- trío semántico -->
+                  <circle cx="775" cy="400" r="24" fill="var(--color-success)"/>
+                  <circle cx="748" cy="447" r="17" fill="var(--color-warning)"/>
+                  <circle cx="790" cy="458" r="11" fill="var(--color-danger)"/>
+                </svg>
+              </figure>
+
+              <div class="card cl-pairs">
+                <h2>Pares de uso</h2>
+                <div class="cl-chips">
+                  <div class="cl-chip" style="background:var(--color-bg);color:var(--color-text);border:1px solid var(--color-border)">Texto sobre fondo</div>
+                  <div class="cl-chip" style="background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-border)">Texto sobre tarjeta</div>
+                  <div class="cl-chip" style="background:var(--color-primary);color:var(--color-on-primary)">Botón primario</div>
+                  <div class="cl-chip" style="background:var(--color-bg);color:var(--color-primary);border:1px solid var(--color-border)">Enlace sobre fondo</div>
+                  <div class="cl-chip" style="background:var(--color-primary-soft);color:var(--color-primary)">Primario suave</div>
+                  <div class="cl-chip" style="background:var(--color-success-soft);color:var(--color-success)">Éxito</div>
+                  <div class="cl-chip" style="background:var(--color-warning-soft);color:var(--color-warning)">Alerta</div>
+                  <div class="cl-chip" style="background:var(--color-danger-soft);color:var(--color-danger)">Peligro</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card cl-band">
+              <h2>Proporción 60 · 30 · 10</h2>
+              <div class="cl-band-bar">
+                <span style="flex:45;background:var(--color-bg)"></span>
+                <span style="flex:15;background:var(--color-surface)"></span>
+                <span style="flex:20;background:var(--color-primary-soft)"></span>
+                <span style="flex:12;background:var(--color-primary)"></span>
+                <span style="flex:8;background:var(--color-accent)"></span>
+              </div>
+              <p>Dominante (fondos) · secundario (superficies y suaves) · acento (primario y acento). Una paleta sana respeta aproximadamente esta proporción en pantalla.</p>
+            </div>
+
+            <div class="cl-strips">
+              <h2>Paleta núcleo</h2>
+              <div class="cl-strip">
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-bg)"></span><strong>Fondo</strong><code data-hexof="bg"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-surface)"></span><strong>Tarjeta</strong><code data-hexof="surface"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-surface-alt)"></span><strong>Sup. alt</strong><code data-hexof="surfaceAlt"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-border)"></span><strong>Borde</strong><code data-hexof="border"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-text-muted)"></span><strong>Atenuado</strong><code data-hexof="textMuted"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-text)"></span><strong>Texto</strong><code data-hexof="text"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-primary)"></span><strong>Primario</strong><code data-hexof="primary"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-primary-hover)"></span><strong>Hover</strong><code data-hexof="primaryHover"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-primary-soft)"></span><strong>Suave</strong><code data-hexof="primarySoft"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-on-primary)"></span><strong>S/ primario</strong><code data-hexof="onPrimary"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-accent)"></span><strong>Acento</strong><code data-hexof="accent"></code></div>
+              </div>
+              <h2>Semánticos</h2>
+              <div class="cl-strip cl-strip-sem">
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-success)"></span><strong>Éxito</strong><code data-hexof="success"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-success-soft)"></span><strong>Éxito suave</strong><code data-hexof="successSoft"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-warning)"></span><strong>Alerta</strong><code data-hexof="warning"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-warning-soft)"></span><strong>Alerta suave</strong><code data-hexof="warningSoft"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-danger)"></span><strong>Peligro</strong><code data-hexof="danger"></code></div>
+                <div class="cl-col"><span class="cl-swatch" style="background:var(--color-danger-soft)"></span><strong>Peligro suave</strong><code data-hexof="dangerSoft"></code></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Píldora de comparación A/B -->
+    <div id="ab-pill" aria-live="polite" hidden>
+      <span class="ab-dim" id="ab-dim-label">Tipografía</span>
+      <div class="ab-choices">
+        <button type="button" id="ab-a" class="ab-choice">A</button>
+        <button type="button" id="ab-b" class="ab-choice" disabled>B</button>
+      </div>
+      <span class="ab-hint" id="ab-hint">Elige la opción B en el panel</span>
+      <button type="button" id="ab-split" hidden title="Vista dividida: A y B a la vez"><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="2"/><path d="M8 2.5v11"/></svg>Dividir</button>
+      <button type="button" id="ab-commit" hidden>Elegir esta ⏎</button>
+      <button type="button" id="ab-commit-a" hidden>Elegir A</button>
+      <button type="button" id="ab-commit-b" hidden>Elegir B</button>
+      <button type="button" id="ab-cancel" aria-label="Cancelar comparación"><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+    </div>
+  </div>
+
+  <!-- ============ PANEL DE CONTROL ============ -->
+  <aside id="panel">
+    <div class="panel-head">
+      <div>
+        <h1>Decisiones de diseño</h1>
+        <p id="panel-preset-label">Preset: Tech minimal</p>
+      </div>
+      <div class="panel-head-actions">
+        <button type="button" id="undo-btn" title="Deshacer (Ctrl+Z)" aria-label="Deshacer" disabled><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M6 3.5 3 6.5l3 3"/><path d="M3 6.5h6.5a3.5 3.5 0 0 1 0 7H8"/></svg></button>
+        <button type="button" id="redo-btn" title="Rehacer (Ctrl+Mayús+Z)" aria-label="Rehacer" disabled><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M10 3.5l3 3-3 3"/><path d="M13 6.5H6.5a3.5 3.5 0 0 0 0 7H8"/></svg></button>
+        <button type="button" id="reset-btn" title="Volver al preset por defecto">Restablecer</button>
+      </div>
+    </div>
+    <div class="panel-scroll">
+      <section class="p-section">
+        <h2 class="p-title">Direcciones sugeridas</h2>
+        <div id="preset-list"></div>
+      </section>
+
+      <section class="p-section" id="sec-snapshots">
+        <h2 class="p-title">Direcciones guardadas</h2>
+        <div id="snap-list"></div>
+        <div class="snap-actions">
+          <button type="button" id="snap-save"><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Guardar actual…</button>
+          <button type="button" id="estado-export" title="Descarga estado.json para compartir o respaldar">Exportar estado</button>
+          <button type="button" id="estado-import" title="Carga un estado.json o un tokens.json exportado">Importar…</button>
+        </div>
+      </section>
+
+      <details class="p-acc" data-dim="fontPair" open>
+        <summary><span>Tipografía</span><button type="button" class="ab-btn" data-dim="fontPair">A/B</button></summary>
+        <div class="p-body" id="body-fontPair"></div>
+      </details>
+
+      <details class="p-acc" data-dim="typeScale">
+        <summary><span>Escala tipográfica</span><button type="button" class="ab-btn" data-dim="typeScale">A/B</button></summary>
+        <div class="p-body" id="body-typeScale"></div>
+      </details>
+
+      <details class="p-acc" data-dim="palette">
+        <summary><span>Color</span><button type="button" class="ab-btn" data-dim="palette">A/B</button></summary>
+        <div class="p-body" id="body-palette"></div>
+      </details>
+
+      <details class="p-acc" data-dim="spacing">
+        <summary><span>Espaciado y densidad</span><button type="button" class="ab-btn" data-dim="spacing">A/B</button></summary>
+        <div class="p-body" id="body-spacing"></div>
+      </details>
+
+      <details class="p-acc" data-dim="radius">
+        <summary><span>Bordes</span><button type="button" class="ab-btn" data-dim="radius">A/B</button></summary>
+        <div class="p-body" id="body-radius"></div>
+      </details>
+
+      <details class="p-acc" data-dim="shadow">
+        <summary><span>Sombras</span><button type="button" class="ab-btn" data-dim="shadow">A/B</button></summary>
+        <div class="p-body" id="body-shadow"></div>
+      </details>
+
+      <details class="p-acc" data-dim="reading">
+        <summary><span>Lectura</span><button type="button" class="ab-btn" data-dim="reading">A/B</button></summary>
+        <div class="p-body" id="body-reading"></div>
+      </details>
+
+      <details class="p-acc" data-dim="a11y">
+        <summary><span>Accesibilidad · contraste</span></summary>
+        <div class="p-body" id="body-a11y"></div>
+      </details>
+
+      <p class="panel-foot">Atajos: <kbd>1·2·3·4</kbd> pantallas · <kbd>D</kbd> oscuro · <kbd>P</kbd> panel · <kbd>Ctrl+Z</kbd> deshacer<br>En A/B: <kbd>Espacio</kbd> alterna · <kbd>⏎</kbd> elige · <kbd>Esc</kbd> cancela</p>
+    </div>
+  </aside>
+</div>
+
+<!-- ============ MODAL DE EXPORTACIÓN ============ -->
+<div id="export-modal" class="modal-backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="export-title">
+    <button type="button" class="modal-close" id="export-close" aria-label="Cerrar"><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+    <h2 id="export-title">Exportar documento de diseño</h2>
+    <p class="modal-sub">Tres archivos generados con tus decisiones actuales. El documento HTML es autónomo e incluye los tokens embebidos.</p>
+    <div class="export-rows">
+      <button type="button" class="export-row" data-export="doc">
+        <strong>diseño.html</strong><span>Documento legible: decisiones, racional, paleta, especímenes y contraste</span>
+      </button>
+      <button type="button" class="export-row" data-export="css">
+        <strong>tokens.css</strong><span>Variables CSS listas para usar, con bloque de modo oscuro</span>
+      </button>
+      <button type="button" class="export-row" data-export="json">
+        <strong>tokens.json</strong><span>Tokens de diseño en JSON para herramientas y pipelines</span>
+      </button>
+    </div>
+    <div class="modal-actions">
+      <button type="button" id="export-all" class="tb-primary">Descargar todo</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="import-file" accept=".json,application/json" hidden>
+
+<script src="js/data.js"></script>
+<script src="js/color.js"></script>
+<script src="js/fonts.js"></script>
+<script src="js/state.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/export.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
