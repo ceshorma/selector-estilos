@@ -15,6 +15,16 @@ Ordenadas por impacto dentro de cada bloque.
   "propuesta cálida") en localStorage, listarlas, recuperarlas y compararlas entre sí.
 - [x] **Importar estado** (S) — cargar un `tokens.json` exportado (o un JSON de snapshot)
   para retomar decisiones en otra máquina. Hoy el flujo es de una sola dirección: exportar.
+- [ ] **Compartir por URL** (S) — codificar el estado completo en el hash (JSON en
+  base64url, sin dependencias) para enviar una dirección como enlace. Brilla combinado
+  con GitHub Pages.
+- [ ] **GitHub Pages** (S) — activar Pages en el repo para que la herramienta viva online;
+  cero código, convierte los deep-links y el compartir-por-URL en colaboración real.
+- [ ] **Comparador de snapshots** (S) — tabla diff entre dos direcciones guardadas:
+  qué dimensiones difieren y en qué valor. Documenta el porqué de la elección.
+- [ ] **"Sorpréndeme"** (S/M) — dirección coherente al azar (pareja armónica, paleta
+  generada desde matiz aleatorio, escala sensata), estilo barra espaciadora de Coolors.
+  Explorar territorio no obvio es el regalo de una herramienta así.
 
 ## Nuevas dimensiones de diseño
 
