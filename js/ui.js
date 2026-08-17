@@ -55,17 +55,26 @@ SE.ui = (function () {
 
   /* ================= PRESETS ================= */
 
+  /* Tres iconos de muestra por dirección: el trazo se elige mirándolo,
+     no leyendo «lineal fino» en una etiqueta. */
+  var PRESET_ICONS = ["riego", "grafica", "usuario"];
+
   function renderPresets() {
     var html = SE.data.presets.map(function (p) {
       var pal = SE.findIn(SE.data.palettes, p.decisions.palette.id);
       var pair = SE.resolvePair(p.decisions.fontPair);
+      var iconSet = SE.findIn(SE.data.iconSets, p.decisions.icons) || SE.data.iconSets[1];
       var dots = [pal.light.bg, pal.light.primarySoft, pal.light.primary, pal.light.accent, pal.light.text]
         .map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("");
       var fonts = pair.heading.family + (pair.heading.id === pair.body.id ? "" : " + " + pair.body.family);
+      var icons = PRESET_ICONS.map(function (n) {
+        return SE.icons.markup(n, panelIconSet(iconSet));
+      }).join("");
       return '<button type="button" class="preset-card' + (SE.state.presetId === p.id ? " active" : "") + '" data-preset="' + p.id + '">' +
         '<span class="pc-top"><span class="pc-name">' + p.name + '</span><span class="pc-dots">' + dots + "</span></span>" +
+        (p.origen ? '<span class="pc-origen">' + p.origen + "</span>" : "") +
         '<span class="pc-desc">' + p.desc + "</span>" +
-        '<span class="pc-fonts">' + fonts + "</span></button>";
+        '<span class="pc-foot"><span class="pc-icons">' + icons + '</span><span class="pc-fonts">' + fonts + "</span></span></button>";
     }).join("");
     $("#preset-list").innerHTML = html;
   }
@@ -77,10 +86,12 @@ SE.ui = (function () {
     $all(".preset-card").forEach(function (el) {
       el.classList.toggle("active", el.dataset.preset === id);
     });
-    var name = id === "custom" ? "personalizado" : SE.findPreset(id).name;
+    /* El nombre vive en la cabecera del acordeón: cerrado, sigue diciendo
+       en qué dirección estás (y, comparando, cuál de las dos ves). */
+    var name = id === "custom" ? "Personalizada" : SE.findPreset(id).name;
     $("#panel-preset-label").textContent = comparing
       ? "Viendo: " + (ab.showing === "a" ? ab.labelA : ab.labelB)
-      : "Preset: " + name;
+      : name;
   }
 
   /* ================= TIPOGRAFÍA ================= */
@@ -517,7 +528,7 @@ SE.ui = (function () {
   /* Relanza la entrada escalonada de la pantalla visible. Se reinicia
      quitando la clase y forzando un reflow antes de devolverla. */
   function playEnter() {
-    var el = $("#mock-viewport .mock-screen.active");
+    var el = $("#mock-viewport > .mock-screen.active");
     if (!el) return;
     el.classList.remove("playing");
     void el.offsetWidth;
@@ -526,7 +537,7 @@ SE.ui = (function () {
 
   function switchScreen(screen) {
     SE.setScreen(screen);
-    $all(".mock-screen").forEach(function (el) {
+    $all("#mock-viewport > .mock-screen").forEach(function (el) {
       el.classList.toggle("active", el.dataset.screen === screen);
     });
     $all("#screen-tabs button").forEach(function (el) {
@@ -558,9 +569,19 @@ SE.ui = (function () {
     });
   }
 
+  /* Plegar es una acción sobre el panel, así que el mando vive en el
+     panel; y plegado queda el raíl, para que la vuelta esté a la vista. */
+  function setPanel(hidden) {
+    document.body.classList.toggle("panel-hidden", hidden);
+    $("#panel-rail").hidden = !hidden;
+    $("#panel-collapse").setAttribute("aria-expanded", String(!hidden));
+    $("#panel-rail").setAttribute("aria-expanded", String(!hidden));
+    /* Las miniaturas se reescalan al cambiar el ancho disponible */
+    measureOverview();
+  }
+
   function togglePanel() {
-    var hidden = document.body.classList.toggle("panel-hidden");
-    $("#panel-toggle").textContent = hidden ? "Mostrar panel" : "Ocultar panel";
+    setPanel(!document.body.classList.contains("panel-hidden"));
   }
 
   function bindTopbar() {
@@ -572,7 +593,8 @@ SE.ui = (function () {
       SE.setMode(SE.state.mode === "light" ? "dark" : "light");
       updateModeUI();
     });
-    $("#panel-toggle").addEventListener("click", togglePanel);
+    $("#panel-collapse").addEventListener("click", togglePanel);
+    $("#panel-rail").addEventListener("click", togglePanel);
     $("#vision-btn").addEventListener("click", function (e) {
       e.stopPropagation();
       var dd = $("#vision-dropdown");
@@ -655,6 +677,7 @@ SE.ui = (function () {
     $("#ab-dim-label").textContent = isAll ? "Dirección" : (DIM_LABELS[ab.dimension] || ab.dimension);
     var hasB = ab.b != null;
     var split = !!(ab.split && hasB);
+    pill.classList.toggle("split", split);
     var btnA = $("#ab-a"), btnB = $("#ab-b");
     btnA.classList.toggle("showing", !split && ab.showing === "a");
     btnB.classList.toggle("showing", !split && ab.showing === "b");
@@ -711,7 +734,7 @@ SE.ui = (function () {
     /* Clona la pantalla activa para pintarla con los tokens de B */
     overlay.innerHTML = "";
     SE.icons.invalidate(overlay);
-    var active = vp.querySelector(".mock-screen.active");
+    var active = $("#mock-viewport > .mock-screen.active");
     if (active) {
       var clone = active.cloneNode(true);
       clone.removeAttribute("data-screen");
@@ -837,20 +860,28 @@ SE.ui = (function () {
   /* Cada dimensión tiene una pantalla donde de verdad se juzga.
      La pista la hace explícita y lleva allí de un click. */
   var SCREEN_NAMES = {
-    dashboard: "Panel", landing: "Landing", blog: "Artículo",
+    resumen: "Vista general", dashboard: "Panel", pagina: "Página",
     colores: "Colores", componentes: "Componentes"
   };
 
+  /* Para qué sirve cada pantalla; se usa en las tarjetas de la vista general */
+  var SCREEN_PURPOSE = {
+    dashboard: "Densidad, colores semánticos, tamaños pequeños y los estados incómodos.",
+    pagina: "Los display grandes arriba y la escala completa en texto largo abajo.",
+    colores: "Toda la paleta conviviendo: formas puras, proporciones y pares de uso.",
+    componentes: "El kit con los estados forzados: iconos, botones, campos y movimiento."
+  };
+
   var DIM_PURPOSE = {
-    fontPair: { screen: "blog", text: "La armonía entre título y cuerpo se juzga leyendo; los titulares grandes, en la Landing." },
-    typeScale: { screen: "blog", text: "El Artículo recorre la escala entera, del pie de foto al titular." },
+    fontPair: { screen: "pagina", text: "La armonía entre título y cuerpo se juzga leyendo, y los titulares grandes justo encima." },
+    typeScale: { screen: "pagina", text: "La mitad editorial de Página recorre la escala entera, del pie de foto al titular." },
     palette: { screen: "colores", text: "Colores enfrenta toda la paleta; el Panel prueba los semánticos en uso real." },
     spacing: { screen: "dashboard", text: "La densidad se siente en la pantalla más apretada." },
-    radius: { screen: "landing", text: "El radio se lee en los botones y tarjetas grandes." },
-    shadow: { screen: "landing", text: "La elevación se aprecia en tarjetas sobre fondo amplio." },
+    radius: { screen: "pagina", text: "El radio se lee en los botones y tarjetas grandes del hero." },
+    shadow: { screen: "pagina", text: "La elevación se aprecia en tarjetas sobre fondo amplio." },
     icons: { screen: "componentes", text: "Componentes reúne los 24 iconos del sistema a tres tamaños: es donde se ve si la familia aguanta." },
     motion: { screen: "componentes", text: "El movimiento se juzga interactuando: pasa el puntero por botones, filas y tarjetas." },
-    reading: { screen: "blog", text: "Interlineado y ancho de línea solo se juzgan con texto largo." }
+    reading: { screen: "pagina", text: "Interlineado y ancho de línea solo se juzgan con texto largo." }
   };
 
   function appendPurpose(dim) {
@@ -913,6 +944,71 @@ SE.ui = (function () {
 
   /* ================= INIT ================= */
 
+  /* ================= VISTA GENERAL ================= */
+
+  /* Cada miniatura es un clon vivo de su pantalla. Al vivir dentro de
+     #mock-viewport hereda los tokens y el repintado de iconos: no hay
+     una segunda maqueta que mantener sincronizada. */
+  function renderOverview() {
+    var grid = $("#ov-grid");
+    if (!grid) return;
+    var html = "";
+    SE.SCREENS.forEach(function (screen) {
+      if (screen === "resumen") return;
+      html += '<button type="button" class="ov-card" data-goto-screen="' + screen + '">' +
+        '<span class="ov-card-head"><strong>' + SCREEN_NAMES[screen] + "</strong>" +
+        "<span>" + (SCREEN_PURPOSE[screen] || "") + "</span></span>" +
+        '<span class="ov-frame"><span class="ov-scale"></span></span></button>';
+    });
+    grid.innerHTML = html;
+
+    $all("#ov-grid .ov-card").forEach(function (card) {
+      var src = $('#mock-viewport .mock-screen[data-screen="' + card.dataset.gotoScreen + '"]');
+      if (!src) return;
+      var clone = src.cloneNode(true);
+      clone.classList.add("active");
+      clone.classList.remove("playing");
+      clone.removeAttribute("data-screen");
+      clone.setAttribute("aria-hidden", "true");
+      /* Fuera los ids duplicados, los marcadores de entrada y todo lo
+         que pueda robar el foco desde dentro de una miniatura. */
+      $all2(clone, "[id]").forEach(function (n) { n.removeAttribute("id"); });
+      $all2(clone, "[data-enter]").forEach(function (n) { n.removeAttribute("data-enter"); });
+      $all2(clone, "a, button, input, select, textarea").forEach(function (n) { n.setAttribute("tabindex", "-1"); });
+      card.querySelector(".ov-scale").appendChild(clone);
+    });
+    measureOverview();
+  }
+
+  function $all2(root, sel) {
+    return Array.prototype.slice.call(root.querySelectorAll(sel));
+  }
+
+  /* El factor de escala depende del ancho real del marco, que cambia al
+     plegar el panel o redimensionar la ventana. */
+  function measureOverview() {
+    var grid = $("#ov-grid");
+    if (!grid) return;
+    var frame = grid.querySelector(".ov-frame");
+    if (!frame) return;
+    var w = frame.clientWidth;
+    if (w > 0) grid.style.setProperty("--ov-k", (w / 1280).toFixed(4));
+  }
+
+  function bindOverview() {
+    var grid = $("#ov-grid");
+    if (!grid) return;
+    grid.addEventListener("click", function (e) {
+      var card = e.target.closest("[data-goto-screen]");
+      if (card) switchScreen(card.dataset.gotoScreen);
+    });
+    if (window.ResizeObserver) {
+      new ResizeObserver(measureOverview).observe(grid);
+    } else {
+      window.addEventListener("resize", measureOverview);
+    }
+  }
+
   /* La rejilla de iconos de la pantalla Componentes se genera desde el
      registro: así nunca se desincroniza del catálogo. */
   function renderIconGrid() {
@@ -937,12 +1033,14 @@ SE.ui = (function () {
     bindMotion();
     bindReading();
     bindSnapshots();
+    bindOverview();
     bindAB();
     bindKeyboard();
     setVision(SE.state.vision || "normal");
     /* Los iconos recién inyectados aún no tienen trazado: se invalida el
        repintado para que la siguiente aplicación de tokens los rellene. */
     renderIconGrid();
+    renderOverview();
     SE.icons.invalidate($("#mock-viewport"));
     SE.applyTokens();
     SE.ui.ready = true;
