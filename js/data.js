@@ -11,39 +11,39 @@ SE.data = (function () {
      cat: sans | serif | display | mono · tone: neutral | geometric | humanist | expressive
      contrast: contraste de trazo · super: superfamilia diseñada junta */
   var fonts = {
-    "inter":             { id: "inter", family: "Inter", css2: "Inter:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.02em", super: null },
-    "space-grotesk":     { id: "space-grotesk", family: "Space Grotesk", css2: "Space+Grotesk:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: null },
-    "manrope":           { id: "manrope", family: "Manrope", css2: "Manrope:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 700, tracking: "-0.015em", super: null },
-    "playfair":          { id: "playfair", family: "Playfair Display", css2: "Playfair+Display:wght@400;600;700", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 600, tracking: "0", super: null },
-    "lora":              { id: "lora", family: "Lora", css2: "Lora:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "medium", headingWeight: 600, tracking: "0", super: null },
-    "fraunces":          { id: "fraunces", family: "Fraunces", css2: "Fraunces:wght@400;600;700", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 600, tracking: "-0.005em", super: null },
-    "nunito-sans":       { id: "nunito-sans", family: "Nunito Sans", css2: "Nunito+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.005em", super: null },
-    "merriweather":      { id: "merriweather", family: "Merriweather", css2: "Merriweather:wght@400;700", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "medium", headingWeight: 700, tracking: "-0.01em", super: null },
-    "source-sans":       { id: "source-sans", family: "Source Sans 3", css2: "Source+Sans+3:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 600, tracking: "-0.005em", super: null },
-    "libre-franklin":    { id: "libre-franklin", family: "Libre Franklin", css2: "Libre+Franklin:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 600, tracking: "-0.015em", super: "libre" },
+    "inter":             { id: "inter", family: "Inter", css2: "Inter:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.02em", super: null },
+    "space-grotesk":     { id: "space-grotesk", family: "Space Grotesk", css2: "Space+Grotesk:wght@400;500;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: null },
+    "manrope":           { id: "manrope", family: "Manrope", css2: "Manrope:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 700, tracking: "-0.015em", super: null },
+    "playfair":          { id: "playfair", family: "Playfair Display", css2: "Playfair+Display:wght@400;500;600;700;800", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 600, tracking: "0", super: null },
+    "lora":              { id: "lora", family: "Lora", css2: "Lora:wght@400;500;600;700", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "medium", headingWeight: 600, tracking: "0", super: null },
+    "fraunces":          { id: "fraunces", family: "Fraunces", css2: "Fraunces:wght@400;500;600;700;800", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 600, tracking: "-0.005em", super: null },
+    "nunito-sans":       { id: "nunito-sans", family: "Nunito Sans", css2: "Nunito+Sans:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.005em", super: null },
+    "merriweather":      { id: "merriweather", family: "Merriweather", css2: "Merriweather:wght@400;500;600;700;800", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "medium", headingWeight: 700, tracking: "-0.01em", super: null },
+    "source-sans":       { id: "source-sans", family: "Source Sans 3", css2: "Source+Sans+3:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 600, tracking: "-0.005em", super: null },
+    "libre-franklin":    { id: "libre-franklin", family: "Libre Franklin", css2: "Libre+Franklin:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 600, tracking: "-0.015em", super: "libre" },
     "libre-baskerville": { id: "libre-baskerville", family: "Libre Baskerville", css2: "Libre+Baskerville:wght@400;700", fallback: "Georgia, serif", cat: "serif", tone: "expressive", contrast: "high", headingWeight: 700, tracking: "0", super: "libre" },
     "dm-serif":          { id: "dm-serif", family: "DM Serif Display", css2: "DM+Serif+Display", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 400, tracking: "0", super: "dm" },
-    "dm-sans":           { id: "dm-sans", family: "DM Sans", css2: "DM+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: "dm" },
-    "plex-sans":         { id: "plex-sans", family: "IBM Plex Sans", css2: "IBM+Plex+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 600, tracking: "-0.01em", super: "plex" },
-    "plex-serif":        { id: "plex-serif", family: "IBM Plex Serif", css2: "IBM+Plex+Serif:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "neutral", contrast: "medium", headingWeight: 600, tracking: "0", super: "plex" },
-    "poppins":           { id: "poppins", family: "Poppins", css2: "Poppins:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 600, tracking: "-0.005em", super: null },
-    "open-sans":         { id: "open-sans", family: "Open Sans", css2: "Open+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.005em", super: null },
+    "dm-sans":           { id: "dm-sans", family: "DM Sans", css2: "DM+Sans:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: "dm" },
+    "plex-sans":         { id: "plex-sans", family: "IBM Plex Sans", css2: "IBM+Plex+Sans:wght@400;500;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 600, tracking: "-0.01em", super: "plex" },
+    "plex-serif":        { id: "plex-serif", family: "IBM Plex Serif", css2: "IBM+Plex+Serif:wght@400;500;600;700", fallback: "Georgia, serif", cat: "serif", tone: "neutral", contrast: "medium", headingWeight: 600, tracking: "0", super: "plex" },
+    "poppins":           { id: "poppins", family: "Poppins", css2: "Poppins:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 600, tracking: "-0.005em", super: null },
+    "open-sans":         { id: "open-sans", family: "Open Sans", css2: "Open+Sans:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.005em", super: null },
 
     /* Segunda tanda: fuentes con más carácter, para salir del repertorio
        por defecto (Inter · Poppins · Playfair) sin salir de Google Fonts. */
     "instrument-serif":  { id: "instrument-serif", family: "Instrument Serif", css2: "Instrument+Serif", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 400, tracking: "-0.015em", super: null },
-    "bricolage":         { id: "bricolage", family: "Bricolage Grotesque", css2: "Bricolage+Grotesque:wght@400;600;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "expressive", contrast: "medium", headingWeight: 800, tracking: "-0.025em", super: null },
-    "newsreader":        { id: "newsreader", family: "Newsreader", css2: "Newsreader:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "medium", headingWeight: 600, tracking: "-0.005em", super: null },
-    "spectral":          { id: "spectral", family: "Spectral", css2: "Spectral:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "neutral", contrast: "medium", headingWeight: 600, tracking: "0", super: null },
-    "eb-garamond":       { id: "eb-garamond", family: "EB Garamond", css2: "EB+Garamond:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "high", headingWeight: 600, tracking: "0", super: null },
-    "cormorant":         { id: "cormorant", family: "Cormorant Garamond", css2: "Cormorant+Garamond:wght@400;600;700", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 400, tracking: "0.04em", super: null },
-    "karla":             { id: "karla", family: "Karla", css2: "Karla:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: null },
-    "work-sans":         { id: "work-sans", family: "Work Sans", css2: "Work+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 600, tracking: "-0.015em", super: null },
-    "archivo":           { id: "archivo", family: "Archivo", css2: "Archivo:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.03em", super: null },
+    "bricolage":         { id: "bricolage", family: "Bricolage Grotesque", css2: "Bricolage+Grotesque:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "expressive", contrast: "medium", headingWeight: 800, tracking: "-0.025em", super: null },
+    "newsreader":        { id: "newsreader", family: "Newsreader", css2: "Newsreader:wght@400;500;600;700;800", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "medium", headingWeight: 600, tracking: "-0.005em", super: null },
+    "spectral":          { id: "spectral", family: "Spectral", css2: "Spectral:wght@400;500;600;700;800", fallback: "Georgia, serif", cat: "serif", tone: "neutral", contrast: "medium", headingWeight: 600, tracking: "0", super: null },
+    "eb-garamond":       { id: "eb-garamond", family: "EB Garamond", css2: "EB+Garamond:wght@400;500;600;700;800", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "high", headingWeight: 600, tracking: "0", super: null },
+    "cormorant":         { id: "cormorant", family: "Cormorant Garamond", css2: "Cormorant+Garamond:wght@400;500;600;700", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 400, tracking: "0.04em", super: null },
+    "karla":             { id: "karla", family: "Karla", css2: "Karla:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: null },
+    "work-sans":         { id: "work-sans", family: "Work Sans", css2: "Work+Sans:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 600, tracking: "-0.015em", super: null },
+    "archivo":           { id: "archivo", family: "Archivo", css2: "Archivo:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.03em", super: null },
     "anton":             { id: "anton", family: "Anton", css2: "Anton", fallback: "Impact, system-ui, sans-serif", cat: "display", tone: "expressive", contrast: "low", headingWeight: 400, tracking: "-0.01em", super: null },
-    "hanken":            { id: "hanken", family: "Hanken Grotesk", css2: "Hanken+Grotesk:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.02em", super: null },
-    "jetbrains-mono":    { id: "jetbrains-mono", family: "JetBrains Mono", css2: "JetBrains+Mono:wght@400;600;700", fallback: "ui-monospace, SFMono-Regular, Menlo, monospace", cat: "mono", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.04em", super: null },
-    "public-sans":       { id: "public-sans", family: "Public Sans", css2: "Public+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: null },
+    "hanken":            { id: "hanken", family: "Hanken Grotesk", css2: "Hanken+Grotesk:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.02em", super: null },
+    "jetbrains-mono":    { id: "jetbrains-mono", family: "JetBrains Mono", css2: "JetBrains+Mono:wght@400;500;600;700;800", fallback: "ui-monospace, SFMono-Regular, Menlo, monospace", cat: "mono", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.04em", super: null },
+    "public-sans":       { id: "public-sans", family: "Public Sans", css2: "Public+Sans:wght@400;500;600;700;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: null },
     "atkinson":          { id: "atkinson", family: "Atkinson Hyperlegible", css2: "Atkinson+Hyperlegible:wght@400;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "0", super: null }
   };
 
@@ -116,6 +116,18 @@ SE.data = (function () {
       light: { sm: "0 2px 10px rgba(0,0,0,0.05)", md: "0 8px 30px -6px rgba(0,0,0,0.12)", lg: "0 18px 50px -10px rgba(0,0,0,0.18)" },
       dark:  { sm: "0 2px 10px rgba(0,0,0,0.5)", md: "0 10px 34px -6px rgba(0,0,0,0.6)", lg: "0 20px 56px -10px rgba(0,0,0,0.65)" },
       rationale: "Sombras grandes y suaves: atmósfera flotante, tono premium." }
+  ];
+
+  /* ---------- Peso de titulares ----------
+     No todas las familias tienen todos los pesos: Anton e Instrument Serif
+     solo traen 400. El panel ofrece los de la fuente vigente (derivados de
+     su propio css2) y writeTokens ajusta al más cercano disponible. */
+  var weights = [
+    { id: 400, name: "Normal", rationale: "Titulares del mismo peso que el texto: la jerarquía la sostienen el tamaño y el espacio. Sereno, editorial, exige una escala amplia." },
+    { id: 500, name: "Medio", rationale: "Apenas por encima del texto: refuerza sin levantar la voz. Funciona bien con serifas de alto contraste." },
+    { id: 600, name: "Semi", rationale: "El punto medio de producto: destaca con claridad sin bloques negros en pantalla." },
+    { id: 700, name: "Negrita", rationale: "El peso clásico de titular: contundente y universalmente disponible." },
+    { id: 800, name: "Extra", rationale: "Máxima presencia: titulares que mandan sobre todo lo demás. Cansa si hay muchos seguidos." }
   ];
 
   /* ---------- Familias de iconos ----------
@@ -253,35 +265,35 @@ SE.data = (function () {
   var presets = [
     { id: "neogrotesca", name: "Neo-grotesca con carácter", origen: "Grotesca contemporánea de las imperfecciones deliberadas",
       desc: "Titular con irregularidades a propósito, cuerpo neutro y teal mineral en lugar del violeta de rigor.",
-      decisions: { fontPair: { type: "pair", id: "bricolage-inter" }, typeScale: { ratio: 1.25, base: 16 }, palette: { type: "curated", id: "teal" }, spacing: "normal", radius: "medio", shadow: "sutil", icons: "lineal-suave", motion: "sutil", reading: { lineHeight: 1.55, measure: 68 } } },
+      decisions: { fontPair: { type: "pair", id: "bricolage-inter" }, typeScale: { ratio: 1.25, base: 16 }, palette: { type: "curated", id: "teal" }, spacing: "normal", radius: "medio", shadow: "sutil", icons: "lineal-suave", motion: "sutil", weight: 800, reading: { lineHeight: 1.55, measure: 68 } } },
 
     { id: "suiza", name: "Suiza internacional", origen: "Escuela suiza · Müller-Brockmann, Neue Grafik",
       desc: "Una sola grotesca, retícula apretada, esquinas vivas y el rojo reservado para lo que de verdad avisa.",
-      decisions: { fontPair: { type: "pair", id: "archivo-archivo" }, typeScale: { ratio: 1.2, base: 16 }, palette: { type: "curated", id: "suiza" }, spacing: "compacta", radius: "recto", shadow: "ninguna", icons: "geometrico", motion: "ninguno", reading: { lineHeight: 1.45, measure: 72 } } },
+      decisions: { fontPair: { type: "pair", id: "archivo-archivo" }, typeScale: { ratio: 1.2, base: 16 }, palette: { type: "curated", id: "suiza" }, spacing: "compacta", radius: "recto", shadow: "ninguna", icons: "geometrico", motion: "ninguno", weight: 700, reading: { lineHeight: 1.45, measure: 72 } } },
 
     { id: "revista", name: "Revista editorial", origen: "Serifas expresivas y retícula de revista",
       desc: "Display de alto contraste sobre papel crema, saltos grandes de escala y cero sombras: manda el texto.",
-      decisions: { fontPair: { type: "pair", id: "instrument-newsreader" }, typeScale: { ratio: 1.414, base: 18 }, palette: { type: "curated", id: "tinta-papel" }, spacing: "normal", radius: "sutil", shadow: "ninguna", icons: "lineal-fino", motion: "sutil", reading: { lineHeight: 1.62, measure: 66 } } },
+      decisions: { fontPair: { type: "pair", id: "instrument-newsreader" }, typeScale: { ratio: 1.414, base: 18 }, palette: { type: "curated", id: "tinta-papel" }, spacing: "normal", radius: "sutil", shadow: "ninguna", icons: "lineal-fino", motion: "sutil", weight: 400, reading: { lineHeight: 1.62, measure: 66 } } },
 
     { id: "terminal", name: "Documento técnico", origen: "Revival del monoespaciado en producto",
       desc: "Titulares de terminal, densidad alta y bordes finos. Precisión antes que calidez.",
-      decisions: { fontPair: { type: "pair", id: "mono-plex" }, typeScale: { ratio: 1.2, base: 15 }, palette: { type: "curated", id: "grafito" }, spacing: "compacta", radius: "sutil", shadow: "ninguna", icons: "geometrico", motion: "sutil", reading: { lineHeight: 1.55, measure: 74 } } },
+      decisions: { fontPair: { type: "pair", id: "mono-plex" }, typeScale: { ratio: 1.2, base: 15 }, palette: { type: "curated", id: "grafito" }, spacing: "compacta", radius: "sutil", shadow: "ninguna", icons: "geometrico", motion: "sutil", weight: 700, reading: { lineHeight: 1.55, measure: 74 } } },
 
     { id: "bouba", name: "Grotesca cálida", origen: "Grotescas blandas y neutros terrosos",
       desc: "Formas redondeadas, oliva y piedra, mucho aire y una curva con rebote. Cercano sin ser infantil.",
-      decisions: { fontPair: { type: "pair", id: "hanken-hanken" }, typeScale: { ratio: 1.25, base: 17 }, palette: { type: "curated", id: "oliva" }, spacing: "amplia", radius: "redondeado", shadow: "difusa", icons: "grueso", motion: "expresivo", reading: { lineHeight: 1.6, measure: 62 } } },
+      decisions: { fontPair: { type: "pair", id: "hanken-hanken" }, typeScale: { ratio: 1.25, base: 17 }, palette: { type: "curated", id: "oliva" }, spacing: "amplia", radius: "redondeado", shadow: "difusa", icons: "grueso", motion: "expresivo", weight: 700, reading: { lineHeight: 1.6, measure: 62 } } },
 
     { id: "industrial", name: "Cartel industrial", origen: "Display brutalista y cartelería",
       desc: "Condensada pesadísima, saltos de escala enormes, amarillo ácido y ni un gramo de suavidad.",
-      decisions: { fontPair: { type: "pair", id: "anton-work" }, typeScale: { ratio: 1.5, base: 16 }, palette: { type: "curated", id: "acido" }, spacing: "compacta", radius: "recto", shadow: "ninguna", icons: "relleno", motion: "ninguno", reading: { lineHeight: 1.45, measure: 70 } } },
+      decisions: { fontPair: { type: "pair", id: "anton-work" }, typeScale: { ratio: 1.5, base: 16 }, palette: { type: "curated", id: "acido" }, spacing: "compacta", radius: "recto", shadow: "ninguna", icons: "relleno", motion: "ninguno", weight: 400, reading: { lineHeight: 1.45, measure: 70 } } },
 
     { id: "versalitas", name: "Lujo en versalitas", origen: "Display ancho en versalitas espaciadas",
       desc: "Garalda finísima sobre marfil, iconos duotono en oro apagado. El color calla para que hable la letra.",
-      decisions: { fontPair: { type: "pair", id: "cormorant-karla" }, typeScale: { ratio: 1.333, base: 17 }, palette: { type: "curated", id: "oro-tinta" }, spacing: "amplia", radius: "recto", shadow: "sutil", icons: "duotono", motion: "suave", reading: { lineHeight: 1.7, measure: 60 } } },
+      decisions: { fontPair: { type: "pair", id: "cormorant-karla" }, typeScale: { ratio: 1.333, base: 17 }, palette: { type: "curated", id: "oro-tinta" }, spacing: "amplia", radius: "recto", shadow: "sutil", icons: "duotono", motion: "suave", weight: 400, reading: { lineHeight: 1.7, measure: 60 } } },
 
     { id: "servicio", name: "Servicio público", origen: "Sistemas de diseño públicos · USWDS, GOV.UK",
       desc: "Cuerpo grande, azul institucional y dos fuentes dibujadas para leerse. La accesibilidad como punto de partida.",
-      decisions: { fontPair: { type: "pair", id: "public-atkinson" }, typeScale: { ratio: 1.2, base: 17 }, palette: { type: "curated", id: "azul-institucional" }, spacing: "normal", radius: "sutil", shadow: "ninguna", icons: "lineal-suave", motion: "sutil", reading: { lineHeight: 1.6, measure: 66 } } }
+      decisions: { fontPair: { type: "pair", id: "public-atkinson" }, typeScale: { ratio: 1.2, base: 17 }, palette: { type: "curated", id: "azul-institucional" }, spacing: "normal", radius: "sutil", shadow: "ninguna", icons: "lineal-suave", motion: "sutil", weight: 700, reading: { lineHeight: 1.6, measure: 66 } } }
   ];
 
   return {
@@ -291,6 +303,7 @@ SE.data = (function () {
     spacings: spacings,
     radii: radii,
     shadows: shadows,
+    weights: weights,
     iconSets: iconSets,
     motions: motions,
     palettes: palettes,

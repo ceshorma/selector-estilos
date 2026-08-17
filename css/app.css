@@ -86,6 +86,7 @@ body {
 #app {
   display: flex;
   height: 100vh;
+  height: 100dvh; /* en iOS la barra de URL mueve 100vh */
 }
 
 #stage {
@@ -102,11 +103,15 @@ body {
   background: var(--app-bg2);
 }
 
+/* Contenedor con nombre: los mocks consultan SU ancho, no el de la
+   ventana. Es lo que permite encogerlos para caber en un móvil sin que
+   se disparen sus reglas de tablet. */
 #mock-viewport {
   position: relative;
   min-width: 1024px;
   min-height: 100%;
   background: var(--color-bg);
+  container: mock / inline-size;
 }
 
 /* --- Vista dividida A|B (cortina a escala real) --- */
@@ -135,6 +140,7 @@ body {
 .split-handle {
   position: sticky;
   top: 44vh;
+  top: 44dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -291,6 +297,10 @@ kbd {
 
 .tb-right button:hover, #reset-btn:hover { background: var(--app-bg-hover); }
 
+#fit-toggle { display: none; }
+
+body.narrow #fit-toggle { display: inline-flex; }
+
 button.tb-primary {
   background: var(--app-accent);
   border-color: var(--app-accent);
@@ -426,10 +436,13 @@ button.tb-primary:hover { background: #ecc476; }
 
 /* El clon se dibuja a tamaño real y se encoge: así el resultado es
    fiel, con sus tipos y su densidad, y no una maqueta aparte. */
-/* display:block obligatorio: transform no se aplica a elementos en línea */
+/* display:block obligatorio: transform no se aplica a elementos en línea.
+   Y contenedor propio: cada clon debe estilarse por sus 1280 px, no por
+   el ancho del viewport que lo aloja. */
 .ov-scale {
   display: block;
   width: 1280px;
+  container: mock / inline-size;
   transform: scale(var(--ov-k, 0.34));
   transform-origin: top left;
   pointer-events: none;
@@ -713,6 +726,23 @@ body.panel-hidden #panel { display: none; }
 
 /* Con «Direcciones» plegado, el nombre de la activa sigue leyéndose
    en la propia cabecera: cerrarlo no te deja sin saber dónde estás. */
+#surprise-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 24px;
+  border: 1px solid var(--app-line);
+  border-radius: 7px;
+  background: var(--app-bg3);
+  color: var(--app-muted);
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+}
+
+#surprise-btn:hover { color: var(--app-accent); border-color: var(--app-accent); }
+
 .p-acc summary > small {
   font-size: 11px;
   font-weight: 500;
@@ -916,6 +946,161 @@ body.panel-hidden #panel { display: none; }
   color: var(--app-accent);
   cursor: pointer;
   white-space: nowrap;
+}
+
+/* ---------- Explorador tipográfico ----------
+   Lo que faltaba: ver la fuente, no leer su nombre. Cada ficha se pinta
+   con las familias reales, cargadas subseteadas al texto de muestra. */
+
+.p-input {
+  width: 100%;
+  background: var(--app-bg);
+  color: var(--app-text);
+  border: 1px solid var(--app-line);
+  border-radius: 8px;
+  font: 12.5px var(--app-font);
+  padding: 8px 10px;
+  margin-top: 8px;
+}
+
+.p-input::placeholder { color: var(--app-faint); }
+
+.fp-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fp-preview .p-input { margin-top: 0; flex: 1; min-width: 0; }
+
+.fp-size { flex: 0 0 74px; }
+
+.fp-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.fp-cat {
+  border: 1px solid var(--app-line);
+  background: transparent;
+  color: var(--app-muted);
+  font: 500 11px var(--app-font);
+  padding: 4px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.fp-cat:hover { color: var(--app-text); }
+
+.fp-cat.active {
+  background: var(--app-bg3);
+  color: var(--app-text);
+  border-color: var(--app-accent);
+}
+
+.fp-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 46vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-bg3) transparent;
+}
+
+.font-card {
+  display: flex;
+  flex-direction: column;
+  /* Hijo de una columna flex con max-height: sin esto se comprime hasta
+     desaparecer en vez de desbordar y hacer scroll. */
+  flex: 0 0 auto;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--app-line);
+  background: var(--app-bg2);
+  color: var(--app-text);
+  border-radius: 9px;
+  padding: 9px 11px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.font-card:hover { background: var(--app-bg3); }
+
+.font-card.active {
+  border-color: var(--app-accent);
+  background: var(--app-bg3);
+}
+
+.fc-label {
+  font: 600 11.5px var(--app-font);
+  color: var(--app-muted);
+}
+
+/* Los espécimenes: sin recorte de línea, con el color del texto */
+.fc-sample {
+  display: block;
+  color: var(--app-text);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fc-body {
+  color: var(--app-muted);
+  line-height: 1.4;
+  margin-top: 1px;
+}
+
+.fc-names {
+  font: 10.5px var(--app-mono);
+  color: var(--app-faint);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fc-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fc-name {
+  color: var(--app-text);
+  line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fc-cat {
+  flex: 0 0 auto;
+  font: 10px var(--app-mono);
+  color: var(--app-faint);
+  text-transform: lowercase;
+}
+
+/* Glifo del peso: la misma «Aa» en cada peso disponible */
+.seg-btn .glyph-weight {
+  font-size: 17px;
+  line-height: 1.1;
+  color: currentColor;
+}
+
+.seg-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 /* Filas de opción (parejas tipográficas, paletas) */
@@ -1365,6 +1550,9 @@ body.panel-hidden #panel { display: none; }
 .modal {
   position: relative;
   width: min(480px, calc(100vw - 40px));
+  /* Sin tope de alto, «Descargar todo» quedaba fuera de pantalla */
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
   background: var(--app-bg2);
   border: 1px solid var(--app-line);
   border-radius: 14px;
@@ -1515,4 +1703,193 @@ body.panel-hidden #panel { display: none; }
     row-gap: 4px;
   }
   .tb-right { flex-wrap: wrap; }
+}
+
+
+/* ============================================================
+   MÓVIL — la herramienta con el dedo
+   El mock conserva su maqueta de escritorio y se encoge (ver
+   measureFit en ui.js); lo que cambia aquí es el instrumento.
+   ============================================================ */
+
+@media (max-width: 720px) {
+  /* --- Barra superior: dos filas, pestañas deslizables --- */
+  #topbar {
+    height: auto;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px) * 0);
+  }
+
+  .tb-left {
+    width: 100%;
+    overflow: visible;
+    order: 2;
+  }
+
+  .tb-right {
+    width: 100%;
+    order: 1;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  /* Los cuatro controles caben en una fila si la etiqueta del modo se va
+     y el resto no se estira: la barra pasa de 330 px de alto a ~150. */
+  .tb-right button {
+    flex: 0 1 auto;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 11px;
+    font-size: 12px;
+  }
+
+  #mode-toggle .tb-label,
+  #vision-btn .tb-label { display: none; }
+
+  #mode-toggle { flex: 0 0 auto; min-width: 44px; padding: 8px 12px; }
+
+  .tb-menu { flex: 0 1 auto; display: flex; min-width: 0; }
+  .tb-menu > button { width: 100%; }
+
+  #export-btn { flex: 0 0 auto; }
+
+  /* Las 5 pestañas piden ~414 px: se deslizan en vez de recortarse */
+  .tb-tabs {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .tb-tabs::-webkit-scrollbar { display: none; }
+
+  .tb-tabs button {
+    scroll-snap-align: start;
+  }
+
+  .tb-dropdown { left: 0; right: auto; min-width: 0; width: 100%; }
+
+  /* --- El panel pasa a hoja inferior --- */
+  #panel {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: auto;
+    flex: none;
+    height: min(86dvh, 620px);
+    border-left: 0;
+    border-top: 1px solid var(--app-line);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -14px 44px rgba(0, 0, 0, 0.6);
+    z-index: 40;
+  }
+
+  /* Asa de la hoja */
+  #panel::before {
+    content: "";
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--app-line);
+  }
+
+  .panel-head { padding-top: 18px; }
+
+  .panel-scroll { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+
+  /* El raíl lateral se convierte en botón flotante inferior */
+  #panel-rail {
+    top: auto;
+    right: 50%;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(50%);
+    flex-direction: row;
+    gap: 8px;
+    padding: 12px 20px;
+    min-height: 44px;
+    border: 1px solid var(--app-line);
+    border-radius: 999px;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5);
+  }
+
+  #panel-rail:hover { padding-right: 20px; }
+
+  #panel-rail span { writing-mode: horizontal-tb; }
+
+  /* --- Objetivos táctiles --- */
+  #panel-collapse,
+  #undo-btn,
+  #redo-btn,
+  #surprise-btn,
+  .stepper-btn,
+  .ab-choice,
+  #ab-cancel,
+  .modal-close,
+  .snap-cmp,
+  .snap-del {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  #reset-btn { min-height: 44px; }
+
+  .seg-btn { min-height: 44px; }
+
+  .tb-tabs button { min-height: 44px; }
+
+  .snap-actions button,
+  .pal-edit-toggle,
+  .snap-apply { min-height: 44px; }
+
+  /* En la cabecera de un acordeón, 44 de alto lo deformaría: se queda en
+     32×44, por encima del mínimo de 24 que exige WCAG 2.5.8. */
+  .ab-btn { min-width: 44px; min-height: 32px; }
+
+  .fp-cat { min-height: 34px; padding: 6px 12px; }
+
+  /* --- Píldora A/B: envuelve en vez de salirse --- */
+  #ab-pill {
+    left: 8px;
+    right: 8px;
+    transform: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ab-hint { display: none; }
+
+  #ab-commit-a, #ab-commit-b { max-width: 44vw; }
+
+  /* --- Una miniatura por fila --- */
+  .ov-grid { grid-template-columns: minmax(0, 1fr); }
+
+  .ov-page { padding: var(--space-5) var(--space-4) var(--space-6); }
+
+  /* --- Modal a pantalla casi completa --- */
+  .modal { width: calc(100vw - 20px); padding: 18px 16px; }
+
+  .share-row { flex-wrap: wrap; }
+
+  #share-copy { width: 100%; min-height: 44px; }
+
+  .fp-list { max-height: 40vh; }
+}
+
+/* Botones de empuje del divisor: en táctil el asa es inagarrable */
+#ab-nudge-l[hidden], #ab-nudge-r[hidden] { display: none; }
+
+#ab-nudge-l, #ab-nudge-r {
+  min-width: 34px;
+  font-size: 12px;
+  justify-content: center;
 }

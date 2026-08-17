@@ -217,6 +217,10 @@
 
 .ld-feature:hover .ld-feature-link .ic { transform: translateX(4px); }
 
+@media (hover: none) {
+  .ld-feature:active .ld-feature-link .ic { transform: translateX(4px); }
+}
+
 /* --- Testimonio --- */
 
 .ld-quote {
@@ -346,7 +350,11 @@
   color: var(--color-text-muted);
 }
 
-@media (max-width: 1240px) {
+/* Container query, no media query: estos mocks viven dentro de una caja de
+   1024 px o más con desplazamiento propio, así que deben responder a SU ancho
+   y no al del navegador. Con @media se activaban las reglas de tablet mientras
+   el mock seguía midiendo 1024 px, y lo mismo deformaba las miniaturas. */
+@container mock (max-width: 1240px) {
   .ld-feature-grid { grid-template-columns: 1fr 1fr; }
   .ld-footer-cols { grid-template-columns: 1fr 1fr; }
 }

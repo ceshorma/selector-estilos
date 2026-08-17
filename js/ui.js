@@ -12,7 +12,7 @@ SE.ui = (function () {
   var DIM_LABELS = {
     fontPair: "Tipografía", typeScale: "Escala", palette: "Color",
     spacing: "Espaciado", radius: "Bordes", shadow: "Sombras",
-    icons: "Iconos", motion: "Movimiento", reading: "Lectura"
+    weight: "Peso", icons: "Iconos", motion: "Movimiento", reading: "Lectura"
   };
 
   var VISION_LABELS = {
@@ -105,6 +105,30 @@ SE.ui = (function () {
 
   /* ================= TIPOGRAFÍA ================= */
 
+  /* Estado del explorador. Son preferencias de visualización, no
+     decisiones de diseño: no entran en `decisions` ni en el export. */
+  var UI_PREFS_KEY = "selectorEstilos.ui.v1";
+  var fpSlot = "heading";          /* qué ranura edita el modo Libre */
+  var fpQuery = "";
+  var fpCat = "todas";
+  var fpSample = "Cultiva con datos";
+  var fpSize = 26;
+
+  var CAT_LABELS = { sans: "sans", serif: "serif", display: "display", mono: "mono" };
+
+  function loadPrefs() {
+    try {
+      var v = JSON.parse(localStorage.getItem(UI_PREFS_KEY) || "{}");
+      if (typeof v.sample === "string" && v.sample.length) fpSample = v.sample.slice(0, 60);
+      if (typeof v.size === "number" && v.size >= 14 && v.size <= 44) fpSize = v.size;
+    } catch (e) { /* sin almacenamiento */ }
+  }
+
+  function savePrefs() {
+    try { localStorage.setItem(UI_PREFS_KEY, JSON.stringify({ sample: fpSample, size: fpSize })); }
+    catch (e) { /* sin almacenamiento */ }
+  }
+
   /* Sincroniza la pestaña Sugeridas/Libre con el tipo de decisión.
      Solo se llama en refrescos globales (preset, reset, carga) para
      no arrebatarle la pestaña al usuario mientras explora. */
@@ -112,52 +136,169 @@ SE.ui = (function () {
     fpMode = SE.state.decisions.fontPair.type === "custom" ? "free" : "pairs";
   }
 
+  function fontStyle(fontId, size, weight) {
+    var f = SE.data.fonts[fontId];
+    return "font-family:'" + f.family + "'," + f.fallback +
+      ";font-size:" + size + "px" +
+      (weight ? ";font-weight:" + weight : "") +
+      ";letter-spacing:" + f.tracking;
+  }
+
+  /* Ficha de pareja: el titular y el cuerpo escritos en sus fuentes reales.
+     Esto es lo que faltaba — antes la tipografía se elegía leyendo nombres. */
+  function pairCard(p, activo) {
+    var hf = SE.data.fonts[p.heading], bf = SE.data.fonts[p.body];
+    return '<button type="button" class="font-card' + (activo ? " active" : "") + '" data-pair="' + p.id + '">' +
+      '<span class="fc-label">' + p.label + "</span>" +
+      '<span class="fc-sample fc-head" style="' + fontStyle(p.heading, fpSize, hf.headingWeight) + '">' + esc(fpSample) + "</span>" +
+      '<span class="fc-sample fc-body" style="' + fontStyle(p.body, 13) + '">' + esc(fpSample) + "</span>" +
+      '<span class="fc-names">' + hf.family + (hf.id === bf.id ? "" : " + " + bf.family) + "</span></button>";
+  }
+
+  /* Fila del explorador: el nombre de la fuente, escrito en sí misma */
+  function fontRow(f, activo) {
+    var peso = fpSlot === "heading" ? f.headingWeight : 400;
+    return '<button type="button" class="font-card font-row' + (activo ? " active" : "") + '" data-font="' + f.id + '">' +
+      '<span class="fc-top"><span class="fc-name" style="' + fontStyle(f.id, 17, peso) + '">' + f.family + "</span>" +
+      '<span class="fc-cat">' + (CAT_LABELS[f.cat] || f.cat) + "</span></span>" +
+      '<span class="fc-sample" style="' + fontStyle(f.id, fpSize, peso) + '">' + esc(fpSample) + "</span></button>";
+  }
+
+  function fontMatches(f) {
+    if (fpCat !== "todas" && f.cat !== fpCat) return false;
+    if (!fpQuery) return true;
+    return f.family.toLowerCase().indexOf(fpQuery.toLowerCase()) >= 0;
+  }
+
+  /* Solo la lista: así el buscador conserva el foco al teclear */
+  function renderFontList() {
+    var cont = $("#fp-list");
+    if (!cont) return;
+    var d = SE.effectiveDecisions().fontPair;
+    if (fpMode === "pairs") {
+      cont.innerHTML = SE.data.pairs.map(function (p) {
+        return pairCard(p, d.type === "pair" && d.id === p.id);
+      }).join("");
+      return;
+    }
+    var ids = SE.resolvePairIds(d);
+    var lista = Object.keys(SE.data.fonts).map(function (id) { return SE.data.fonts[id]; }).filter(fontMatches);
+    if (!lista.length) {
+      cont.innerHTML = '<p class="p-hint" style="padding:10px 2px">Ninguna fuente coincide con «' + esc(fpQuery) + '».</p>';
+      return;
+    }
+    cont.innerHTML = lista.map(function (f) { return fontRow(f, f.id === ids[fpSlot]); }).join("");
+  }
+
   function renderFontPair() {
     var d = SE.effectiveDecisions().fontPair;
-    var body = $("#body-fontPair");
+    var ids = SE.resolvePairIds(d);
+    SE.fonts.ensureSpecimens(fpSample);
+
     var html = '<div class="seg" style="margin-top:10px" data-role="fp-mode">' +
       '<button type="button" class="seg-btn' + (fpMode === "pairs" ? " active" : "") + '" data-fpmode="pairs">Sugeridas</button>' +
       '<button type="button" class="seg-btn' + (fpMode === "free" ? " active" : "") + '" data-fpmode="free">Libre</button></div>';
 
-    if (fpMode === "pairs") {
-      html += '<div style="margin-top:8px">' + SE.data.pairs.map(function (p) {
-        var hf = SE.data.fonts[p.heading], bf = SE.data.fonts[p.body];
-        var active = d.type === "pair" && d.id === p.id;
-        return '<button type="button" class="opt-row' + (active ? " active" : "") + '" data-pair="' + p.id + '">' +
-          '<span class="opt-main"><span class="opt-label">' + p.label + "</span>" +
-          '<span class="opt-sub">' + hf.family + (hf.id === bf.id ? "" : " + " + bf.family) + "</span></span></button>";
-      }).join("") + "</div>";
-    } else {
-      var ids = SE.resolvePairIds(d);
-      var fontOptions = function (selected) {
-        return Object.keys(SE.data.fonts).map(function (id) {
-          var f = SE.data.fonts[id];
-          return '<option value="' + id + '"' + (id === selected ? " selected" : "") + ">" + f.family + " · " + (f.cat === "display" ? "display" : f.cat) + "</option>";
-        }).join("");
-      };
-      var hint = SE.pairingHint(ids.heading, ids.body);
-      html += '<div class="p-field"><div class="p-field-head"><label>Títulos</label></div>' +
-        '<select class="p-select" data-role="fp-heading">' + fontOptions(ids.heading) + "</select></div>" +
-        '<div class="p-field"><div class="p-field-head"><label>Cuerpo</label></div>' +
-        '<select class="p-select" data-role="fp-body">' + fontOptions(ids.body) + "</select></div>" +
-        (hint.text ? '<p class="p-hint hint-' + hint.level + '">' + HINT_ICONS[hint.level] + " " + hint.text + "</p>" : "");
+    /* Texto de muestra y tamaño: compartidos por los dos modos */
+    html += '<div class="fp-preview">' +
+      '<input type="text" class="p-input" data-role="fp-sample" maxlength="60" placeholder="Texto de muestra" value="' + esc(fpSample) + '" aria-label="Texto de muestra">' +
+      '<input type="range" class="p-range fp-size" min="14" max="44" step="1" value="' + fpSize + '" data-role="fp-size" aria-label="Tamaño de la muestra"></div>';
+
+    if (fpMode === "free") {
+      html += '<div class="seg" style="margin-top:8px" data-role="fp-slot">' +
+        '<button type="button" class="seg-btn' + (fpSlot === "heading" ? " active" : "") + '" data-fpslot="heading">Títulos<small>' + SE.data.fonts[ids.heading].family + "</small></button>" +
+        '<button type="button" class="seg-btn' + (fpSlot === "body" ? " active" : "") + '" data-fpslot="body">Cuerpo<small>' + SE.data.fonts[ids.body].family + "</small></button></div>" +
+        '<input type="search" class="p-input" data-role="fp-search" placeholder="Buscar fuente…" value="' + esc(fpQuery) + '" aria-label="Buscar fuente">' +
+        '<div class="fp-cats">' + ["todas", "sans", "serif", "display", "mono"].map(function (c) {
+          return '<button type="button" class="fp-cat' + (fpCat === c ? " active" : "") + '" data-fpcat="' + c + '">' + c + "</button>";
+        }).join("") + "</div>";
     }
-    body.innerHTML = html;
+
+    html += '<div id="fp-list" class="fp-list"></div>';
+
+    if (fpMode === "free") {
+      var hint = SE.pairingHint(ids.heading, ids.body);
+      if (hint.text) html += '<p class="p-hint hint-' + hint.level + '">' + HINT_ICONS[hint.level] + " " + hint.text + "</p>";
+    }
+    $("#body-fontPair").innerHTML = html;
+    renderFontList();
   }
+
+  var sampleTimer = null;
 
   function bindFontPair() {
     on("#body-fontPair", "click", function (e) {
       var mode = e.target.closest("[data-fpmode]");
-      if (mode) { fpMode = mode.dataset.fpmode; renderFontPair(); return; }
-      var row = e.target.closest("[data-pair]");
-      if (row) SE.setDecision("fontPair", { type: "pair", id: row.dataset.pair });
-    });
-    on("#body-fontPair", "change", function (e) {
-      if (e.target.dataset.role === "fp-heading" || e.target.dataset.role === "fp-body") {
-        var h = $('[data-role="fp-heading"]').value;
-        var b = $('[data-role="fp-body"]').value;
-        SE.setDecision("fontPair", { type: "custom", heading: h, body: b });
+      if (mode) { fpMode = mode.dataset.fpmode; refreshDim("fontPair"); return; }
+      var slot = e.target.closest("[data-fpslot]");
+      if (slot) { fpSlot = slot.dataset.fpslot; refreshDim("fontPair"); return; }
+      var cat = e.target.closest("[data-fpcat]");
+      if (cat) {
+        fpCat = cat.dataset.fpcat;
+        $all("#body-fontPair .fp-cat").forEach(function (b) { b.classList.toggle("active", b.dataset.fpcat === fpCat); });
+        renderFontList();
+        return;
       }
+      var row = e.target.closest("[data-pair]");
+      if (row) { SE.setDecision("fontPair", { type: "pair", id: row.dataset.pair }); return; }
+      var f = e.target.closest("[data-font]");
+      if (f) {
+        var ids = SE.resolvePairIds(SE.effectiveDecisions().fontPair);
+        ids[fpSlot] = f.dataset.font;
+        SE.setDecision("fontPair", { type: "custom", heading: ids.heading, body: ids.body });
+      }
+    });
+
+    /* Al teclear no se repinta la sección entera: se perdería el cursor.
+       La muestra se aplica in situ y la lista solo cuando filtra. */
+    on("#body-fontPair", "input", function (e) {
+      var role = e.target.dataset.role;
+      if (role === "fp-search") { fpQuery = e.target.value; renderFontList(); return; }
+      if (role === "fp-sample") {
+        fpSample = e.target.value || " ";
+        $all("#body-fontPair .fc-sample").forEach(function (el) { el.textContent = fpSample; });
+        savePrefs();
+        clearTimeout(sampleTimer);
+        sampleTimer = setTimeout(function () { SE.fonts.ensureSpecimens(fpSample); }, 400);
+        return;
+      }
+      if (role === "fp-size") {
+        fpSize = Number(e.target.value);
+        $all("#body-fontPair .font-card > .fc-sample:not(.fc-body)").forEach(function (el) {
+          el.style.fontSize = fpSize + "px";
+        });
+        savePrefs();
+      }
+    });
+  }
+
+  /* ================= PESO DE TITULARES ================= */
+
+  function renderWeight() {
+    var d = SE.effectiveDecisions();
+    var ids = SE.resolvePairIds(d.fontPair);
+    var f = SE.data.fonts[ids.heading];
+    var disponibles = SE.fontWeights(ids.heading);
+    var actual = SE.nearestWeight(ids.heading, d.weight || f.headingWeight);
+    var elegido = SE.findIn(SE.data.weights, actual);
+
+    $("#body-weight").innerHTML = '<div class="seg seg-wrap" style="margin-top:10px" data-role="weight">' +
+      SE.data.weights.map(function (w) {
+        var hay = disponibles.indexOf(w.id) >= 0;
+        return '<button type="button" class="seg-btn' + (actual === w.id ? " active" : "") + '" data-weight="' + w.id + '"' +
+          (hay ? "" : " disabled") + ' title="' + (hay ? w.rationale : f.family + " no tiene este peso") + '">' +
+          '<span class="glyph-weight" style="font-family:\'' + f.family + "'," + f.fallback + ";font-weight:" + w.id + '">Aa</span>' +
+          "<small>" + w.name + "</small></button>";
+      }).join("") + "</div>" +
+      '<p class="p-hint">' + (elegido ? elegido.rationale : "") + "</p>" +
+      '<p class="p-hint">' + f.family + " ofrece " + disponibles.join(" · ") +
+      (disponibles.length === 1 ? ". Los demás pesos no existen en esta familia." : ".") + "</p>";
+  }
+
+  function bindWeight() {
+    on("#body-weight", "click", function (e) {
+      var btn = e.target.closest("[data-weight]");
+      if (btn && !btn.disabled) SE.setDecision("weight", Number(btn.dataset.weight));
     });
   }
 
@@ -560,9 +701,10 @@ SE.ui = (function () {
   }
 
   function updateModeUI() {
+    /* La etiqueta va en su propio span: en móvil se oculta y queda el icono */
     $("#mode-toggle").innerHTML = SE.state.mode === "light"
-      ? ICONS.moon + "Oscuro"
-      : ICONS.sun + "Claro";
+      ? ICONS.moon + '<span class="tb-label">Oscuro</span>'
+      : ICONS.sun + '<span class="tb-label">Claro</span>';
   }
 
   function setVision(v) {
@@ -570,7 +712,7 @@ SE.ui = (function () {
     var vp = $("#mock-viewport");
     vp.className = vp.className.replace(/\bvision-[\w-]+\b/g, "").trim();
     if (v !== "normal") vp.classList.add("vision-" + v);
-    $("#vision-btn").innerHTML = "Visión: " + VISION_LABELS[v] + ICONS.chevron;
+    $("#vision-btn").innerHTML = '<span class="tb-label">Visión: </span>' + VISION_LABELS[v] + ICONS.chevron;
     $all("#vision-dropdown button").forEach(function (el) {
       el.classList.toggle("active", el.dataset.vision === v);
     });
@@ -583,8 +725,9 @@ SE.ui = (function () {
     $("#panel-rail").hidden = !hidden;
     $("#panel-collapse").setAttribute("aria-expanded", String(!hidden));
     $("#panel-rail").setAttribute("aria-expanded", String(!hidden));
-    /* Las miniaturas se reescalan al cambiar el ancho disponible */
+    /* Miniaturas y ajuste se recalculan al cambiar el ancho disponible */
     measureOverview();
+    measureFit();
   }
 
   function togglePanel() {
@@ -600,6 +743,7 @@ SE.ui = (function () {
       SE.setMode(SE.state.mode === "light" ? "dark" : "light");
       updateModeUI();
     });
+    on("#fit-toggle", "click", toggleFit);
     on("#panel-collapse", "click", togglePanel);
     on("#panel-rail", "click", togglePanel);
     on("#vision-btn", "click", function (e) {
@@ -623,6 +767,11 @@ SE.ui = (function () {
         endABUI();
         SE.reset();
       }
+    });
+    on("#surprise-btn", "click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      SE.surprise();
     });
     on("#preset-list", "click", function (e) {
       var card = e.target.closest("[data-preset]");
@@ -700,6 +849,8 @@ SE.ui = (function () {
     $("#ab-hint").textContent = split
       ? "Arrastra el divisor · ←/→ lo mueven"
       : (hasB ? names + "Espacio alterna · ⏎ elige · Esc cancela" : "Elige la opción B en el panel →");
+    $("#ab-nudge-l").hidden = !split;
+    $("#ab-nudge-r").hidden = !split;
     $("#ab-split").hidden = !hasB;
     $("#ab-split").classList.toggle("active", split);
     $("#ab-commit").hidden = !hasB || split;
@@ -761,9 +912,11 @@ SE.ui = (function () {
       function up() {
         document.removeEventListener("pointermove", move);
         document.removeEventListener("pointerup", up);
+        document.removeEventListener("pointercancel", up);
       }
       document.addEventListener("pointermove", move);
       document.addEventListener("pointerup", up);
+      document.addEventListener("pointercancel", up);
     });
   }
 
@@ -806,6 +959,10 @@ SE.ui = (function () {
     on("#ab-commit", "click", commitABUI);
     on("#ab-commit-a", "click", function () { SE.commitABChoice("a"); endABUI(); updatePresetUI(); });
     on("#ab-commit-b", "click", function () { SE.commitABChoice("b"); endABUI(); updatePresetUI(); });
+    /* Mover el divisor sin arrastrar: en táctil el asa es inagarrable, y
+       con teclado solo existían las flechas. */
+    on("#ab-nudge-l", "click", function () { setSplitPos(splitPos - 6); });
+    on("#ab-nudge-r", "click", function () { setSplitPos(splitPos + 6); });
     on("#ab-cancel", "click", cancelABUI);
   }
 
@@ -853,6 +1010,7 @@ SE.ui = (function () {
       if (screenKey >= 1 && screenKey <= SE.SCREENS.length) switchScreen(SE.SCREENS[screenKey - 1]);
       else if (e.key === "d" || e.key === "D") { SE.setMode(SE.state.mode === "light" ? "dark" : "light"); updateModeUI(); }
       else if (e.key === "p" || e.key === "P") togglePanel();
+      else if (e.key === "s" || e.key === "S") SE.surprise();
     });
   }
 
@@ -861,7 +1019,7 @@ SE.ui = (function () {
   var RENDERERS = {
     fontPair: renderFontPair, typeScale: renderTypeScale, palette: renderPalette,
     spacing: renderSpacing, radius: renderRadius, shadow: renderShadow,
-    icons: renderIcons, motion: renderMotion, reading: renderReading
+    weight: renderWeight, icons: renderIcons, motion: renderMotion, reading: renderReading
   };
 
   /* Cada dimensión tiene una pantalla donde de verdad se juzga.
@@ -882,6 +1040,7 @@ SE.ui = (function () {
   var DIM_PURPOSE = {
     fontPair: { screen: "pagina", text: "La armonía entre título y cuerpo se juzga leyendo, y los titulares grandes justo encima." },
     typeScale: { screen: "pagina", text: "La mitad editorial de Página recorre la escala entera, del pie de foto al titular." },
+    weight: { screen: "pagina", text: "El peso se juzga en un titular grande, con texto alrededor que le dé escala." },
     palette: { screen: "colores", text: "Colores enfrenta toda la paleta; el Panel prueba los semánticos en uso real." },
     spacing: { screen: "dashboard", text: "La densidad se siente en la pantalla más apretada." },
     radius: { screen: "pagina", text: "El radio se lee en los botones y tarjetas grandes del hero." },
@@ -905,6 +1064,8 @@ SE.ui = (function () {
     if (!RENDERERS[dim]) return;
     RENDERERS[dim]();
     appendPurpose(dim);
+    /* Los pesos disponibles dependen de la familia de titulares */
+    if (dim === "fontPair" && RENDERERS.weight) refreshDim("weight");
   }
 
   function refreshDims() {
@@ -991,6 +1152,32 @@ SE.ui = (function () {
     return Array.prototype.slice.call(root.querySelectorAll(sel));
   }
 
+  /* ---------- Ajustar el mock al ancho disponible ----------
+     Los mocks son maquetas de escritorio (mínimo 1024 px). En una pantalla
+     estrecha, en vez de dejar una barra de scroll horizontal permanente, se
+     encogen con `zoom`: reflowea, así que la altura del contenedor sale
+     sola y el container query sigue viendo sus ~1024 px —el mock enseña su
+     maqueta de escritorio en pequeño, no una tablet deformada—. */
+  var fitMode = "fit";
+
+  function measureFit() {
+    var wrap = $("#viewport-wrap");
+    var vp = $("#mock-viewport");
+    if (!wrap || !vp) return;
+    var disponible = wrap.clientWidth;
+    var estrecho = disponible > 0 && disponible < 1024;
+    document.body.classList.toggle("narrow", estrecho);
+    var k = (estrecho && fitMode === "fit") ? disponible / 1024 : 1;
+    vp.style.zoom = k >= 1 ? "" : String(Math.round(k * 1000) / 1000);
+    var btn = $("#fit-toggle");
+    if (btn) btn.textContent = fitMode === "fit" ? "Tamaño real" : "Ajustar";
+  }
+
+  function toggleFit() {
+    fitMode = fitMode === "fit" ? "real" : "fit";
+    measureFit();
+  }
+
   /* El factor de escala depende del ancho real del marco, que cambia al
      plegar el panel o redimensionar la ventana. */
   function measureOverview() {
@@ -1011,8 +1198,9 @@ SE.ui = (function () {
     });
     if (window.ResizeObserver) {
       new ResizeObserver(measureOverview).observe(grid);
+      new ResizeObserver(measureFit).observe($("#viewport-wrap"));
     } else {
-      window.addEventListener("resize", measureOverview);
+      window.addEventListener("resize", function () { measureOverview(); measureFit(); });
     }
   }
 
@@ -1040,6 +1228,7 @@ SE.ui = (function () {
   }
 
   function init() {
+    loadPrefs();
     /* Los enlaces "Ver en …" de las pistas de propósito */
     step("pistas de propósito", function () {
       on(".panel-scroll", "click", function (e) {
@@ -1049,6 +1238,7 @@ SE.ui = (function () {
     });
     step("barra superior", bindTopbar);
     step("tipografía", bindFontPair);
+    step("peso", bindWeight);
     step("escala", bindTypeScale);
     step("paleta", bindPalette);
     step("segmentados", bindSimpleSegs);
@@ -1063,6 +1253,7 @@ SE.ui = (function () {
        repintado para que la siguiente aplicación de tokens los rellene. */
     step("rejilla de iconos", renderIconGrid);
     step("miniaturas", renderOverview);
+    step("ajuste del mock", measureFit);
     step("tokens", function () {
       SE.icons.invalidate($("#mock-viewport"));
       SE.applyTokens();

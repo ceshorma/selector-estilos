@@ -16,7 +16,8 @@ Fonts (sin conexión, la app funciona con fuentes de sistema de respaldo).
 
 | Dimensión | Opciones |
 |---|---|
-| Tipografía | 20 parejas sugeridas sobre 31 familias, o combinación libre con pista de compatibilidad |
+| Tipografía | 20 parejas y 31 familias, **vistas en su propia fuente**: buscador por nombre, filtros por categoría, texto de muestra editable y tamaño de previsualización |
+| Peso de titulares | 400 · 500 · 600 · 700 · 800, limitado a los que la familia elegida tiene de verdad |
 | Escala tipográfica | Razón modular (1.125–1.5) + tamaño base |
 | Color | 13 paletas curadas (claro y oscuro), generador por reglas clásicas de armonía con ajuste automático a contraste AA, y **editor fino** token a token con aviso AA en vivo |
 | Espaciado | Compacta · Normal · Amplia |
@@ -46,6 +47,9 @@ posterior la convierte en "personalizada", y todo es reversible con **Ctrl+Z** /
 
 Entre las ocho quedan cubiertas las seis familias de iconos y los cuatro niveles de
 movimiento: no hay ninguna opción del catálogo que no se pueda ver aplicada de un click.
+Y el botón del dado (o la tecla `S`) genera una **dirección coherente al azar** —eje de
+carácter, paleta generada con contraste AA garantizado, pareja que la heurística no
+desaconseja— para salir de lo que uno ya tenía en la cabeza.
 
 ## Cada pantalla decide algo
 
@@ -60,6 +64,18 @@ en…") y lleva allí de un click.
 | **Página** | La página pública entera: arriba los tamaños display, los botones grandes, radios y sombras; abajo la escala tipográfica **completa** en texto largo, con el interlineado y el ancho de línea. Van juntas porque juzgan lo mismo desde dos ángulos |
 | **Colores** | La convivencia de toda la paleta: formas puras, proporción 60·30·10, pares de uso, iconos teñidos con cada token y tiras con hex |
 | **Componentes** | El kit del sistema con los estados forzados: los 24 iconos a tres tamaños, botones en reposo/puntero/foco/en curso/deshabilitado, campos, chips, avisos, progreso, pestañas, menú y diálogo. Es donde se deciden **iconos** y **movimiento** |
+
+## En el móvil
+
+La herramienta funciona con el dedo: la barra se reordena y las pestañas se deslizan, el
+panel pasa a hoja inferior con su asa y vuelve desde un botón flotante, y los controles
+cumplen el objetivo táctil.
+
+Los mocks son maquetas de escritorio (piden 1024 px), así que **se encogen para caber** en
+vez de dejar una barra de scroll horizontal: enseñan su diseño de escritorio en pequeño, no
+una tablet deformada. El botón **Tamaño real** desactiva el ajuste para recorrerlas a su
+tamaño. Esto último es posible porque los mocks consultan su propio ancho con *container
+queries* y no el de la ventana.
 
 ## Comparación A/B
 
@@ -99,7 +115,8 @@ enseñar una propuesta.
 
 ## Atajos
 
-`1 · 2 · 3 · 4 · 5` pantallas · `D` claro/oscuro · `P` plegar panel · `Ctrl+Z` deshacer ·
+`1 · 2 · 3 · 4 · 5` pantallas · `D` claro/oscuro · `P` plegar panel · `S` sorpréndeme ·
+`Ctrl+Z` deshacer ·
 en A/B: `Espacio` / `←` `→` / `Enter` / `Esc`
 
 El panel se pliega desde su propia cabecera (el botón `»`) y vuelve desde la pestaña
@@ -146,5 +163,6 @@ cualquier fichero de `css/` o `js/` hay que subir `v` y actualizar la huella**;
 
 `node test/logic-test.js` — suite de ~900 chequeos: matemática de escala, contraste
 WCAG de todas las paletas, generador de armonías, máquina A/B, historial, snapshots,
-catálogos de iconos, movimiento, fuentes y direcciones, escritura de tokens,
+catálogos de iconos, movimiento, pesos, fuentes y direcciones, 200 direcciones
+aleatorias, escritura de tokens,
 alias de pantallas, sello de versión de los assets, importación y exportadores.

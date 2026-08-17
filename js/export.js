@@ -32,6 +32,9 @@ SE.exporter = (function () {
     var radius = SE.findIn(SE.data.radii, d.radius);
     var shadow = SE.findIn(SE.data.shadows, d.shadow);
     var iconSet = SE.findIn(SE.data.iconSets, d.icons) || SE.data.iconSets[1];
+    var pairIds = SE.resolvePairIds(d.fontPair);
+    var pesoUsado = SE.nearestWeight(pairIds.heading, d.weight || pair.heading.headingWeight);
+    var pesoInfo = SE.findIn(SE.data.weights, pesoUsado);
     var motion = SE.findIn(SE.data.motions, d.motion) || SE.data.motions[1];
     var ratio = null;
     for (var i = 0; i < SE.data.ratios.length; i++)
@@ -63,7 +66,7 @@ SE.exporter = (function () {
 
     return {
       d: d, pair: pair, palette: palette, scale: scale, spacing: spacing, radius: radius,
-      shadow: shadow, iconSet: iconSet, motion: motion, ratio: ratio, presetName: presetName,
+      shadow: shadow, iconSet: iconSet, motion: motion, weight: pesoUsado, weightInfo: pesoInfo, ratio: ratio, presetName: presetName,
       presetOrigen: presetOrigen, fecha: fecha,
       leadingTight: leadingTight, fontsHref: fontsHref, space: space, pairInfo: pairInfo
     };
@@ -77,7 +80,7 @@ SE.exporter = (function () {
     var lines = [
       '--font-heading: "' + ctx.pair.heading.family + '", ' + ctx.pair.heading.fallback + ";",
       '--font-body: "' + ctx.pair.body.family + '", ' + ctx.pair.body.fallback + ";",
-      "--weight-heading: " + ctx.pair.heading.headingWeight + ";",
+      "--weight-heading: " + ctx.weight + ";",
       "--tracking-heading: " + ctx.pair.heading.tracking + ";",
       "--leading-tight: " + ctx.leadingTight + ";",
       "--leading-body: " + ctx.d.reading.lineHeight + ";",
@@ -198,7 +201,7 @@ SE.exporter = (function () {
         googleFonts: ctx.fontsHref
       },
       font: {
-        heading: { family: ctx.pair.heading.family, fallback: ctx.pair.heading.fallback, weight: ctx.pair.heading.headingWeight, tracking: ctx.pair.heading.tracking },
+        heading: { family: ctx.pair.heading.family, fallback: ctx.pair.heading.fallback, weight: ctx.weight, tracking: ctx.pair.heading.tracking },
         body: { family: ctx.pair.body.family, fallback: ctx.pair.body.fallback, weight: 400 }
       },
       typeScale: { ratio: ctx.d.typeScale.ratio, basePx: ctx.d.typeScale.base, sizesPx: ctx.scale },
@@ -258,6 +261,8 @@ SE.exporter = (function () {
       ["Espaciado", ctx.spacing.name + " (unidad " + ctx.spacing.unit + "px)", ctx.spacing.rationale],
       ["Bordes", ctx.radius.name + " (" + ctx.radius.values.join(" / ") + "px)", ctx.radius.rationale],
       ["Sombras", ctx.shadow.name, ctx.shadow.rationale],
+      ["Peso de titulares", ctx.weight + (ctx.weightInfo ? " · " + ctx.weightInfo.name : ""),
+        (ctx.weightInfo ? ctx.weightInfo.rationale + " " : "") + "Disponibles en " + ctx.pair.heading.family + ": " + SE.fontWeights(ctx.pair.heading.id).join(", ") + "."],
       ["Iconos", ctx.iconSet.name + " (trazo " + ctx.iconSet.stroke + ", remate " + ctx.iconSet.cap + ")", ctx.iconSet.rationale],
       ["Movimiento", ctx.motion.name + " (" + ctx.motion.duration + " ms · " + ctx.motion.ease + ")", ctx.motion.rationale],
       ["Lectura", "Interlineado " + ctx.d.reading.lineHeight + " · línea de " + ctx.d.reading.measure + "ch", "El interlineado y el ancho de línea marcan el ritmo del texto largo; se validaron sobre el mock de artículo."]
@@ -501,6 +506,8 @@ motionCard(ctx) + "\n" +
           d.radius = SE.data.radii[r].id;
       }
     }
+    if (obj.font && obj.font.heading && SE.findIn(SE.data.weights, Number(obj.font.heading.weight)))
+      d.weight = Number(obj.font.heading.weight);
     if (obj.icons && SE.findIn(SE.data.iconSets, obj.icons.familia)) d.icons = obj.icons.familia;
     if (obj.motion && SE.findIn(SE.data.motions, obj.motion.nivel)) d.motion = obj.motion.nivel;
     if (obj.shadow && obj.shadow.light) {
