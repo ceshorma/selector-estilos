@@ -516,6 +516,54 @@ check("contexto trae procedencia", ctxSuiza.presetOrigen.indexOf("suiza") >= 0, 
 check("doc nombra la procedencia", SE.exporter.buildDoc(ctxSuiza).indexOf(ctxSuiza.presetOrigen) >= 0);
 check("tokens.json trae la procedencia", JSON.parse(SE.exporter.buildTokensJson(ctxSuiza)).meta.origen === ctxSuiza.presetOrigen);
 
+/* ---------- 13. Sello de versión de los assets ----------
+   GitHub Pages sirve todo con `Cache-Control: max-age=600` y sin huella en
+   los nombres, así que sin sufijo de versión un index.html recién llegado
+   puede ejecutarse con el css/js viejo que el navegador guarde en caché.
+   Eso ya pasó una vez y dejó la herramienta en blanco. Esta guardia falla
+   cuando los assets cambian y el sello no. */
+
+var crypto = require("crypto");
+var indexPath = path.join(__dirname, "..", "index.html");
+var indexHtml = fs.readFileSync(indexPath, "utf8");
+
+/* Referencias locales, con y sin sufijo, para cazar también la que se olvidó */
+var refs = [];
+var reRef = /(?:href|src)="((?:css|js)\/[^"]+)"/g;
+var m;
+while ((m = reRef.exec(indexHtml)) !== null) refs.push(m[1]);
+
+check("index.html referencia assets locales", refs.length >= 15, String(refs.length));
+
+var sinSello = refs.filter(function (r) { return r.indexOf("?v=") < 0; });
+check("todos los assets llevan ?v=", sinSello.length === 0, sinSello.join(", "));
+
+var versiones = {};
+refs.forEach(function (r) {
+  var v = r.split("?v=")[1];
+  if (v) versiones[v] = true;
+});
+check("todos comparten la misma versión", Object.keys(versiones).length === 1, Object.keys(versiones).join(" / "));
+
+/* La huella cubre el contenido real de los ficheros sellados */
+var archivos = refs.map(function (r) { return r.split("?")[0]; });
+var hash = crypto.createHash("sha1");
+archivos.forEach(function (rel) {
+  hash.update(fs.readFileSync(path.join(__dirname, "..", rel)));
+});
+var huellaReal = hash.digest("hex").slice(0, 8);
+
+var marca = /assets v=(\d+) · huella ([0-9a-f]{8})/.exec(indexHtml);
+check("index.html declara versión y huella", !!marca);
+if (marca) {
+  check("la versión del comentario coincide con la de los assets",
+    marca[1] === Object.keys(versiones)[0], marca[1] + " vs " + Object.keys(versiones)[0]);
+  check("la huella corresponde a los assets actuales — si falla: escribe la huella " +
+    huellaReal + " en index.html, y sube ?v= a " + (Number(marca[1]) + 1) +
+    " si la v" + marca[1] + " ya está publicada",
+    marca[2] === huellaReal, "declarada " + marca[2] + ", real " + huellaReal);
+}
+
 /* ---------- resultado ---------- */
 if (fails.length) {
   console.log("FALLOS (" + fails.length + "):");

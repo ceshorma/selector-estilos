@@ -502,6 +502,11 @@ body.panel-hidden #panel { display: none; }
   border-bottom: 1px solid var(--app-line);
 }
 
+/* El título cede espacio antes que los botones: en 344 px conviven
+   deshacer, rehacer, Restablecer y plegar, y el último no puede quedar
+   fuera del panel. */
+.panel-head > div:first-child { min-width: 0; }
+
 .panel-head h1 {
   margin: 0;
   font-size: 12px;
@@ -509,6 +514,8 @@ body.panel-hidden #panel { display: none; }
   letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .panel-head p {
@@ -1478,6 +1485,24 @@ body.panel-hidden #panel { display: none; }
 
 @media (max-width: 1420px) {
   .tb-tabs kbd { display: none; }
+}
+
+/* Los mocks asumen escritorio (#mock-viewport: min-width 1024px). Por
+   debajo de este ancho, un panel que ocupe sitio en la fila deja el
+   escenario por debajo de esos 1024 px y aparece una barra de scroll
+   horizontal permanente. Así que el panel deja de restar ancho y pasa a
+   flotar sobre la muestra: plegarlo y el raíl siguen funcionando igual. */
+@media (max-width: 1380px) {
+  #app { position: relative; }
+
+  #panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 15;
+    box-shadow: -10px 0 28px rgba(0, 0, 0, 0.45);
+  }
 }
 
 @media (max-width: 1240px) {

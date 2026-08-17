@@ -68,6 +68,9 @@ Ordenadas por impacto dentro de cada bloque.
 - [x] **Landing + Artículo fusionadas** (M) — una sola pantalla «Página»: hero y botones
   grandes arriba, artículo completo abajo. Juzgaban lo mismo desde dos ángulos y obligaban
   a saltar de pestaña.
+- [x] **Panel flotante en pantallas estrechas** (S) — por debajo de 1380 px el panel se
+  superpone en vez de restar ancho, para que el mock conserve sus 1024 px y no aparezca
+  scroll horizontal.
 - [ ] **Vista responsive** (M) — previsualizar cada mock a 390px (móvil) y 768px (tablet)
   dentro de un marco; los mocks hoy asumen escritorio (min 1024px). Implica media queries
   completas en los tres mocks.
@@ -109,6 +112,13 @@ Ordenadas por impacto dentro de cada bloque.
   cuando se decida que compensa.
 
 ## Infraestructura
+
+- [x] **Sello de versión en los assets** (S) — `?v=N` en los 15 `<link>`/`<script>` con una
+  huella verificada por la suite. Sin él, cada despliegue abría una ventana de 10 minutos
+  en la que un visitante podía recibir HTML nuevo con JS viejo y ver la app en blanco.
+- [x] **Arranque a prueba de elementos ausentes** (S) — helper `on()` y `step()` en
+  `init()`: un nodo que falte se registra en consola y se omite, en vez de cancelar todos
+  los pasos siguientes.
 
 - [x] **Direcciones con procedencia** (M) — las siete direcciones genéricas se sustituyen
   por ocho ancladas a tradiciones reconocibles (suiza, revista, monoespaciado, grotesca

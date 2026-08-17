@@ -103,7 +103,9 @@ enseñar una propuesta.
 en A/B: `Espacio` / `←` `→` / `Enter` / `Esc`
 
 El panel se pliega desde su propia cabecera (el botón `»`) y vuelve desde la pestaña
-lateral; con `P` se hace lo mismo desde el teclado. «Direcciones» es un acordeón: cerrado
+lateral; con `P` se hace lo mismo desde el teclado. Por debajo de 1380 px el panel deja de
+restar ancho y flota sobre la muestra: los mocks asumen escritorio (1024 px mínimo) y de
+otro modo aparecería una barra de scroll horizontal permanente. «Direcciones» es un acordeón: cerrado
 sigue diciendo en cuál estás.
 
 También admite deep-links: `index.html#pagina,dark,revista` (pantalla, modo, dirección) y
@@ -125,9 +127,24 @@ El botón **Exportar** genera tres archivos con las decisiones actuales:
 Las decisiones se guardan en `localStorage` y se restauran al volver a abrir.
 **Restablecer** vuelve al preset por defecto (reversible con Ctrl+Z).
 
+## Al tocar CSS o JS: sube el sello
+
+Los `<link>` y `<script>` de `index.html` llevan sufijo `?v=N`, y junto a ellos hay un
+comentario con la versión y una huella del contenido de esos ficheros.
+
+No es decorativo. GitHub Pages sirve todo con `Cache-Control: max-age=600` y sin huella en
+los nombres, así que sin el sufijo un `index.html` recién desplegado puede ejecutarse
+contra el `js/ui.js` viejo que el navegador tenga en caché — y basta con que el HTML nuevo
+haya quitado un elemento que el JS viejo busca para que la herramienta arranque en blanco.
+Ya pasó una vez.
+
+Con el sufijo, si llega el HTML nuevo llegan con él los assets nuevos. **Al modificar
+cualquier fichero de `css/` o `js/` hay que subir `v` y actualizar la huella**;
+`node test/logic-test.js` falla si no coinciden y dice exactamente qué escribir.
+
 ## Tests
 
 `node test/logic-test.js` — suite de ~900 chequeos: matemática de escala, contraste
 WCAG de todas las paletas, generador de armonías, máquina A/B, historial, snapshots,
 catálogos de iconos, movimiento, fuentes y direcciones, escritura de tokens,
-alias de pantallas, importación y exportadores.
+alias de pantallas, sello de versión de los assets, importación y exportadores.
