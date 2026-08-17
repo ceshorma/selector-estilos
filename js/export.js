@@ -31,6 +31,8 @@ SE.exporter = (function () {
     var spacing = SE.findIn(SE.data.spacings, d.spacing);
     var radius = SE.findIn(SE.data.radii, d.radius);
     var shadow = SE.findIn(SE.data.shadows, d.shadow);
+    var iconSet = SE.findIn(SE.data.iconSets, d.icons) || SE.data.iconSets[1];
+    var motion = SE.findIn(SE.data.motions, d.motion) || SE.data.motions[1];
     var ratio = null;
     for (var i = 0; i < SE.data.ratios.length; i++)
       if (Math.abs(SE.data.ratios[i].value - d.typeScale.ratio) < 0.001) ratio = SE.data.ratios[i];
@@ -59,7 +61,7 @@ SE.exporter = (function () {
 
     return {
       d: d, pair: pair, palette: palette, scale: scale, spacing: spacing, radius: radius,
-      shadow: shadow, ratio: ratio, presetName: presetName, fecha: fecha,
+      shadow: shadow, iconSet: iconSet, motion: motion, ratio: ratio, presetName: presetName, fecha: fecha,
       leadingTight: leadingTight, fontsHref: fontsHref, space: space, pairInfo: pairInfo
     };
   }
@@ -107,6 +109,17 @@ SE.exporter = (function () {
     lines.push("--shadow-sm: " + sh.sm + ";");
     lines.push("--shadow-md: " + sh.md + ";");
     lines.push("--shadow-lg: " + sh.lg + ";");
+    lines.push("");
+    lines.push("--icon-stroke: " + ctx.iconSet.stroke + ";");
+    lines.push("--icon-cap: " + ctx.iconSet.cap + ";");
+    lines.push("--icon-join: " + ctx.iconSet.join + ";");
+    lines.push("--icon-fill: " + ctx.iconSet.fill + ";");
+    lines.push("");
+    lines.push("--motion-duration: " + ctx.motion.duration + "ms;");
+    lines.push("--motion-duration-slow: " + Math.round(ctx.motion.duration * 1.6) + "ms;");
+    lines.push("--motion-ease: " + ctx.motion.ease + ";");
+    lines.push("--motion-lift: " + ctx.motion.lift + "px;");
+    lines.push("--motion-stagger: " + ctx.motion.stagger + "ms;");
     return lines;
   }
 
@@ -156,6 +169,16 @@ SE.exporter = (function () {
     out.push('[data-theme="dark"] {');
     cssVarsDark(ctx).forEach(function (l) { out.push("  " + l); });
     out.push("}");
+    out.push("");
+    out.push("/* Quien pide menos movimiento debe recibirlo también aquí */");
+    out.push("@media (prefers-reduced-motion: reduce) {");
+    out.push("  :root {");
+    out.push("    --motion-duration: 0.01ms;");
+    out.push("    --motion-duration-slow: 0.01ms;");
+    out.push("    --motion-lift: 0px;");
+    out.push("    --motion-stagger: 0ms;");
+    out.push("  }");
+    out.push("}");
     return out.join("\n");
   }
 
@@ -180,7 +203,16 @@ SE.exporter = (function () {
       color: { light: ctx.palette.light, dark: ctx.palette.dark },
       spacePx: ctx.space,
       radiusPx: { sm: ctx.radius.values[0], md: ctx.radius.values[1], lg: ctx.radius.values[2], full: 999 },
-      shadow: { light: ctx.shadow.light, dark: ctx.shadow.dark }
+      shadow: { light: ctx.shadow.light, dark: ctx.shadow.dark },
+      icons: {
+        familia: ctx.iconSet.id, nombre: ctx.iconSet.name, strokeWidth: ctx.iconSet.stroke,
+        linecap: ctx.iconSet.cap, linejoin: ctx.iconSet.join, fill: ctx.iconSet.fill, trazados: ctx.iconSet.paths
+      },
+      motion: {
+        nivel: ctx.motion.id, nombre: ctx.motion.name, durationMs: ctx.motion.duration,
+        durationSlowMs: Math.round(ctx.motion.duration * 1.6), ease: ctx.motion.ease,
+        liftPx: ctx.motion.lift, staggerMs: ctx.motion.stagger
+      }
     };
     return JSON.stringify(obj, null, 2);
   }
@@ -222,6 +254,8 @@ SE.exporter = (function () {
       ["Espaciado", ctx.spacing.name + " (unidad " + ctx.spacing.unit + "px)", ctx.spacing.rationale],
       ["Bordes", ctx.radius.name + " (" + ctx.radius.values.join(" / ") + "px)", ctx.radius.rationale],
       ["Sombras", ctx.shadow.name, ctx.shadow.rationale],
+      ["Iconos", ctx.iconSet.name + " (trazo " + ctx.iconSet.stroke + ", remate " + ctx.iconSet.cap + ")", ctx.iconSet.rationale],
+      ["Movimiento", ctx.motion.name + " (" + ctx.motion.duration + " ms · " + ctx.motion.ease + ")", ctx.motion.rationale],
       ["Lectura", "Interlineado " + ctx.d.reading.lineHeight + " · línea de " + ctx.d.reading.measure + "ch", "El interlineado y el ancho de línea marcan el ritmo del texto largo; se validaron sobre el mock de artículo."]
     ];
     return rows.map(function (r) {
@@ -245,6 +279,22 @@ SE.exporter = (function () {
     for (var i = 1; i <= 8; i++)
       out.push('<div class="space-row"><code>--space-' + i + " · " + ctx.space[i] + 'px</code><span class="space-bar" style="width:' + ctx.space[i] * 3 + 'px"></span></div>');
     return out.join("");
+  }
+
+  function iconSheet(ctx) {
+    return '<div class="icon-sheet">' + SE.icons.order.map(function (it) {
+      return '<div class="icon-cell">' + SE.icons.markup(it[0], ctx.iconSet) + "<span>" + it[1] + "</span></div>";
+    }).join("") + "</div>";
+  }
+
+  function motionCard(ctx) {
+    return '<div class="motion-card">' +
+      "<p><strong>" + ctx.motion.name + "</strong> · duración " + ctx.motion.duration + " ms · elevación " +
+      ctx.motion.lift + " px · entrada escalonada cada " + ctx.motion.stagger + " ms<br>" +
+      "<code>" + esc(ctx.motion.ease) + "</code></p>" +
+      '<p class="motion-try">Pasa el puntero por el botón para sentir la curva:</p>' +
+      '<div class="spec-row"><button class="sp-btn sp-primary sp-motion">Acción principal</button></div>' +
+      "</div>";
   }
 
   function specimens() {
@@ -307,6 +357,15 @@ SE.exporter = (function () {
 ".sp-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: var(--space-5); max-width: 420px; }\n" +
 ".sp-card h4 { margin: 0 0 var(--space-2); font: var(--weight-heading) var(--text-lg) var(--font-heading); letter-spacing: var(--tracking-heading); color: var(--color-text); }\n" +
 ".sp-card p { margin: 0; font-size: var(--text-sm); color: var(--color-text-muted); line-height: var(--leading-body); }\n" +
+".icon-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; padding: 18px; border: 1px solid #e2e2e6; border-radius: 10px; background: var(--color-bg); }\n" +
+".icon-cell { display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 10px 6px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); }\n" +
+".icon-cell span { font-size: 11px; color: var(--color-text-muted); text-align: center; }\n" +
+".ic { width: 22px; height: 22px; stroke: currentColor; overflow: visible; }\n" +
+".motion-card { margin-top: 16px; padding: 18px; border: 1px solid #e2e2e6; border-radius: 10px; background: var(--color-bg); color: var(--color-text); font-size: 13.5px; }\n" +
+".motion-try { margin: 14px 0 10px; color: var(--color-text-muted); font-size: 12.5px; }\n" +
+".sp-motion { transition: background var(--motion-duration) var(--motion-ease), transform var(--motion-duration) var(--motion-ease), box-shadow var(--motion-duration) var(--motion-ease); }\n" +
+".sp-motion:hover { background: var(--color-primary-hover); transform: translateY(calc(-1 * var(--motion-lift))); box-shadow: var(--shadow-md); }\n" +
+"@media (prefers-reduced-motion: reduce) { .sp-motion { transition-duration: 0.01ms; } }\n" +
 ".ok { color: #0f7a3d; } .mid { color: #9a6a00; } .bad { color: #b3261e; }\n" +
 "td b { font-weight: 700; font-size: 11px; }\n" +
 "pre { background: #14141a; color: #e8e8ee; padding: 18px; border-radius: 10px; overflow-x: auto; font: 11.5px/1.55 ui-monospace, Consolas, monospace; }\n" +
@@ -325,14 +384,20 @@ SE.exporter = (function () {
 
 "<h2>4 · Espaciado</h2>\n" + spaceBars(ctx) + "\n" +
 
-"<h2>5 · Especímenes</h2>\n<p>Componentes reales renderizados con los tokens (modo claro):</p>\n" + specimens() + "\n" +
+"<h2>5 · Iconos y movimiento</h2>\n" +
+"<p>Familia <strong>" + ctx.iconSet.name + "</strong> — trazo " + ctx.iconSet.stroke +
+", remate <code>" + ctx.iconSet.cap + "</code>, unión <code>" + ctx.iconSet.join +
+"</code>, relleno <code>" + esc(ctx.iconSet.fill) + "</code>:</p>\n" + iconSheet(ctx) + "\n" +
+motionCard(ctx) + "\n" +
+
+"<h2>6 · Especímenes</h2>\n<p>Componentes reales renderizados con los tokens (modo claro):</p>\n" + specimens() + "\n" +
 "<p style='margin-top:14px'>Modo oscuro:</p>\n" + '<div class="dark-scope">' + specimens() + "</div>\n" +
 
-"<h2>6 · Contraste WCAG</h2>\n<table><tr><th>Combinación</th><th>Modo claro</th><th>Modo oscuro</th></tr>" + contrastRows(ctx) + "</table>\n" +
+"<h2>7 · Contraste WCAG</h2>\n<table><tr><th>Combinación</th><th>Modo claro</th><th>Modo oscuro</th></tr>" + contrastRows(ctx) + "</table>\n" +
 "<p style='font-size:12.5px;color:#666'>AA exige 4.5:1 en texto normal y 3:1 en texto grande (≥24px o ≥19px negrita) y componentes de interfaz. AAA exige 7:1.</p>\n" +
 
-"<h2>7 · tokens.css</h2>\n<pre>" + esc(tokensCss) + "</pre>\n" +
-"<h2>8 · tokens.json</h2>\n<pre>" + esc(tokensJson) + "</pre>\n" +
+"<h2>8 · tokens.css</h2>\n<pre>" + esc(tokensCss) + "</pre>\n" +
+"<h2>9 · tokens.json</h2>\n<pre>" + esc(tokensJson) + "</pre>\n" +
 "</body></html>";
   }
 
@@ -431,6 +496,8 @@ SE.exporter = (function () {
           d.radius = SE.data.radii[r].id;
       }
     }
+    if (obj.icons && SE.findIn(SE.data.iconSets, obj.icons.familia)) d.icons = obj.icons.familia;
+    if (obj.motion && SE.findIn(SE.data.motions, obj.motion.nivel)) d.motion = obj.motion.nivel;
     if (obj.shadow && obj.shadow.light) {
       for (var s = 0; s < SE.data.shadows.length; s++)
         if (SE.data.shadows[s].light.md === obj.shadow.light.md) d.shadow = SE.data.shadows[s].id;

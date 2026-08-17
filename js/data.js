@@ -89,6 +89,44 @@ SE.data = (function () {
       rationale: "Sombras grandes y suaves: atmósfera flotante, tono premium." }
   ];
 
+  /* ---------- Familias de iconos ----------
+     stroke/cap/join/fill viajan como tokens CSS (no tocan el DOM);
+     `paths` decide qué juego de trazados pinta SE.icons. */
+  var iconSets = [
+    { id: "lineal-fino", name: "Lineal fino", sample: "riego",
+      stroke: 1.1, cap: "round", join: "round", fill: "none", paths: "outline",
+      rationale: "Trazo capilar: los iconos se retiran a un segundo plano y dejan mandar al texto. Elegante, pero exige buen contraste." },
+    { id: "lineal-suave", name: "Lineal suave", sample: "riego",
+      stroke: 1.6, cap: "round", join: "round", fill: "none", paths: "outline",
+      rationale: "El estándar de producto: peso suficiente para leerse a 16 px y remates redondos que suavizan la geometría." },
+    { id: "geometrico", name: "Geométrico recto", sample: "riego",
+      stroke: 1.5, cap: "butt", join: "miter", fill: "none", paths: "outline",
+      rationale: "Remates a escuadra y vértices en punta: preciso, técnico, de plano de ingeniería." },
+    { id: "grueso", name: "Trazo grueso", sample: "riego",
+      stroke: 2.25, cap: "round", join: "round", fill: "none", paths: "outline",
+      rationale: "Mucho peso visual: los iconos compiten con los titulares. Amable y rotundo, mejor con pocos iconos." },
+    { id: "duotono", name: "Duotono", sample: "riego",
+      stroke: 1.5, cap: "round", join: "round", fill: "var(--color-primary-soft)", paths: "outline",
+      rationale: "Contorno con relleno teñido del primario: da color a la interfaz sin llenarla de manchas sólidas." },
+    { id: "relleno", name: "Relleno", sample: "riego",
+      stroke: 0, cap: "round", join: "round", fill: "currentColor", paths: "solid",
+      rationale: "Siluetas macizas: máxima presencia y legibilidad a tamaño pequeño; el conjunto se vuelve más denso." }
+  ];
+
+  /* ---------- Movimiento ----------
+     duration en ms; lift en px de elevación al pasar el puntero;
+     stagger en ms entre bloques al entrar una pantalla. */
+  var motions = [
+    { id: "ninguno", name: "Ninguno", duration: 0, ease: "linear", lift: 0, stagger: 0,
+      rationale: "Cambios instantáneos: la interfaz responde sin ceremonia. Sobrio, rapidísimo y a prueba de mareos." },
+    { id: "sutil", name: "Sutil", duration: 120, ease: "cubic-bezier(0.2, 0, 0.2, 1)", lift: 1, stagger: 25,
+      rationale: "Se nota sin verse: solo confirma que el sistema te ha oído. La opción segura para herramientas de trabajo." },
+    { id: "suave", name: "Suave", duration: 220, ease: "cubic-bezier(0.22, 0.61, 0.36, 1)", lift: 2, stagger: 45,
+      rationale: "Salidas desaceleradas y elevación perceptible: el gesto acompaña y da sensación de calidad." },
+    { id: "expresivo", name: "Expresivo", duration: 340, ease: "cubic-bezier(0.34, 1.4, 0.64, 1)", lift: 4, stagger: 70,
+      rationale: "Curva con rebote y recorridos largos: la interfaz tiene carácter. Cansa en pantallas de uso diario." }
+  ];
+
   /* ---------- Colores semánticos compartidos ---------- */
   var semLight = {
     success: "#15803d", successSoft: "#dcfce7",
@@ -151,18 +189,24 @@ SE.data = (function () {
       dark:  pal({ bg: "#000000", surface: "#0d0d0d", surfaceAlt: "#1a1a1a", text: "#ffffff", textMuted: "#d4d4d4", border: "#6b6b6b", primary: "#99b3ff", primaryHover: "#bcd0ff", primarySoft: "#1a2966", onPrimary: "#000033", accent: "#ff66b3" }, semDark) }
   ];
 
-  /* ---------- Presets: direcciones completas ---------- */
+  /* ---------- Presets: direcciones completas ----------
+     Siete puntos de partida deliberadamente distintos: cada uno
+     cierra las nueve decisiones de forma coherente entre sí. */
   var presets = [
-    { id: "editorial", name: "Editorial clásico", desc: "Serifas, papel y tinta. Para leer despacio.",
-      decisions: { fontPair: { type: "pair", id: "playfair-lora" }, typeScale: { ratio: 1.333, base: 18 }, palette: { type: "curated", id: "tinta-papel" }, spacing: "normal", radius: "sutil", shadow: "ninguna", reading: { lineHeight: 1.65, measure: 65 } } },
-    { id: "tech-minimal", name: "Tech minimal", desc: "Neutro, funcional, sin ruido. El estándar de producto.",
-      decisions: { fontPair: { type: "pair", id: "inter-inter" }, typeScale: { ratio: 1.25, base: 16 }, palette: { type: "curated", id: "grafito" }, spacing: "normal", radius: "medio", shadow: "sutil", reading: { lineHeight: 1.5, measure: 70 } } },
-    { id: "calido", name: "Cálido humano", desc: "Tierra, curvas y aire. Cercano sin ser infantil.",
-      decisions: { fontPair: { type: "pair", id: "fraunces-nunito" }, typeScale: { ratio: 1.25, base: 17 }, palette: { type: "curated", id: "terracota" }, spacing: "amplia", radius: "redondeado", shadow: "difusa", reading: { lineHeight: 1.6, measure: 62 } } },
-    { id: "corporativo", name: "Corporativo sobrio", desc: "Denso, azul y preciso. Para trabajar en serio.",
-      decisions: { fontPair: { type: "pair", id: "plex-plex" }, typeScale: { ratio: 1.2, base: 16 }, palette: { type: "curated", id: "azul-institucional" }, spacing: "compacta", radius: "sutil", shadow: "sutil", reading: { lineHeight: 1.55, measure: 70 } } },
-    { id: "audaz", name: "Audaz contemporáneo", desc: "Geometría, violeta y saltos grandes de escala.",
-      decisions: { fontPair: { type: "pair", id: "space-inter" }, typeScale: { ratio: 1.333, base: 16 }, palette: { type: "curated", id: "violeta" }, spacing: "normal", radius: "redondeado", shadow: "media", reading: { lineHeight: 1.5, measure: 68 } } }
+    { id: "editorial", name: "Editorial clásico", desc: "Papel, tinta y serifas de alto contraste. Iconos capilares y ni un gesto de más: manda el texto.",
+      decisions: { fontPair: { type: "pair", id: "playfair-lora" }, typeScale: { ratio: 1.333, base: 18 }, palette: { type: "curated", id: "tinta-papel" }, spacing: "normal", radius: "sutil", shadow: "ninguna", icons: "lineal-fino", motion: "ninguno", reading: { lineHeight: 1.65, measure: 65 } } },
+    { id: "tech-minimal", name: "Tech minimal", desc: "Neutro y funcional, sin ruido. Iconos de trazo estándar y un movimiento que solo confirma.",
+      decisions: { fontPair: { type: "pair", id: "inter-inter" }, typeScale: { ratio: 1.25, base: 16 }, palette: { type: "curated", id: "grafito" }, spacing: "normal", radius: "medio", shadow: "sutil", icons: "lineal-suave", motion: "sutil", reading: { lineHeight: 1.5, measure: 70 } } },
+    { id: "calido", name: "Cálido humano", desc: "Tierra, curvas y aire. Iconos gruesos y gestos suaves: cercano sin ser infantil.",
+      decisions: { fontPair: { type: "pair", id: "fraunces-nunito" }, typeScale: { ratio: 1.25, base: 17 }, palette: { type: "curated", id: "terracota" }, spacing: "amplia", radius: "redondeado", shadow: "difusa", icons: "grueso", motion: "suave", reading: { lineHeight: 1.6, measure: 62 } } },
+    { id: "corporativo", name: "Corporativo sobrio", desc: "Denso, azul y preciso. Iconos a escuadra y transiciones cortas: herramienta de trabajo.",
+      decisions: { fontPair: { type: "pair", id: "plex-plex" }, typeScale: { ratio: 1.2, base: 16 }, palette: { type: "curated", id: "azul-institucional" }, spacing: "compacta", radius: "sutil", shadow: "sutil", icons: "geometrico", motion: "sutil", reading: { lineHeight: 1.55, measure: 70 } } },
+    { id: "audaz", name: "Audaz contemporáneo", desc: "Geometría, violeta y saltos grandes de escala. Iconos macizos y movimiento con rebote.",
+      decisions: { fontPair: { type: "pair", id: "space-inter" }, typeScale: { ratio: 1.333, base: 16 }, palette: { type: "curated", id: "violeta" }, spacing: "normal", radius: "redondeado", shadow: "media", icons: "relleno", motion: "expresivo", reading: { lineHeight: 1.5, measure: 68 } } },
+    { id: "brutalista", name: "Brutalista", desc: "Esquinas vivas, cero sombras y máximo contraste. Iconos técnicos y ninguna animación: puro esqueleto.",
+      decisions: { fontPair: { type: "pair", id: "franklin-baskerville" }, typeScale: { ratio: 1.414, base: 16 }, palette: { type: "curated", id: "alto-contraste" }, spacing: "compacta", radius: "recto", shadow: "ninguna", icons: "geometrico", motion: "ninguno", reading: { lineHeight: 1.45, measure: 72 } } },
+    { id: "sereno", name: "Sereno premium", desc: "Verde profundo, mucho aire y sombras difusas. Iconos duotono y gestos largos: calma cara.",
+      decisions: { fontPair: { type: "pair", id: "dmserif-dmsans" }, typeScale: { ratio: 1.25, base: 17 }, palette: { type: "curated", id: "esmeralda" }, spacing: "amplia", radius: "redondeado", shadow: "difusa", icons: "duotono", motion: "suave", reading: { lineHeight: 1.62, measure: 64 } } }
   ];
 
   return {
@@ -172,6 +216,8 @@ SE.data = (function () {
     spacings: spacings,
     radii: radii,
     shadows: shadows,
+    iconSets: iconSets,
+    motions: motions,
     palettes: palettes,
     presets: presets,
     semLight: semLight,

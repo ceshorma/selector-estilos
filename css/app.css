@@ -70,11 +70,14 @@ body {
   outline-offset: 2px;
 }
 
-/* Las transiciones son solo feedback de hover: apagarlas no pierde estado */
+/* Las transiciones son solo feedback de hover: apagarlas no pierde estado.
+   El retardo también se anula: con la entrada escalonada, dejarlo puesto
+   mantendría los bloques invisibles unos cientos de milisegundos. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
   }
 }
 
@@ -194,6 +197,11 @@ body {
   min-width: 0;
 }
 
+/* Con cinco pantallas la barra ya no cabe holgada: la izquierda cede
+   espacio antes de solaparse con los controles de la derecha. */
+.tb-left { flex: 0 1 auto; overflow: hidden; }
+.tb-right { flex: 0 0 auto; }
+
 .tb-brand {
   font-size: 13px;
   font-weight: 700;
@@ -226,13 +234,23 @@ body {
   background: transparent;
   color: var(--app-muted);
   font: 500 12.5px var(--app-font);
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
+  white-space: nowrap;
   transition: background 0.12s, color 0.12s;
+}
+
+/* Los recordatorios de atajo son lo primero que sobra al estrecharse */
+@media (max-width: 1540px) {
+  .tb-tabs kbd { display: none; }
+}
+
+@media (max-width: 1180px) {
+  .tb-brand { display: none; }
 }
 
 .tb-tabs button:hover { color: var(--app-text); }
@@ -632,6 +650,72 @@ body.panel-hidden #panel { display: none; }
   height: 12px;
   border-radius: 3px;
   background: #fff;
+}
+
+/* Glifos de familia de iconos: cada botón dibuja el mismo icono con
+   sus propios atributos, para comparar trazo contra trazo. */
+.seg-btn .glyph-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+}
+
+.seg-btn .glyph-icon .ic {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  overflow: visible;
+}
+
+.icon-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--app-line);
+  border-radius: 8px;
+  color: var(--app-text);
+}
+
+.icon-strip .ic {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  overflow: visible;
+}
+
+/* Glifo de movimiento: un punto recorre la pista con la curva y la
+   duración de esa opción. Se reproduce al renderizar y al apuntar. */
+.seg-btn .glyph-motion {
+  position: relative;
+  width: 30px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--app-bg3);
+  overflow: hidden;
+}
+
+/* Transición, no keyframes: así el punto usa exactamente la duración y
+   la curva reales de la opción (y con «Ninguno» salta de golpe). */
+.seg-btn .glyph-motion i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  transition: transform var(--gm-d) var(--gm-e);
+}
+
+.seg-btn .glyph-motion.run i { transform: translateX(16px); }
+
+.p-motion-hint a {
+  color: var(--app-accent);
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 /* Filas de opción (parejas tipográficas, paletas) */

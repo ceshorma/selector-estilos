@@ -54,16 +54,8 @@
   font-weight: 600;
 }
 
-.db-nav svg {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+/* El aspecto del trazo lo deciden los tokens --icon-*; aquí solo el tamaño */
+.db-nav .ic { width: 16px; height: 16px; }
 
 .db-sidenav-foot {
   display: flex;
@@ -104,16 +96,7 @@
   color: var(--color-warning);
 }
 
-.db-banner-icon {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 auto;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.4;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
+.db-banner-icon { width: 20px; height: 20px; }
 
 .db-banner-text {
   flex: 1;
@@ -151,7 +134,49 @@
   gap: var(--space-2);
 }
 
-.db-search { width: 230px; }
+.db-search-wrap { position: relative; display: flex; align-items: center; }
+
+.db-search-icon {
+  position: absolute;
+  left: var(--space-3);
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.db-search { width: 230px; padding-left: calc(var(--space-3) * 2 + 14px); }
+
+/* --- Barra de filtros: donde se ven interruptor, chips y movimiento --- */
+
+.db-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.db-toolbar-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--color-border);
+}
+
+.db-toolbar-spacer { flex: 1; }
+
+.db-toolbar-note {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.db-toolbar-note .ic { width: 13px; height: 13px; }
 
 /* --- Stat cards --- */
 

@@ -1,7 +1,7 @@
 # Selector de Estilos
 
 Herramienta local para tomar decisiones de diseño viéndolas aplicadas en vivo sobre
-cuatro páginas mock realistas, y exportarlas como documento de diseño + tokens de código.
+cinco páginas mock realistas, y exportarlas como documento de diseño + tokens de código.
 
 **En línea: https://ceshorma.github.io/selector-estilos/**
 
@@ -21,15 +21,17 @@ Fonts (sin conexión, la app funciona con fuentes de sistema de respaldo).
 | Espaciado | Compacta · Normal · Amplia |
 | Bordes | Recto · Sutil · Medio · Redondeado |
 | Sombras | Ninguna · Sutil · Media · Difusa |
+| Iconos | 6 familias sobre un mismo juego de trazados: lineal fino, lineal suave, geométrico recto, trazo grueso, duotono y relleno |
+| Movimiento | Ninguno · Sutil · Suave · Expresivo (duración, curva, elevación y entrada escalonada) |
 | Lectura | Interlineado y ancho de línea |
 
-Los 5 **presets** ("direcciones") son puntos de partida completos; cualquier ajuste
+Las 7 **direcciones** (presets) son puntos de partida completos; cualquier ajuste
 posterior los convierte en "personalizado". Todo es reversible con **Ctrl+Z** /
 **Ctrl+Mayús+Z** (o los botones ↶↷ del panel).
 
 ## Cada pantalla decide algo
 
-Las cuatro mock no son variaciones del mismo contenido: cada una es *el* lugar donde
+Las cinco mock no son variaciones del mismo contenido: cada una es *el* lugar donde
 una decisión concreta se puede juzgar. El panel lo dice en cada dimensión ("se juzga
 mejor en…") y lleva allí de un click.
 
@@ -38,7 +40,8 @@ mejor en…") y lleva allí de un click.
 | **Panel** | Densidad y espaciado, colores semánticos en uso, tamaños pequeños, y los estados difíciles: banner de alerta, error de formulario, botón deshabilitado, estado vacío |
 | **Landing** | Tamaños display, jerarquía de titulares, botones grandes, radios, sombras y el color de acento a gran escala |
 | **Artículo** | La escala tipográfica **completa** (los 8 peldaños, del pie de foto al titular), la armonía título/cuerpo, el interlineado y el ancho de línea |
-| **Colores** | La convivencia de toda la paleta: formas puras, proporción 60·30·10, pares de uso y tiras con hex |
+| **Colores** | La convivencia de toda la paleta: formas puras, proporción 60·30·10, pares de uso, iconos teñidos con cada token y tiras con hex |
+| **Componentes** | El kit del sistema con los estados forzados: los 24 iconos a tres tamaños, botones en reposo/puntero/foco/en curso/deshabilitado, campos, chips, avisos, progreso, pestañas, menú y diálogo. Es donde se deciden **iconos** y **movimiento** |
 
 ## Comparación A/B
 
@@ -78,7 +81,7 @@ enseñar una propuesta.
 
 ## Atajos
 
-`1 · 2 · 3 · 4` pantallas · `D` claro/oscuro · `P` ocultar panel · `Ctrl+Z` deshacer ·
+`1 · 2 · 3 · 4 · 5` pantallas · `D` claro/oscuro · `P` ocultar panel · `Ctrl+Z` deshacer ·
 en A/B: `Espacio` / `←` `→` / `Enter` / `Esc`
 
 También admite deep-links: `index.html#landing,dark,calido` (pantalla, modo, preset) y
@@ -89,9 +92,11 @@ También admite deep-links: `index.html#landing,dark,calido` (pantalla, modo, pr
 El botón **Exportar** genera tres archivos con las decisiones actuales:
 
 - `diseño.html` — documento legible y autónomo: decisiones con racional, escala
-  renderizada, paleta en ambos modos, espaciado, especímenes reales, tabla de
-  contraste WCAG y los tokens embebidos.
-- `tokens.css` — variables CSS listas para usar (`:root` + bloque `[data-theme="dark"]`).
+  renderizada, paleta en ambos modos, espaciado, el juego de iconos dibujado, la ficha
+  de movimiento, especímenes reales, tabla de contraste WCAG y los tokens embebidos.
+- `tokens.css` — variables CSS listas para usar (`:root` + bloque `[data-theme="dark"]`),
+  incluidos `--icon-*` y `--motion-*`, con un bloque `prefers-reduced-motion` que anula
+  las duraciones para quien pide menos movimiento.
 - `tokens.json` — tokens en JSON para herramientas y pipelines.
 
 Las decisiones se guardan en `localStorage` y se restauran al volver a abrir.
@@ -99,6 +104,6 @@ Las decisiones se guardan en `localStorage` y se restauran al volver a abrir.
 
 ## Tests
 
-`node test/logic-test.js` — suite de ~450 chequeos: matemática de escala, contraste
+`node test/logic-test.js` — suite de ~600 chequeos: matemática de escala, contraste
 WCAG de todas las paletas, generador de armonías, máquina A/B, historial, snapshots,
-importación y exportadores.
+catálogos de iconos y movimiento, escritura de tokens, importación y exportadores.

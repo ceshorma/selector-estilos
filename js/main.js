@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (hash) {
     hash.split(",").forEach(function (tok) {
       if (tok.indexOf("s=") === 0) SE.applyEncodedState(tok.slice(2), { silent: true });
-      else if (["dashboard", "landing", "blog", "colores"].indexOf(tok) >= 0) SE.state.screen = tok;
+      else if (SE.SCREENS.indexOf(tok) >= 0) SE.state.screen = tok;
       else if (tok === "dark" || tok === "light") SE.state.mode = tok;
       else if (SE.findIn(SE.data.presets, tok)) {
         SE.state.decisions = SE.clone(SE.findPreset(tok).decisions);

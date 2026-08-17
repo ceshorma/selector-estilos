@@ -11,7 +11,8 @@ SE.ui = (function () {
 
   var DIM_LABELS = {
     fontPair: "Tipografía", typeScale: "Escala", palette: "Color",
-    spacing: "Espaciado", radius: "Bordes", shadow: "Sombras", reading: "Lectura"
+    spacing: "Espaciado", radius: "Bordes", shadow: "Sombras",
+    icons: "Iconos", motion: "Movimiento", reading: "Lectura"
   };
 
   var VISION_LABELS = {
@@ -310,8 +311,84 @@ SE.ui = (function () {
       '<p class="p-hint">Con «Ninguna», las tarjetas se sostienen solo con su borde.</p>';
   }
 
+  /* ================= ICONOS ================= */
+
+  /* El duotono se rellena con un token del mock que en el panel no existe:
+     para el glifo se sustituye por el gris de la app. */
+  function panelIconSet(s) {
+    if (s.fill.indexOf("var(") !== 0) return s;
+    var copy = {};
+    for (var k in s) copy[k] = s[k];
+    copy.fill = "var(--app-bg3)";
+    return copy;
+  }
+
+  function renderIcons() {
+    var d = SE.effectiveDecisions().icons;
+    var active = SE.findIn(SE.data.iconSets, d) || SE.data.iconSets[1];
+    $("#body-icons").innerHTML = '<div class="seg seg-wrap" style="margin-top:10px" data-role="icons">' +
+      SE.data.iconSets.map(function (s) {
+        return '<button type="button" class="seg-btn' + (d === s.id ? " active" : "") + '" data-icons="' + s.id + '" title="' + s.rationale + '">' +
+          '<span class="glyph-icon">' + SE.icons.markup(s.sample, panelIconSet(s)) + "</span>" +
+          "<small>" + s.name + "</small></button>";
+      }).join("") + "</div>" +
+      '<div class="icon-strip">' + ["informes", "campana", "escudo", "usuario", "ajustes", "grafica"].map(function (n) {
+        return SE.icons.markup(n, panelIconSet(active));
+      }).join("") + "</div>" +
+      '<p class="p-hint">' + active.rationale + "</p>";
+  }
+
+  /* ================= MOVIMIENTO ================= */
+
+  function renderMotion() {
+    var d = SE.effectiveDecisions().motion;
+    var active = SE.findIn(SE.data.motions, d) || SE.data.motions[1];
+    $("#body-motion").innerHTML = '<div class="seg seg-wrap" style="margin-top:10px" data-role="motion">' +
+      SE.data.motions.map(function (m) {
+        return '<button type="button" class="seg-btn' + (d === m.id ? " active" : "") + '" data-motion="' + m.id + '" title="' + m.rationale + '">' +
+          '<span class="glyph-motion" data-ms="' + m.duration + '" style="--gm-d:' + m.duration + "ms;--gm-e:" + m.ease + '"><i></i></span>' +
+          "<small>" + m.name + "</small></button>";
+      }).join("") + "</div>" +
+      '<p class="p-hint p-motion-hint">' + active.rationale +
+      ' <a data-role="motion-replay">Reproducir ↻</a></p>' +
+      '<p class="p-hint">Duración ' + active.duration + " ms · elevación " + active.lift +
+      " px · entrada escalonada cada " + active.stagger + " ms.</p>";
+    replayMotionGlyphs();
+  }
+
+  /* El punto va y vuelve: la ida usa la curva de la opción, y la vuelta
+     ocurre cuando la ida ha terminado. Sin bucles: el panel es un sitio
+     tranquilo y el movimiento solo aparece cuando se pide. */
+  function playGlyph(glyph) {
+    if (!glyph) return;
+    if (glyph._timer) clearTimeout(glyph._timer);
+    /* Reflow entre quitar y poner para que la transición vuelva a arrancar */
+    glyph.classList.remove("run");
+    void glyph.offsetWidth;
+    glyph.classList.add("run");
+    glyph._timer = setTimeout(function () {
+      glyph.classList.remove("run");
+    }, Number(glyph.dataset.ms || 0) + 420);
+  }
+
+  function replayMotionGlyphs() {
+    $all("#body-motion .glyph-motion").forEach(playGlyph);
+  }
+
+  function bindMotion() {
+    var body = $("#body-motion");
+    body.addEventListener("click", function (e) {
+      if (e.target.dataset.role === "motion-replay") replayMotionGlyphs();
+    });
+    /* Cada opción reproduce su propia curva al apuntarla */
+    body.addEventListener("mouseover", function (e) {
+      var btn = e.target.closest(".seg-btn");
+      if (btn) playGlyph(btn.querySelector(".glyph-motion"));
+    });
+  }
+
   function bindSimpleSegs() {
-    ["spacing", "radius", "shadow"].forEach(function (dim) {
+    ["spacing", "radius", "shadow", "icons", "motion"].forEach(function (dim) {
       $("#body-" + dim).addEventListener("click", function (e) {
         var btn = e.target.closest("[data-" + dim + "]");
         if (btn) SE.setDecision(dim, btn.dataset[dim]);
@@ -437,6 +514,16 @@ SE.ui = (function () {
 
   /* ================= PANTALLAS / TOP BAR ================= */
 
+  /* Relanza la entrada escalonada de la pantalla visible. Se reinicia
+     quitando la clase y forzando un reflow antes de devolverla. */
+  function playEnter() {
+    var el = $("#mock-viewport .mock-screen.active");
+    if (!el) return;
+    el.classList.remove("playing");
+    void el.offsetWidth;
+    el.classList.add("playing");
+  }
+
   function switchScreen(screen) {
     SE.setScreen(screen);
     $all(".mock-screen").forEach(function (el) {
@@ -446,6 +533,7 @@ SE.ui = (function () {
       el.classList.toggle("active", el.dataset.screen === screen);
     });
     $("#viewport-wrap").scrollTop = 0;
+    playEnter();
     /* En vista dividida, el overlay debe clonar la nueva pantalla */
     if (SE.state.ab && SE.state.ab.split && SE.state.ab.b != null) {
       updateSplitUI();
@@ -622,6 +710,7 @@ SE.ui = (function () {
     }
     /* Clona la pantalla activa para pintarla con los tokens de B */
     overlay.innerHTML = "";
+    SE.icons.invalidate(overlay);
     var active = vp.querySelector(".mock-screen.active");
     if (active) {
       var clone = active.cloneNode(true);
@@ -730,10 +819,8 @@ SE.ui = (function () {
         $("#vision-dropdown").hidden = true;
         return;
       }
-      if (e.key === "1") switchScreen("dashboard");
-      else if (e.key === "2") switchScreen("landing");
-      else if (e.key === "3") switchScreen("blog");
-      else if (e.key === "4") switchScreen("colores");
+      var screenKey = Number(e.key);
+      if (screenKey >= 1 && screenKey <= SE.SCREENS.length) switchScreen(SE.SCREENS[screenKey - 1]);
       else if (e.key === "d" || e.key === "D") { SE.setMode(SE.state.mode === "light" ? "dark" : "light"); updateModeUI(); }
       else if (e.key === "p" || e.key === "P") togglePanel();
     });
@@ -743,12 +830,16 @@ SE.ui = (function () {
 
   var RENDERERS = {
     fontPair: renderFontPair, typeScale: renderTypeScale, palette: renderPalette,
-    spacing: renderSpacing, radius: renderRadius, shadow: renderShadow, reading: renderReading
+    spacing: renderSpacing, radius: renderRadius, shadow: renderShadow,
+    icons: renderIcons, motion: renderMotion, reading: renderReading
   };
 
   /* Cada dimensión tiene una pantalla donde de verdad se juzga.
      La pista la hace explícita y lleva allí de un click. */
-  var SCREEN_NAMES = { dashboard: "Panel", landing: "Landing", blog: "Artículo", colores: "Colores" };
+  var SCREEN_NAMES = {
+    dashboard: "Panel", landing: "Landing", blog: "Artículo",
+    colores: "Colores", componentes: "Componentes"
+  };
 
   var DIM_PURPOSE = {
     fontPair: { screen: "blog", text: "La armonía entre título y cuerpo se juzga leyendo; los titulares grandes, en la Landing." },
@@ -757,6 +848,8 @@ SE.ui = (function () {
     spacing: { screen: "dashboard", text: "La densidad se siente en la pantalla más apretada." },
     radius: { screen: "landing", text: "El radio se lee en los botones y tarjetas grandes." },
     shadow: { screen: "landing", text: "La elevación se aprecia en tarjetas sobre fondo amplio." },
+    icons: { screen: "componentes", text: "Componentes reúne los 24 iconos del sistema a tres tamaños: es donde se ve si la familia aguanta." },
+    motion: { screen: "componentes", text: "El movimiento se juzga interactuando: pasa el puntero por botones, filas y tarjetas." },
     reading: { screen: "blog", text: "Interlineado y ancho de línea solo se juzgan con texto largo." }
   };
 
@@ -820,6 +913,16 @@ SE.ui = (function () {
 
   /* ================= INIT ================= */
 
+  /* La rejilla de iconos de la pantalla Componentes se genera desde el
+     registro: así nunca se desincroniza del catálogo. */
+  function renderIconGrid() {
+    var grid = $("#cp-icon-grid");
+    if (!grid) return;
+    grid.innerHTML = SE.icons.order.map(function (it) {
+      return '<span class="cp-icon"><svg class="ic" data-icon="' + it[0] + '" viewBox="0 0 16 16" aria-hidden="true"></svg><small>' + it[1] + "</small></span>";
+    }).join("");
+  }
+
   function init() {
     /* Los enlaces "Ver en …" de las pistas de propósito */
     $(".panel-scroll").addEventListener("click", function (e) {
@@ -831,11 +934,17 @@ SE.ui = (function () {
     bindTypeScale();
     bindPalette();
     bindSimpleSegs();
+    bindMotion();
     bindReading();
     bindSnapshots();
     bindAB();
     bindKeyboard();
     setVision(SE.state.vision || "normal");
+    /* Los iconos recién inyectados aún no tienen trazado: se invalida el
+       repintado para que la siguiente aplicación de tokens los rellene. */
+    renderIconGrid();
+    SE.icons.invalidate($("#mock-viewport"));
+    SE.applyTokens();
     SE.ui.ready = true;
     ready = true;
     refreshAll();

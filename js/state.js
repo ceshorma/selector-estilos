@@ -7,6 +7,9 @@ window.SE = window.SE || {};
 
 SE.STORAGE_KEY = "selectorEstilos.v1";
 
+/* Pantallas mock disponibles (orden de las pestañas y de las teclas 1-5) */
+SE.SCREENS = ["dashboard", "landing", "blog", "colores", "componentes"];
+
 SE.clone = function (v) { return JSON.parse(JSON.stringify(v)); };
 
 /* ---------- estado ---------- */
@@ -54,7 +57,7 @@ SE.loadState = function () {
     try {
       var saved = JSON.parse(raw);
       if (saved && saved.version === 1) {
-        if (["dashboard", "landing", "blog", "colores"].indexOf(saved.screen) >= 0) state.screen = saved.screen;
+        if (SE.SCREENS.indexOf(saved.screen) >= 0) state.screen = saved.screen;
         if (saved.mode === "light" || saved.mode === "dark") state.mode = saved.mode;
         if (typeof saved.presetId === "string") state.presetId = saved.presetId;
         if (saved.decisions) SE.mergeValidDecisions(state.decisions, saved.decisions);
@@ -94,6 +97,8 @@ SE.mergeValidDecisions = function (base, saved) {
   if (SE.findIn(SE.data.spacings, saved.spacing)) base.spacing = saved.spacing;
   if (SE.findIn(SE.data.radii, saved.radius)) base.radius = saved.radius;
   if (SE.findIn(SE.data.shadows, saved.shadow)) base.shadow = saved.shadow;
+  if (SE.findIn(SE.data.iconSets, saved.icons)) base.icons = saved.icons;
+  if (SE.findIn(SE.data.motions, saved.motion)) base.motion = saved.motion;
 
   var rd = saved.reading;
   if (rd) base.reading = { lineHeight: clampNum(rd.lineHeight, 1.3, 1.9, base.reading.lineHeight), measure: Math.round(clampNum(rd.measure, 50, 80, base.reading.measure)) };
@@ -230,6 +235,22 @@ SE.writeTokens = function (el, d, mode) {
   set("--shadow-md", sh.md);
   set("--shadow-lg", sh.lg);
 
+  /* Iconos: grosor, remates y relleno son puro CSS; el juego de
+     trazados (outline/solid) lo pinta SE.icons desde applyTokens. */
+  var iconSet = SE.findIn(SE.data.iconSets, d.icons) || SE.data.iconSets[1];
+  set("--icon-stroke", String(iconSet.stroke));
+  set("--icon-cap", iconSet.cap);
+  set("--icon-join", iconSet.join);
+  set("--icon-fill", iconSet.fill);
+
+  /* Movimiento */
+  var motion = SE.findIn(SE.data.motions, d.motion) || SE.data.motions[1];
+  set("--motion-duration", motion.duration + "ms");
+  set("--motion-duration-slow", Math.round(motion.duration * 1.6) + "ms");
+  set("--motion-ease", motion.ease);
+  set("--motion-lift", motion.lift + "px");
+  set("--motion-stagger", motion.stagger + "ms");
+
   /* Lectura */
   set("--leading-body", String(d.reading.lineHeight));
   set("--measure", d.reading.measure + "ch");
@@ -244,12 +265,16 @@ SE.applyTokens = function () {
   /* En vista dividida el viewport base muestra siempre A… */
   var d = split ? SE.withCandidate(SE.state.decisions, ab, "a") : SE.effectiveDecisions();
   SE.writeTokens(vp, d, SE.state.mode);
+  SE.icons.paint(vp, d.icons);
   vp.dataset.mode = SE.state.mode;
 
-  /* …y el overlay recortado muestra siempre B. */
+  /* …y el overlay recortado muestra siempre B, con su propio
+     juego de iconos: la cortina compara también esa decisión. */
   var overlay = document.getElementById("split-overlay");
   if (split && overlay) {
-    SE.writeTokens(overlay, SE.withCandidate(SE.state.decisions, ab, "b"), SE.state.mode);
+    var db = SE.withCandidate(SE.state.decisions, ab, "b");
+    SE.writeTokens(overlay, db, SE.state.mode);
+    SE.icons.paint(overlay, db.icons);
   }
 
   if (SE.ui && SE.ui.ready) SE.ui.afterApply();
