@@ -22,17 +22,18 @@ Ordenadas por impacto dentro de cada bloque.
   (el repo pasó a público: Pages sobre privado exige plan de pago).
 - [ ] **Comparador de snapshots** (S) — tabla diff entre dos direcciones guardadas:
   qué dimensiones difieren y en qué valor. Documenta el porqué de la elección.
-- [ ] **"Sorpréndeme"** (S/M) — dirección coherente al azar (pareja armónica, paleta
-  generada desde matiz aleatorio, escala sensata), estilo barra espaciadora de Coolors.
-  Explorar territorio no obvio es el regalo de una herramienta así.
+- [x] **"Sorpréndeme"** (S/M) — eje de carácter (sobrio ↔ expresivo) del que se derivan las
+  nueve decisiones, para que salgan conjuntos que se sostienen y no ruido. La suite exige
+  que 200 seguidas sean válidas y pasen contraste AA.
 
 ## Nuevas dimensiones de diseño
 
 - [ ] **Familias de iconos por dibujo** (M) — hoy las seis familias comparten trazado y
   se distinguen por grosor, remates y relleno. Un segundo juego realmente redibujado
   (esquinas vivas vs. redondeadas) daría más distancia entre opciones.
-- [ ] **Peso y contraste tipográfico** (S) — elegir peso de titulares (500/600/700/800)
-  y de énfasis del cuerpo; cambia mucho la voz sin cambiar de fuente.
+- [x] **Peso de titulares** (S) — 400 a 800, acotado a los pesos que la familia tiene de
+  verdad (derivados de su propio `css2`) y ajustado al más cercano al cambiar de fuente.
+  Queda pendiente el peso de énfasis del cuerpo.
 - [ ] **Grosor de bordes** (S) — 1px / 1.5px / 2px como token `--border-width`; combinado
   con "sombra: ninguna" define estilos muy distintos (fino elegante vs. brutalist).
 - [ ] **Estilo de botones** (M) — relleno / outline / texto, y tamaño de controles
@@ -100,6 +101,21 @@ Ordenadas por impacto dentro de cada bloque.
 - [ ] **Daltonismo en el documento** (S) — incluir en diseño.html la paleta pasada por las
   matrices de protanopia/deuteranopia, para que la decisión quede documentada también
   para quien no usa la herramienta.
+
+## Tipografía y móvil
+
+- [x] **Explorador tipográfico** (M) — las parejas y las 31 familias se ven escritas en su
+  propia fuente, con buscador, filtros por categoría y texto de muestra editable. Las
+  familias se cargan subseteadas al texto de muestra (`&text=`): 4,5 KB por familia en vez
+  de 32,6, que es lo que lo hace viable en un móvil.
+- [x] **La herramienta en el móvil** (M) — barra reordenada con pestañas deslizables, panel
+  como hoja inferior, objetivos táctiles, `dvh` y `safe-area`, y el mock encogido con `zoom`
+  para caber sin scroll horizontal.
+- [x] **Container queries en los mocks** (S) — sus reglas responsive miraban el ancho de la
+  ventana mientras vivían en una caja de 1024 px: con la ventana estrecha se activaban las
+  reglas de tablet en un mock que seguía midiendo 1024, y lo mismo deformaba las miniaturas.
+- [ ] **Vista responsive de los mocks** (L) — que las cuatro pantallas tengan además una
+  maqueta móvil propia, para juzgar el diseño a 390 px y no solo verlo en pequeño.
 
 ## Panel
 

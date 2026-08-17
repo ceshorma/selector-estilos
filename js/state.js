@@ -109,6 +109,7 @@ SE.mergeValidDecisions = function (base, saved) {
   if (SE.findIn(SE.data.spacings, saved.spacing)) base.spacing = saved.spacing;
   if (SE.findIn(SE.data.radii, saved.radius)) base.radius = saved.radius;
   if (SE.findIn(SE.data.shadows, saved.shadow)) base.shadow = saved.shadow;
+  if (SE.findIn(SE.data.weights, Number(saved.weight))) base.weight = Number(saved.weight);
   if (SE.findIn(SE.data.iconSets, saved.icons)) base.icons = saved.icons;
   if (SE.findIn(SE.data.motions, saved.motion)) base.motion = saved.motion;
 
@@ -122,6 +123,24 @@ SE.resolvePairIds = function (decision) {
   if (decision.type === "custom") return { heading: decision.heading, body: decision.body };
   var pair = SE.findIn(SE.data.pairs, decision.id) || SE.data.pairs[0];
   return { heading: pair.heading, body: pair.body };
+};
+
+/* Pesos realmente disponibles de una fuente, derivados de su propio css2:
+   así es imposible ofrecer —o escribir— un peso que no se ha cargado. */
+SE.fontWeights = function (fontId) {
+  var f = SE.data.fonts[fontId];
+  if (!f) return [400];
+  var m = /wght@([\d;]+)/.exec(f.css2);
+  if (!m) return [400];
+  return m[1].split(";").map(Number).sort(function (a, b) { return a - b; });
+};
+
+SE.nearestWeight = function (fontId, w) {
+  var list = SE.fontWeights(fontId);
+  var best = list[0];
+  for (var i = 1; i < list.length; i++)
+    if (Math.abs(list[i] - w) < Math.abs(best - w)) best = list[i];
+  return best;
 };
 
 SE.resolvePair = function (decision) {
@@ -216,7 +235,9 @@ SE.writeTokens = function (el, d, mode) {
   var pair = SE.resolvePair(d.fontPair);
   set("--font-heading", '"' + pair.heading.family + '", ' + pair.heading.fallback);
   set("--font-body", '"' + pair.body.family + '", ' + pair.body.fallback);
-  set("--weight-heading", String(pair.heading.headingWeight));
+  /* El peso elegido, ajustado a lo que esta familia tenga de verdad */
+  var ids = SE.resolvePairIds(d.fontPair);
+  set("--weight-heading", String(SE.nearestWeight(ids.heading, d.weight || pair.heading.headingWeight)));
   set("--tracking-heading", pair.heading.tracking);
   set("--leading-tight", pair.heading.cat === "display" ? "1.12" : (pair.heading.cat === "serif" ? "1.18" : "1.2"));
 
@@ -379,6 +400,71 @@ SE.applyPreset = function (id) {
   SE.pushHistory();
   SE.state.decisions = SE.clone(preset.decisions);
   SE.state.presetId = preset.id;
+  SE.saveState();
+  SE.applyTokens();
+  if (SE.ui && SE.ui.ready) SE.ui.refreshAll();
+};
+
+/* ---------- «Sorpréndeme» ----------
+   No es ruido aleatorio: se elige primero un eje de carácter (0 sobrio →
+   1 expresivo) y de él se derivan las nueve decisiones, de modo que salgan
+   conjuntos que se sostienen —recto + sin sombra + geométrico + sin
+   movimiento— y no mezclas imposibles. */
+
+function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+/* Reparte una lista entre sobrio y expresivo y elige según el eje */
+function byAxis(axis, sobrio, expresivo) {
+  return pick(axis < 0.5 ? sobrio : expresivo);
+}
+
+SE.surpriseDecisions = function () {
+  var axis = Math.random();
+
+  /* Parejas que la heurística no marca como arriesgadas */
+  var pairs = SE.data.pairs.filter(function (p) {
+    return SE.pairingHint(p.heading, p.body).level !== "arriesgada";
+  });
+  /* Las expresivas llevan display o mono en el titular */
+  var expresivas = pairs.filter(function (p) {
+    var c = SE.data.fonts[p.heading].cat;
+    return c === "display" || c === "mono" || SE.data.fonts[p.heading].tone === "expressive";
+  });
+  var sobrias = pairs.filter(function (p) { return expresivas.indexOf(p) < 0; });
+  var pair = byAxis(axis, sobrias.length ? sobrias : pairs, expresivas.length ? expresivas : pairs);
+
+  var rule = pick(SE.color.RULES).id;
+  /* hslToHex toma saturación y luminosidad en 0..1, no en porcentaje */
+  var hex = SE.color.hslToHex(Math.floor(Math.random() * 360),
+    0.35 + Math.random() * 0.45, 0.28 + Math.random() * 0.20);
+
+  var pesos = SE.fontWeights(pair.heading);
+  return {
+    fontPair: { type: "pair", id: pair.id },
+    typeScale: {
+      ratio: byAxis(axis, [1.2, 1.25], [1.333, 1.414, 1.5]),
+      base: 15 + Math.floor(Math.random() * 4)
+    },
+    palette: { type: "generated", rule: rule, primaryHex: hex, colors: SE.color.generate(hex, rule) },
+    spacing: byAxis(axis, ["compacta", "normal"], ["normal", "amplia"]),
+    radius: byAxis(axis, ["recto", "sutil"], ["medio", "redondeado"]),
+    shadow: byAxis(axis, ["ninguna", "sutil"], ["media", "difusa"]),
+    weight: axis < 0.5 ? pesos[0] : pesos[pesos.length - 1],
+    icons: byAxis(axis, ["lineal-fino", "geometrico", "lineal-suave"], ["grueso", "relleno", "duotono"]),
+    motion: byAxis(axis, ["ninguno", "sutil"], ["suave", "expresivo"]),
+    reading: {
+      lineHeight: Math.round((1.45 + Math.random() * 0.25) * 100) / 100,
+      measure: 58 + Math.floor(Math.random() * 17)
+    }
+  };
+};
+
+SE.surprise = function () {
+  if (SE.state.ab) SE.cancelAB();
+  SE.pushHistory();
+  SE.state.decisions = SE.surpriseDecisions();
+  SE.state.presetId = "custom";
+  SE.fonts.ensureDecision(SE.state.decisions.fontPair);
   SE.saveState();
   SE.applyTokens();
   if (SE.ui && SE.ui.ready) SE.ui.refreshAll();

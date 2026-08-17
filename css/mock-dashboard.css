@@ -358,7 +358,11 @@
 
 .db-empty .btn { margin-top: var(--space-1); }
 
-@media (max-width: 1240px) {
+/* Container query, no media query: estos mocks viven dentro de una caja de
+   1024 px o más con desplazamiento propio, así que deben responder a SU ancho
+   y no al del navegador. Con @media se activaban las reglas de tablet mientras
+   el mock seguía midiendo 1024 px, y lo mismo deformaba las miniaturas. */
+@container mock (max-width: 1240px) {
   .db-stats { grid-template-columns: repeat(2, 1fr); }
   .db-grid { grid-template-columns: 1fr; }
 }

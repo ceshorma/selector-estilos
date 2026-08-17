@@ -516,6 +516,112 @@ check("contexto trae procedencia", ctxSuiza.presetOrigen.indexOf("suiza") >= 0, 
 check("doc nombra la procedencia", SE.exporter.buildDoc(ctxSuiza).indexOf(ctxSuiza.presetOrigen) >= 0);
 check("tokens.json trae la procedencia", JSON.parse(SE.exporter.buildTokensJson(ctxSuiza)).meta.origen === ctxSuiza.presetOrigen);
 
+/* ---------- 12b. Peso de titulares ---------- */
+
+check("catálogo de pesos", SE.data.weights.length === 5, String(SE.data.weights.length));
+SE.data.weights.forEach(function (w) {
+  check("peso " + w.id + " numérico", typeof w.id === "number" && w.id >= 400 && w.id <= 800);
+  check("peso " + w.id + " tiene racional", typeof w.rationale === "string" && w.rationale.length > 30);
+});
+
+/* Los pesos se derivan del css2: nunca se puede ofrecer uno no cargado */
+Object.keys(SE.data.fonts).forEach(function (id) {
+  var pesos = SE.fontWeights(id);
+  var css2 = SE.data.fonts[id].css2;
+  check("pesos de " + id + " no vacíos", pesos.length >= 1);
+  pesos.forEach(function (w) {
+    check("peso " + w + " de " + id + " está en su css2",
+      css2.indexOf("wght@") < 0 ? w === 400 : css2.indexOf(String(w)) >= 0, css2);
+  });
+});
+check("anton solo tiene 400", JSON.stringify(SE.fontWeights("anton")) === "[400]", JSON.stringify(SE.fontWeights("anton")));
+check("instrument-serif solo tiene 400", JSON.stringify(SE.fontWeights("instrument-serif")) === "[400]");
+check("inter llega a 800", SE.fontWeights("inter").indexOf(800) >= 0);
+check("fuente inexistente cae a 400", JSON.stringify(SE.fontWeights("no-existe")) === "[400]");
+
+/* Ajuste al más cercano disponible */
+check("800 sobre anton → 400", SE.nearestWeight("anton", 800) === 400);
+check("500 sobre atkinson → 400", SE.nearestWeight("atkinson", 500) === 400);
+check("600 sobre atkinson → 700", SE.nearestWeight("atkinson", 600) === 700, String(SE.nearestWeight("atkinson", 600)));
+check("600 sobre inter → 600", SE.nearestWeight("inter", 600) === 600);
+
+/* Cada dirección lleva el peso natural de su fuente de titulares */
+SE.data.presets.forEach(function (p) {
+  var ids = SE.resolvePairIds(p.decisions.fontPair);
+  var nat = SE.data.fonts[ids.heading].headingWeight;
+  check("dirección " + p.id + " con peso natural", p.decisions.weight === nat, p.decisions.weight + " vs " + nat);
+  check("dirección " + p.id + " con peso disponible", SE.fontWeights(ids.heading).indexOf(p.decisions.weight) >= 0);
+});
+
+/* writeTokens escribe el peso ajustado, no el pedido a ciegas */
+var pw = {};
+var dPeso = SE.clone(SE.findPreset("industrial").decisions);
+dPeso.weight = 800;   /* Anton solo tiene 400 */
+SE.writeTokens({ style: { setProperty: function (k, v) { pw[k] = v; } } }, dPeso, "light");
+check("peso ajustado a lo que la familia tiene", pw["--weight-heading"] === "400", pw["--weight-heading"]);
+
+var pw2 = {};
+var dPeso2 = SE.clone(SE.findPreset("neogrotesca").decisions);
+dPeso2.weight = 500;
+SE.writeTokens({ style: { setProperty: function (k, v) { pw2[k] = v; } } }, dPeso2, "light");
+check("peso respetado si existe", pw2["--weight-heading"] === "500", pw2["--weight-heading"]);
+
+/* Persistencia y validación */
+var basePeso = SE.clone(SE.findPreset(DEF).decisions);
+SE.mergeValidDecisions(basePeso, { weight: 999 });
+check("peso inválido se descarta", basePeso.weight === SE.findPreset(DEF).decisions.weight, String(basePeso.weight));
+SE.mergeValidDecisions(basePeso, { weight: 600 });
+check("peso válido se conserva", basePeso.weight === 600);
+SE.mergeValidDecisions(basePeso, { weight: "700" });
+check("peso como cadena se normaliza", basePeso.weight === 700, String(basePeso.weight));
+
+/* ---------- 12c. «Sorpréndeme» ----------
+   Un generador que a veces produce basura ilegible sería peor que no
+   tenerlo: se exige que 200 direcciones seguidas sean válidas y AA. */
+
+var sorpresasMal = 0, vistas = {};
+for (var si = 0; si < 200; si++) {
+  var sd = SE.surpriseDecisions();
+  var limpio = SE.clone(SE.findPreset(DEF).decisions);
+  SE.mergeValidDecisions(limpio, sd);
+  ["spacing", "radius", "shadow", "icons", "motion", "weight"].forEach(function (k) {
+    if (JSON.stringify(limpio[k]) !== JSON.stringify(sd[k])) sorpresasMal++;
+  });
+  if (limpio.fontPair.id !== sd.fontPair.id) sorpresasMal++;
+  if (limpio.palette.type !== "generated") sorpresasMal++;
+  if (SE.pairingHint(SE.resolvePairIds(sd.fontPair).heading, SE.resolvePairIds(sd.fontPair).body).level === "arriesgada") sorpresasMal++;
+  var pal = SE.resolvePalette(sd.palette);
+  ["light", "dark"].forEach(function (m) {
+    var c = pal[m];
+    if (SE.color.contrast(c.text, c.bg) < 7) sorpresasMal++;
+    if (SE.color.contrast(c.textMuted, c.bg) < 4.5) sorpresasMal++;
+    if (SE.color.contrast(c.primary, c.bg) < 3) sorpresasMal++;
+    if (SE.color.contrast(c.onPrimary, c.primary) < 3) sorpresasMal++;
+  });
+  vistas[sd.motion] = 1;
+  vistas[sd.icons] = 1;
+}
+check("200 sorpresas válidas y con contraste AA", sorpresasMal === 0, String(sorpresasMal) + " fallos");
+check("las sorpresas recorren el catálogo", Object.keys(vistas).length >= 6, Object.keys(vistas).join(","));
+
+/* El peso viaja al export y vuelve */
+SE.applyPreset("neogrotesca");
+SE.setDecision("weight", 500);
+var ctxPeso = SE.exporter.context();
+check("contexto trae el peso elegido", ctxPeso.weight === 500, String(ctxPeso.weight));
+check("tokens.css escribe el peso", SE.exporter.buildTokensCss(ctxPeso).indexOf("--weight-heading: 500;") >= 0);
+check("tokens.json escribe el peso", JSON.parse(SE.exporter.buildTokensJson(ctxPeso)).font.heading.weight === 500);
+check("el documento lista el peso", SE.exporter.buildDoc(ctxPeso).indexOf("Peso de titulares") >= 0);
+var tokensPeso = SE.exporter.buildTokensJson(ctxPeso);
+SE.applyPreset("industrial");
+SE.exporter.importEstado(tokensPeso);
+check("tokens roundtrip peso", SE.state.decisions.weight === 500, String(SE.state.decisions.weight));
+
+/* Un peso imposible se ajusta al exportar, no se escribe a ciegas */
+SE.applyPreset("industrial");
+SE.setDecision("weight", 800);
+check("export ajusta el peso a la familia", SE.exporter.context().weight === 400, String(SE.exporter.context().weight));
+
 /* ---------- 13. Sello de versión de los assets ----------
    GitHub Pages sirve todo con `Cache-Control: max-age=600` y sin huella en
    los nombres, así que sin sufijo de versión un index.html recién llegado

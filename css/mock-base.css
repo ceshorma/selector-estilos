@@ -663,3 +663,19 @@ select.input { appearance: auto; }
 .menu a:hover, .menu a.is-hover { background: var(--color-surface-alt); }
 .menu a.danger, .menu a.danger .ic { color: var(--color-danger); }
 .menu hr { border: 0; border-top: 1px solid var(--color-border); margin: var(--space-1) 0; }
+
+
+/* ============================================================
+   Sin ratón no hay :hover, y el movimiento se juzga tocando.
+   Se replican las respuestas en :active; el patrón .is-hover de la
+   pantalla Componentes ya hacía lo mismo para los estados forzados.
+   ============================================================ */
+
+@media (hover: none) {
+  .btn:active:not(:disabled) { transform: translateY(calc(-1 * var(--motion-lift))); }
+  .card-lift:active { transform: translateY(calc(-2 * var(--motion-lift))); box-shadow: var(--shadow-lg); }
+  .table tbody tr:active { background: var(--color-primary-soft); }
+  .chip:active { background: var(--color-surface-alt); color: var(--color-text); }
+  .tabs button:active { color: var(--color-text); }
+  .menu a:active { background: var(--color-surface-alt); }
+}
