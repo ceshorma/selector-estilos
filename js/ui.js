@@ -51,6 +51,15 @@ SE.ui = (function () {
 
   function $(sel) { return document.querySelector(sel); }
   function $all(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+
+  /* Enlazar tolerando la ausencia del elemento. Un solo nodo que falte
+     —por un HTML de otra versión, por ejemplo— no puede llevarse por
+     delante el resto del arranque: avisa y sigue. */
+  function on(sel, ev, fn, opts) {
+    var el = typeof sel === "string" ? $(sel) : sel;
+    if (!el) { console.warn("Selector de Estilos · no existe " + sel + ", enlace omitido"); return; }
+    el.addEventListener(ev, fn, opts);
+  }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
 
   /* ================= PRESETS ================= */
@@ -137,13 +146,13 @@ SE.ui = (function () {
   }
 
   function bindFontPair() {
-    $("#body-fontPair").addEventListener("click", function (e) {
+    on("#body-fontPair", "click", function (e) {
       var mode = e.target.closest("[data-fpmode]");
       if (mode) { fpMode = mode.dataset.fpmode; renderFontPair(); return; }
       var row = e.target.closest("[data-pair]");
       if (row) SE.setDecision("fontPair", { type: "pair", id: row.dataset.pair });
     });
-    $("#body-fontPair").addEventListener("change", function (e) {
+    on("#body-fontPair", "change", function (e) {
       if (e.target.dataset.role === "fp-heading" || e.target.dataset.role === "fp-body") {
         var h = $('[data-role="fp-heading"]').value;
         var b = $('[data-role="fp-body"]').value;
@@ -172,7 +181,7 @@ SE.ui = (function () {
   }
 
   function bindTypeScale() {
-    $("#body-typeScale").addEventListener("click", function (e) {
+    on("#body-typeScale", "click", function (e) {
       var d = SE.effectiveDecisions().typeScale;
       var rb = e.target.closest("[data-ratio]");
       if (rb) { SE.setDecision("typeScale", { ratio: Number(rb.dataset.ratio), base: d.base }); return; }
@@ -251,7 +260,7 @@ SE.ui = (function () {
   }
 
   function bindPalette() {
-    $("#body-palette").addEventListener("click", function (e) {
+    on("#body-palette", "click", function (e) {
       var row = e.target.closest("[data-pal]");
       if (row) { SE.setDecision("palette", { type: "curated", id: row.dataset.pal }); return; }
       var rule = e.target.closest("[data-rule]");
@@ -261,7 +270,7 @@ SE.ui = (function () {
         renderPalette();
       }
     });
-    $("#body-palette").addEventListener("input", function (e) {
+    on("#body-palette", "input", function (e) {
       if (e.target.dataset.role === "gen-color") {
         var d = SE.effectiveDecisions().palette;
         if (d.type === "generated") {
@@ -282,7 +291,7 @@ SE.ui = (function () {
       }
     });
     /* Al soltar el picker se re-renderiza para resincronizar estados activos */
-    $("#body-palette").addEventListener("change", function (e) {
+    on("#body-palette", "change", function (e) {
       if (e.target.dataset.petoken) renderPalette();
     });
   }
@@ -387,12 +396,11 @@ SE.ui = (function () {
   }
 
   function bindMotion() {
-    var body = $("#body-motion");
-    body.addEventListener("click", function (e) {
+    on("#body-motion", "click", function (e) {
       if (e.target.dataset.role === "motion-replay") replayMotionGlyphs();
     });
     /* Cada opción reproduce su propia curva al apuntarla */
-    body.addEventListener("mouseover", function (e) {
+    on("#body-motion", "mouseover", function (e) {
       var btn = e.target.closest(".seg-btn");
       if (btn) playGlyph(btn.querySelector(".glyph-motion"));
     });
@@ -400,7 +408,7 @@ SE.ui = (function () {
 
   function bindSimpleSegs() {
     ["spacing", "radius", "shadow", "icons", "motion"].forEach(function (dim) {
-      $("#body-" + dim).addEventListener("click", function (e) {
+      on("#body-" + dim, "click", function (e) {
         var btn = e.target.closest("[data-" + dim + "]");
         if (btn) SE.setDecision(dim, btn.dataset[dim]);
       });
@@ -419,8 +427,7 @@ SE.ui = (function () {
   }
 
   function bindReading() {
-    var body = $("#body-reading");
-    body.addEventListener("input", function (e) {
+    on("#body-reading", "input", function (e) {
       var role = e.target.dataset.role;
       if (role !== "lh" && role !== "ms") return;
       var lh = Number($('[data-role="lh"]').value);
@@ -485,7 +492,7 @@ SE.ui = (function () {
   }
 
   function bindSnapshots() {
-    $("#snap-list").addEventListener("click", function (e) {
+    on("#snap-list", "click", function (e) {
       var del = e.target.closest("[data-snapdel]");
       if (del) {
         SE.deleteSnapshot(del.dataset.snapdel);
@@ -501,16 +508,16 @@ SE.ui = (function () {
       var apply = e.target.closest("[data-snap]");
       if (apply) SE.applySnapshot(apply.dataset.snap);
     });
-    $("#snap-save").addEventListener("click", function () {
+    on("#snap-save", "click", function () {
       var name = prompt("Nombre de la dirección:", "");
       if (name && name.trim()) {
         SE.saveSnapshot(name.trim());
         renderSnapshots();
       }
     });
-    $("#estado-export").addEventListener("click", function () { SE.exporter.exportEstado(); });
-    $("#estado-import").addEventListener("click", function () { $("#import-file").click(); });
-    $("#import-file").addEventListener("change", function () {
+    on("#estado-export", "click", function () { SE.exporter.exportEstado(); });
+    on("#estado-import", "click", function () { $("#import-file").click(); });
+    on("#import-file", "change", function () {
       var file = this.files && this.files[0];
       this.value = "";
       if (!file) return;
@@ -585,39 +592,39 @@ SE.ui = (function () {
   }
 
   function bindTopbar() {
-    $("#screen-tabs").addEventListener("click", function (e) {
+    on("#screen-tabs", "click", function (e) {
       var btn = e.target.closest("[data-screen]");
       if (btn) switchScreen(btn.dataset.screen);
     });
-    $("#mode-toggle").addEventListener("click", function () {
+    on("#mode-toggle", "click", function () {
       SE.setMode(SE.state.mode === "light" ? "dark" : "light");
       updateModeUI();
     });
-    $("#panel-collapse").addEventListener("click", togglePanel);
-    $("#panel-rail").addEventListener("click", togglePanel);
-    $("#vision-btn").addEventListener("click", function (e) {
+    on("#panel-collapse", "click", togglePanel);
+    on("#panel-rail", "click", togglePanel);
+    on("#vision-btn", "click", function (e) {
       e.stopPropagation();
       var dd = $("#vision-dropdown");
       dd.hidden = !dd.hidden;
       $("#vision-btn").setAttribute("aria-expanded", String(!dd.hidden));
     });
-    $("#vision-dropdown").addEventListener("click", function (e) {
+    on("#vision-dropdown", "click", function (e) {
       var btn = e.target.closest("[data-vision]");
       if (btn) { setVision(btn.dataset.vision); $("#vision-dropdown").hidden = true; }
     });
     document.addEventListener("click", function (e) {
       if (!e.target.closest(".tb-menu")) $("#vision-dropdown").hidden = true;
     });
-    $("#export-btn").addEventListener("click", function () { SE.exporter.openModal(); });
-    $("#undo-btn").addEventListener("click", function () { SE.undo(); });
-    $("#redo-btn").addEventListener("click", function () { SE.redo(); });
-    $("#reset-btn").addEventListener("click", function () {
+    on("#export-btn", "click", function () { SE.exporter.openModal(); });
+    on("#undo-btn", "click", function () { SE.undo(); });
+    on("#redo-btn", "click", function () { SE.redo(); });
+    on("#reset-btn", "click", function () {
       if (confirm("¿Volver al preset por defecto? Puedes deshacerlo con Ctrl+Z.")) {
         endABUI();
         SE.reset();
       }
     });
-    $("#preset-list").addEventListener("click", function (e) {
+    on("#preset-list", "click", function (e) {
       var card = e.target.closest("[data-preset]");
       if (card) { endABUI(); SE.applyPreset(card.dataset.preset); }
     });
@@ -793,13 +800,13 @@ SE.ui = (function () {
         else startABUI(dim);
       });
     });
-    $("#ab-a").addEventListener("click", function () { SE.showAB("a"); abSync(); });
-    $("#ab-b").addEventListener("click", function () { SE.showAB("b"); abSync(); });
-    $("#ab-split").addEventListener("click", toggleSplitUI);
-    $("#ab-commit").addEventListener("click", commitABUI);
-    $("#ab-commit-a").addEventListener("click", function () { SE.commitABChoice("a"); endABUI(); updatePresetUI(); });
-    $("#ab-commit-b").addEventListener("click", function () { SE.commitABChoice("b"); endABUI(); updatePresetUI(); });
-    $("#ab-cancel").addEventListener("click", cancelABUI);
+    on("#ab-a", "click", function () { SE.showAB("a"); abSync(); });
+    on("#ab-b", "click", function () { SE.showAB("b"); abSync(); });
+    on("#ab-split", "click", toggleSplitUI);
+    on("#ab-commit", "click", commitABUI);
+    on("#ab-commit-a", "click", function () { SE.commitABChoice("a"); endABUI(); updatePresetUI(); });
+    on("#ab-commit-b", "click", function () { SE.commitABChoice("b"); endABUI(); updatePresetUI(); });
+    on("#ab-cancel", "click", cancelABUI);
   }
 
   /* ================= TECLADO ================= */
@@ -1019,33 +1026,50 @@ SE.ui = (function () {
     }).join("");
   }
 
+  /* Cada paso del arranque va aislado: si uno falla, se registra y los
+     demás siguen. Antes, un solo elemento ausente dejaba la herramienta
+     en blanco porque cancelaba todo lo que venía detrás. El error se
+     sigue viendo en consola —los tests fallan si aparece uno—, pero deja
+     de ser mortal. */
+  function step(nombre, fn) {
+    try {
+      fn();
+    } catch (e) {
+      console.error("Selector de Estilos · fallo en «" + nombre + "»", e);
+    }
+  }
+
   function init() {
     /* Los enlaces "Ver en …" de las pistas de propósito */
-    $(".panel-scroll").addEventListener("click", function (e) {
-      var go = e.target.closest("[data-goto]");
-      if (go) switchScreen(go.dataset.goto);
+    step("pistas de propósito", function () {
+      on(".panel-scroll", "click", function (e) {
+        var go = e.target.closest("[data-goto]");
+        if (go) switchScreen(go.dataset.goto);
+      });
     });
-    bindTopbar();
-    bindFontPair();
-    bindTypeScale();
-    bindPalette();
-    bindSimpleSegs();
-    bindMotion();
-    bindReading();
-    bindSnapshots();
-    bindOverview();
-    bindAB();
-    bindKeyboard();
-    setVision(SE.state.vision || "normal");
+    step("barra superior", bindTopbar);
+    step("tipografía", bindFontPair);
+    step("escala", bindTypeScale);
+    step("paleta", bindPalette);
+    step("segmentados", bindSimpleSegs);
+    step("movimiento", bindMotion);
+    step("lectura", bindReading);
+    step("direcciones guardadas", bindSnapshots);
+    step("vista general", bindOverview);
+    step("comparación A/B", bindAB);
+    step("teclado", bindKeyboard);
+    step("simulador de visión", function () { setVision(SE.state.vision || "normal"); });
     /* Los iconos recién inyectados aún no tienen trazado: se invalida el
        repintado para que la siguiente aplicación de tokens los rellene. */
-    renderIconGrid();
-    renderOverview();
-    SE.icons.invalidate($("#mock-viewport"));
-    SE.applyTokens();
+    step("rejilla de iconos", renderIconGrid);
+    step("miniaturas", renderOverview);
+    step("tokens", function () {
+      SE.icons.invalidate($("#mock-viewport"));
+      SE.applyTokens();
+    });
     SE.ui.ready = true;
     ready = true;
-    refreshAll();
+    step("primer render", refreshAll);
   }
 
   return {
