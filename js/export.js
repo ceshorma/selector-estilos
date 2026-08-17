@@ -37,7 +37,9 @@ SE.exporter = (function () {
     for (var i = 0; i < SE.data.ratios.length; i++)
       if (Math.abs(SE.data.ratios[i].value - d.typeScale.ratio) < 0.001) ratio = SE.data.ratios[i];
 
-    var presetName = SE.state.presetId === "custom" ? "personalizado" : SE.findPreset(SE.state.presetId).name;
+    var preset = SE.state.presetId === "custom" ? null : SE.findPreset(SE.state.presetId);
+    var presetName = preset ? preset.name : "personalizado";
+    var presetOrigen = preset && preset.origen ? preset.origen : "";
     var fecha = new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
 
     var leadingTight = pair.heading.cat === "display" ? 1.12 : (pair.heading.cat === "serif" ? 1.18 : 1.2);
@@ -61,7 +63,8 @@ SE.exporter = (function () {
 
     return {
       d: d, pair: pair, palette: palette, scale: scale, spacing: spacing, radius: radius,
-      shadow: shadow, iconSet: iconSet, motion: motion, ratio: ratio, presetName: presetName, fecha: fecha,
+      shadow: shadow, iconSet: iconSet, motion: motion, ratio: ratio, presetName: presetName,
+      presetOrigen: presetOrigen, fecha: fecha,
       leadingTight: leadingTight, fontsHref: fontsHref, space: space, pairInfo: pairInfo
     };
   }
@@ -152,7 +155,7 @@ SE.exporter = (function () {
     out.push("/* ==========================================================");
     out.push("   tokens.css — generado por Selector de Estilos");
     out.push("   Fecha: " + ctx.fecha);
-    out.push("   Preset base: " + ctx.presetName);
+    out.push("   Dirección base: " + ctx.presetName + (ctx.presetOrigen ? " — " + ctx.presetOrigen : ""));
     out.push("   Paleta: " + ctx.palette.name);
     out.push("   Tipografía: " + ctx.pair.heading.family + " + " + ctx.pair.body.family);
     out.push("");
@@ -189,7 +192,8 @@ SE.exporter = (function () {
       meta: {
         generador: "Selector de Estilos",
         fecha: ctx.fecha,
-        presetBase: ctx.presetName,
+        direccionBase: ctx.presetName,
+        origen: ctx.presetOrigen,
         paleta: ctx.palette.name,
         googleFonts: ctx.fontsHref
       },
@@ -370,7 +374,8 @@ SE.exporter = (function () {
 "td b { font-weight: 700; font-size: 11px; }\n" +
 "pre { background: #14141a; color: #e8e8ee; padding: 18px; border-radius: 10px; overflow-x: auto; font: 11.5px/1.55 ui-monospace, Consolas, monospace; }\n" +
 "</style></head><body>\n" +
-"<header><h1>Documento de diseño</h1><p>Generado el " + ctx.fecha + " con Selector de Estilos · Preset base: " + ctx.presetName + "</p></header>\n" +
+"<header><h1>Documento de diseño</h1><p>Generado el " + ctx.fecha + " con Selector de Estilos · Dirección base: " + ctx.presetName +
+(ctx.presetOrigen ? " <em>(" + esc(ctx.presetOrigen) + ")</em>" : "") + "</p></header>\n" +
 
 "<h2>1 · Decisiones</h2>\n<table><tr><th>Dimensión</th><th>Elección</th><th>Racional</th></tr>" + decisionsTable(ctx) + "</table>\n" +
 

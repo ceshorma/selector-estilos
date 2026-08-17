@@ -62,6 +62,12 @@ Ordenadas por impacto dentro de cada bloque.
   (`.is-hover` / `.is-focus`): los 24 iconos del registro a tres tamaños, matriz de
   botones, campos, chips, avisos, progreso, esqueletos, pestañas, menú y diálogo. Es el
   lugar donde iconos y movimiento se juzgan de verdad.
+- [x] **Vista general** (M) — quinta pantalla con miniaturas vivas de las otras cuatro,
+  clonadas dentro del propio viewport (heredan tokens y repintado de iconos sin trabajo
+  extra) y escaladas con `transform`. Es la pantalla de entrada.
+- [x] **Landing + Artículo fusionadas** (M) — una sola pantalla «Página»: hero y botones
+  grandes arriba, artículo completo abajo. Juzgaban lo mismo desde dos ángulos y obligaban
+  a saltar de pestaña.
 - [ ] **Vista responsive** (M) — previsualizar cada mock a 390px (móvil) y 768px (tablet)
   dentro de un marco; los mocks hoy asumen escritorio (min 1024px). Implica media queries
   completas en los tres mocks.
@@ -92,8 +98,22 @@ Ordenadas por impacto dentro de cada bloque.
   matrices de protanopia/deuteranopia, para que la decisión quede documentada también
   para quien no usa la herramienta.
 
+## Panel
+
+- [x] **Panel plegable desde sí mismo** (S) — botón en su cabecera y pestaña lateral de
+  vuelta; el atajo `P` sigue existiendo. El botón de la barra superior desaparece.
+- [x] **Direcciones en acordeón** (S) — «Direcciones» y «Direcciones guardadas» se pliegan;
+  cerrada, la cabecera sigue diciendo en qué dirección estás.
+- [ ] **Recordar el estado del panel** (S) — hoy arranca siempre desplegado y con los
+  acordeones en su estado inicial; guardarlo en localStorage es un cambio de dos líneas
+  cuando se decida que compensa.
+
 ## Infraestructura
 
+- [x] **Direcciones con procedencia** (M) — las siete direcciones genéricas se sustituyen
+  por ocho ancladas a tradiciones reconocibles (suiza, revista, monoespaciado, grotesca
+  cálida, cartel industrial, versalitas, neo-grotesca, servicio público), con 14 fuentes y
+  5 paletas nuevas. El violeta sigue en el catálogo pero ninguna dirección lo usa.
 - [ ] **Catálogo tipográfico abierto** (M) — campo para añadir cualquier familia de Google
   Fonts por nombre (construyendo el `css2` al vuelo), con atributos estimados para la pista
   de emparejamiento.

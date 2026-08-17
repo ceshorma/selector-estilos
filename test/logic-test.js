@@ -28,6 +28,8 @@ var jsDir = path.join(__dirname, "..", "js");
   (0, eval)(fs.readFileSync(path.join(jsDir, f), "utf8"));
 });
 
+var DEF = SE.data.defaultPresetId;
+
 var fails = [];
 function check(name, cond, detail) {
   if (!cond) fails.push(name + (detail ? " — " + detail : ""));
@@ -85,7 +87,7 @@ SE.data.palettes.forEach(function (p) {
 
 /* ---------- 5. Estado, persistencia y validación ---------- */
 SE.loadState();
-check("estado default preset", SE.state.presetId === "tech-minimal");
+check("estado default preset", SE.state.presetId === DEF);
 SE.setDecision("spacing", "amplia");
 check("setDecision aplica", SE.state.decisions.spacing === "amplia");
 check("setDecision marca custom", SE.state.presetId === "custom");
@@ -98,13 +100,13 @@ localStorage.setItem(SE.STORAGE_KEY, JSON.stringify({
   decisions: { fontPair: { type: "pair", id: "no-existe" }, typeScale: { ratio: 99, base: -4 }, palette: { type: "curated", id: "nope" }, spacing: "gigante", radius: "otro", shadow: "loca", reading: { lineHeight: 12, measure: 900 } }
 }));
 SE.loadState();
-check("corrupto: screen default", SE.state.screen === "dashboard");
-check("corrupto: fontPair default", SE.state.decisions.fontPair.id === "inter-inter");
+check("corrupto: screen default", SE.state.screen === "resumen");
+check("corrupto: fontPair default", SE.state.decisions.fontPair.id === "bricolage-inter");
 check("corrupto: ratio clamp", SE.state.decisions.typeScale.ratio <= 1.6 && SE.state.decisions.typeScale.ratio >= 1.05);
 check("corrupto: measure clamp", SE.state.decisions.reading.measure <= 80);
 localStorage.setItem(SE.STORAGE_KEY, "{esto no es json");
 SE.loadState();
-check("json corrupto: fallback", SE.state.presetId === "tech-minimal");
+check("json corrupto: fallback", SE.state.presetId === DEF);
 
 /* Paleta custom válida sobrevive al merge */
 var customColors = SE.normalizePaletteColors({ light: { bg: "#fffff0" }, dark: {} });
@@ -133,7 +135,7 @@ check("ab arranca sin split", SE.state.ab.split === false);
 SE.setDecision("radius", "redondeado");
 check("ab intercepta a b", SE.state.ab.b === "redondeado");
 check("ab no toca decision", SE.state.decisions.radius === "medio");
-check("ab no marca custom", SE.state.presetId === "tech-minimal");
+check("ab no marca custom", SE.state.presetId === DEF);
 SE.toggleSplit();
 check("split activa", SE.state.ab.split === true);
 SE.toggleSplit();
@@ -161,7 +163,7 @@ check("undo revierte sombra", SE.state.decisions.shadow === "sutil");
 check("undo conserva radio", SE.state.decisions.radius === "recto");
 SE.undo();
 check("undo revierte radio", SE.state.decisions.radius === "medio");
-check("undo restaura preset", SE.state.presetId === "tech-minimal");
+check("undo restaura preset", SE.state.presetId === DEF);
 SE.redo();
 check("redo reaplica radio", SE.state.decisions.radius === "recto");
 SE.setDecision("spacing", "amplia");
@@ -174,41 +176,41 @@ SE.setDecision("reading", { lineHeight: 1.55, measure: 60 }, { silent: true });
 SE.setDecision("reading", { lineHeight: 1.6, measure: 60 }, { silent: true });
 check("arrastre coalescido", SE.history.length === 1, "len " + SE.history.length);
 /* Preset y reset apilan */
-SE.applyPreset("calido");
+SE.applyPreset("bouba");
 check("preset apila", SE.history.length === 2);
 SE.undo();
 check("undo tras preset", SE.state.decisions.reading.lineHeight === 1.6);
 
 /* ---------- 8. Snapshots ---------- */
 localStorage.removeItem(SE.SNAP_KEY);
-SE.applyPreset("editorial");
-SE.saveSnapshot("Propuesta editorial");
-SE.applyPreset("audaz");
-SE.saveSnapshot("Propuesta audaz");
+SE.applyPreset("revista");
+SE.saveSnapshot("Propuesta revista");
+SE.applyPreset("industrial");
+SE.saveSnapshot("Propuesta industrial");
 var snaps = SE.loadSnapshots();
 check("snapshots guardados", snaps.length === 2);
-check("snapshot más reciente primero", snaps[0].name === "Propuesta audaz");
+check("snapshot más reciente primero", snaps[0].name === "Propuesta industrial");
 SE.applySnapshot(snaps[1].id);
-check("snapshot aplica decisiones", SE.state.decisions.fontPair.id === "playfair-lora");
-check("snapshot aplica presetId", SE.state.presetId === "editorial");
+check("snapshot aplica decisiones", SE.state.decisions.fontPair.id === "instrument-newsreader");
+check("snapshot aplica presetId", SE.state.presetId === "revista");
 SE.deleteSnapshot(snaps[0].id);
 check("snapshot borrado", SE.loadSnapshots().length === 1);
 SE.undo();
-check("undo tras snapshot", SE.state.decisions.fontPair.id === "space-inter");
+check("undo tras snapshot", SE.state.decisions.fontPair.id === "anton-work");
 
 /* ---------- 8b. A/B de direcciones completas ---------- */
 localStorage.removeItem(SE.STORAGE_KEY);
 localStorage.removeItem(SE.SNAP_KEY);
 SE.loadState();
-SE.applyPreset("calido");
+SE.applyPreset("bouba");
 SE.saveSnapshot("Cálida");
-SE.applyPreset("corporativo");
+SE.applyPreset("terminal");
 var snapId = SE.loadSnapshots()[0].id;
 check("startABDirections ok", SE.startABDirections(snapId) === true);
 var abAll = SE.state.ab;
 check("dirección: dimensión especial", abAll.dimension === SE.AB_ALL);
-check("dirección: A es el estado actual", abAll.a.fontPair.id === "plex-plex");
-check("dirección: B es la guardada", abAll.b.fontPair.id === "fraunces-nunito");
+check("dirección: A es el estado actual", abAll.a.fontPair.id === "mono-plex");
+check("dirección: B es la guardada", abAll.b.fontPair.id === "hanken-hanken");
 check("dirección: etiquetas", abAll.labelA === "Actual" && abAll.labelB === "Cálida");
 check("dirección: B disponible desde el inicio", abAll.b != null);
 check("dirección: efectivo = A", SE.effectiveDecisions().spacing === "compacta");
@@ -218,22 +220,22 @@ check("dirección: flip a B cambia TODO", SE.effectiveDecisions().spacing === "a
 check("dirección: decisiones reales intactas", SE.state.decisions.spacing === "compacta");
 /* withCandidate en modo dirección devuelve el juego completo */
 var wc = SE.withCandidate(SE.state.decisions, SE.state.ab, "b");
-check("withCandidate dirección", wc.fontPair.id === "fraunces-nunito" && wc.radius === "redondeado");
+check("withCandidate dirección", wc.fontPair.id === "hanken-hanken" && wc.radius === "redondeado");
 SE.commitAB();
-check("dirección: commit aplica todo B", SE.state.decisions.fontPair.id === "fraunces-nunito" && SE.state.decisions.spacing === "amplia");
-check("dirección: commit restaura presetId", SE.state.presetId === "calido");
+check("dirección: commit aplica todo B", SE.state.decisions.fontPair.id === "hanken-hanken" && SE.state.decisions.spacing === "amplia");
+check("dirección: commit restaura presetId", SE.state.presetId === "bouba");
 SE.undo();
-check("dirección: undo vuelve a la anterior", SE.state.decisions.fontPair.id === "plex-plex" && SE.state.presetId === "corporativo");
+check("dirección: undo vuelve a la anterior", SE.state.decisions.fontPair.id === "mono-plex" && SE.state.presetId === "terminal");
 /* Cancelar deja el estado intacto */
 SE.startABDirections(snapId);
 SE.toggleAB();
 SE.cancelAB();
-check("dirección: cancel no toca decisiones", SE.state.decisions.fontPair.id === "plex-plex");
+check("dirección: cancel no toca decisiones", SE.state.decisions.fontPair.id === "mono-plex");
 /* Editar una dimensión durante la comparación consolida lo que se ve */
 SE.startABDirections(snapId);
 SE.toggleAB();
 SE.setDecision("radius", "recto");
-check("dirección: editar consolida B", SE.state.decisions.fontPair.id === "fraunces-nunito");
+check("dirección: editar consolida B", SE.state.decisions.fontPair.id === "hanken-hanken");
 check("dirección: editar aplica el cambio", SE.state.decisions.radius === "recto");
 check("dirección: editar cierra la comparación", SE.state.ab === null);
 /* Snapshot inexistente */
@@ -242,23 +244,23 @@ check("dirección: id inválido", SE.startABDirections("nope") === false);
 /* ---------- 8c. Estado en URL ---------- */
 localStorage.removeItem(SE.STORAGE_KEY);
 SE.loadState();
-SE.applyPreset("audaz");
+SE.applyPreset("industrial");
 SE.setDecision("reading", { lineHeight: 1.75, measure: 58 });
 var token = SE.encodeState();
 check("encode produce base64url", /^[A-Za-z0-9_-]+$/.test(token), token.slice(0, 24));
 var decoded = SE.decodeState(token);
 check("decode devuelve v1", decoded && decoded.v === 1);
 check("decode conserva preset", decoded.p === "custom");
-SE.applyPreset("tech-minimal");
+SE.applyPreset(DEF);
 check("applyEncodedState ok", SE.applyEncodedState(token) === true);
-check("URL roundtrip fuentes", SE.state.decisions.fontPair.id === "space-inter");
+check("URL roundtrip fuentes", SE.state.decisions.fontPair.id === "anton-work");
 check("URL roundtrip lectura", SE.state.decisions.reading.lineHeight === 1.75 && SE.state.decisions.reading.measure === 58);
 SE.undo();
-check("URL: undo recupera lo anterior", SE.state.decisions.fontPair.id === "inter-inter");
+check("URL: undo recupera lo anterior", SE.state.decisions.fontPair.id === "bricolage-inter");
 /* Acentos y paleta generada sobreviven al viaje */
 SE.setDecision("palette", { type: "generated", rule: "analoga", primaryHex: "#c2571b", colors: SE.color.generate("#c2571b", "analoga") });
 var tok2 = SE.encodeState();
-SE.applyPreset("tech-minimal");
+SE.applyPreset(DEF);
 SE.applyEncodedState(tok2);
 check("URL roundtrip paleta generada", SE.state.decisions.palette.type === "generated" && SE.state.decisions.palette.primaryHex === "#c2571b");
 /* Tokens corruptos no rompen */
@@ -273,7 +275,7 @@ var ctx = SE.exporter.context();
 var css = SE.exporter.buildTokensCss(ctx);
 check("css tiene root", css.indexOf(":root {") >= 0);
 check("css tiene dark", css.indexOf('[data-theme="dark"]') >= 0);
-check("css tiene primario", css.indexOf("--color-primary: #2563eb;") >= 0);
+check("css tiene primario", css.indexOf("--color-primary: #0d6a6a;") >= 0);
 var parsed = JSON.parse(SE.exporter.buildTokensJson(ctx));
 check("json escala", parsed.typeScale.sizesPx.base === 16);
 check("json paleta dual", !!parsed.color.light.bg && !!parsed.color.dark.bg);
@@ -283,27 +285,27 @@ check("doc tiene contraste", doc.indexOf("Contraste WCAG") >= 0);
 
 /* ---------- 10. Importación ---------- */
 /* estado.json roundtrip */
-SE.applyPreset("calido");
+SE.applyPreset("bouba");
 SE.setDecision("radius", "recto");
 var estado = SE.exporter.buildEstado();
-SE.applyPreset("tech-minimal");
+SE.applyPreset(DEF);
 var res = SE.exporter.importEstado(estado);
 check("importa estado ok", !!res.ok, res.error);
-check("estado roundtrip fontPair", SE.state.decisions.fontPair.id === "fraunces-nunito");
+check("estado roundtrip fontPair", SE.state.decisions.fontPair.id === "hanken-hanken");
 check("estado roundtrip radius", SE.state.decisions.radius === "recto");
 
 /* tokens.json roundtrip */
-SE.applyPreset("corporativo");
+SE.applyPreset("terminal");
 var tokens = SE.exporter.buildTokensJson(SE.exporter.context());
-SE.applyPreset("tech-minimal");
+SE.applyPreset(DEF);
 var res2 = SE.exporter.importEstado(tokens);
 check("importa tokens ok", !!res2.ok, res2.error);
-check("tokens roundtrip pareja", SE.state.decisions.fontPair.type === "pair" && SE.state.decisions.fontPair.id === "plex-plex",
+check("tokens roundtrip pareja", SE.state.decisions.fontPair.type === "pair" && SE.state.decisions.fontPair.id === "mono-plex",
   JSON.stringify(SE.state.decisions.fontPair));
-check("tokens roundtrip paleta curada", SE.state.decisions.palette.type === "curated" && SE.state.decisions.palette.id === "azul-institucional",
+check("tokens roundtrip paleta curada", SE.state.decisions.palette.type === "curated" && SE.state.decisions.palette.id === "grafito",
   JSON.stringify(SE.state.decisions.palette.type));
 check("tokens roundtrip espaciado", SE.state.decisions.spacing === "compacta");
-check("tokens roundtrip escala", SE.state.decisions.typeScale.ratio === 1.2 && SE.state.decisions.typeScale.base === 16);
+check("tokens roundtrip escala", SE.state.decisions.typeScale.ratio === 1.2 && SE.state.decisions.typeScale.base === 15);
 
 /* basura */
 check("importa basura falla", !!SE.exporter.importEstado("{}").error);
@@ -312,7 +314,7 @@ check("importa no-json falla", !!SE.exporter.importEstado("no json").error);
 /* tokens.json con paleta generada → custom */
 SE.setDecision("palette", { type: "generated", rule: "triadica", primaryHex: "#0f766e", colors: SE.color.generate("#0f766e", "triadica") });
 var tokens2 = SE.exporter.buildTokensJson(SE.exporter.context());
-SE.applyPreset("tech-minimal");
+SE.applyPreset(DEF);
 var res3 = SE.exporter.importEstado(tokens2);
 check("tokens generada importa", !!res3.ok, res3.error);
 check("tokens generada → custom", SE.state.decisions.palette.type === "custom", SE.state.decisions.palette.type);
@@ -364,7 +366,7 @@ SE.data.presets.forEach(function (p) {
 });
 
 /* Validación al cargar: lo inválido se descarta, lo válido se conserva */
-var base = SE.clone(SE.findPreset("tech-minimal").decisions);
+var base = SE.clone(SE.findPreset(DEF).decisions);
 SE.mergeValidDecisions(base, { icons: "no-existe", motion: "ni-idea" });
 check("icons inválido se descarta", base.icons === "lineal-suave", base.icons);
 check("motion inválido se descarta", base.motion === "sutil", base.motion);
@@ -375,19 +377,27 @@ check("motion válido se conserva", base.motion === "expresivo");
 /* writeTokens escribe los nueve tokens nuevos */
 var written = {};
 var spy = { style: { setProperty: function (k, v) { written[k] = v; } } };
-SE.writeTokens(spy, SE.clone(SE.findPreset("audaz").decisions), "light");
+SE.writeTokens(spy, SE.clone(SE.findPreset("industrial").decisions), "light");
 check("token icon-stroke", written["--icon-stroke"] === "0", written["--icon-stroke"]);
 check("token icon-cap", written["--icon-cap"] === "round");
 check("token icon-join", written["--icon-join"] === "round");
 check("token icon-fill", written["--icon-fill"] === "currentColor", written["--icon-fill"]);
-check("token motion-duration", written["--motion-duration"] === "340ms", written["--motion-duration"]);
-check("token motion-duration-slow", written["--motion-duration-slow"] === "544ms", written["--motion-duration-slow"]);
-check("token motion-ease", (written["--motion-ease"] || "").indexOf("cubic-bezier") === 0);
-check("token motion-lift", written["--motion-lift"] === "4px");
-check("token motion-stagger", written["--motion-stagger"] === "70ms");
+check("token motion-duration sin movimiento", written["--motion-duration"] === "0ms", written["--motion-duration"]);
+check("token motion-lift sin movimiento", written["--motion-lift"] === "0px", written["--motion-lift"]);
+
+/* …y el otro extremo, con la curva más larga del catálogo */
+var escritoExpr = {};
+SE.writeTokens({ style: { setProperty: function (k, v) { escritoExpr[k] = v; } } },
+  SE.clone(SE.findPreset("bouba").decisions), "light");
+check("token icon-stroke grueso", escritoExpr["--icon-stroke"] === "2.25", escritoExpr["--icon-stroke"]);
+check("token motion-duration", escritoExpr["--motion-duration"] === "340ms", escritoExpr["--motion-duration"]);
+check("token motion-duration-slow", escritoExpr["--motion-duration-slow"] === "544ms", escritoExpr["--motion-duration-slow"]);
+check("token motion-ease", (escritoExpr["--motion-ease"] || "").indexOf("cubic-bezier") === 0);
+check("token motion-lift", escritoExpr["--motion-lift"] === "4px");
+check("token motion-stagger", escritoExpr["--motion-stagger"] === "70ms");
 
 /* Decisiones incompletas no revientan writeTokens */
-var incompleta = SE.clone(SE.findPreset("tech-minimal").decisions);
+var incompleta = SE.clone(SE.findPreset(DEF).decisions);
 delete incompleta.icons;
 delete incompleta.motion;
 var written2 = {};
@@ -396,7 +406,7 @@ check("sin icons cae al valor por defecto", written2["--icon-stroke"] === "1.6",
 check("sin motion cae al valor por defecto", written2["--motion-duration"] === "120ms", written2["--motion-duration"]);
 
 /* Export: tokens.css, tokens.json y documento */
-SE.applyPreset("sereno");
+SE.applyPreset("versalitas");
 var ctx3 = SE.exporter.context();
 var css3 = SE.exporter.buildTokensCss(ctx3);
 check("css trae icon-stroke", css3.indexOf("--icon-stroke: 1.5;") >= 0);
@@ -413,25 +423,25 @@ check("doc dibuja los iconos", doc3.indexOf('class="icon-sheet"') >= 0);
 check("doc lista las dos decisiones nuevas", doc3.indexOf("<th>Iconos</th>") >= 0 && doc3.indexOf("<th>Movimiento</th>") >= 0);
 
 /* Ida y vuelta por tokens.json y por URL */
-SE.applyPreset("brutalista");
+SE.applyPreset("suiza");
 var tokens3 = SE.exporter.buildTokensJson(SE.exporter.context());
-SE.applyPreset("tech-minimal");
+SE.applyPreset(DEF);
 SE.exporter.importEstado(tokens3);
 check("tokens roundtrip iconos", SE.state.decisions.icons === "geometrico", SE.state.decisions.icons);
 check("tokens roundtrip movimiento", SE.state.decisions.motion === "ninguno", SE.state.decisions.motion);
-SE.applyPreset("calido");
+SE.applyPreset("bouba");
 var url3 = SE.encodeState();
-SE.applyPreset("tech-minimal");
+SE.applyPreset(DEF);
 SE.applyEncodedState(url3);
 check("URL roundtrip iconos", SE.state.decisions.icons === "grueso", SE.state.decisions.icons);
-check("URL roundtrip movimiento", SE.state.decisions.motion === "suave", SE.state.decisions.motion);
+check("URL roundtrip movimiento", SE.state.decisions.motion === "expresivo", SE.state.decisions.motion);
 
 /* Persistencia en localStorage */
-SE.applyPreset("audaz");
+SE.applyPreset("industrial");
 SE.saveState();
 SE.loadState();
 check("localStorage conserva iconos", SE.state.decisions.icons === "relleno", SE.state.decisions.icons);
-check("localStorage conserva movimiento", SE.state.decisions.motion === "expresivo", SE.state.decisions.motion);
+check("localStorage conserva movimiento", SE.state.decisions.motion === "ninguno", SE.state.decisions.motion);
 
 /* La lista de pantallas es la única fuente de verdad */
 check("cinco pantallas", SE.SCREENS.length === 5, SE.SCREENS.join(","));
@@ -439,6 +449,72 @@ check("componentes está en la lista", SE.SCREENS.indexOf("componentes") >= 0);
 localStorage.setItem(SE.STORAGE_KEY, JSON.stringify({ version: 1, screen: "componentes", mode: "light", presetId: "custom", decisions: {} }));
 SE.loadState();
 check("pantalla componentes se restaura", SE.state.screen === "componentes", SE.state.screen);
+
+/* ---------- 12. Pantallas y direcciones ---------- */
+
+check("cinco pantallas", SE.SCREENS.length === 5, SE.SCREENS.join(","));
+check("la vista general va primera", SE.SCREENS[0] === "resumen", SE.SCREENS[0]);
+check("página existe", SE.SCREENS.indexOf("pagina") >= 0);
+check("landing y blog ya no son pantallas", SE.SCREENS.indexOf("landing") < 0 && SE.SCREENS.indexOf("blog") < 0);
+check("alias landing → pagina", SE.resolveScreen("landing") === "pagina", String(SE.resolveScreen("landing")));
+check("alias blog → pagina", SE.resolveScreen("blog") === "pagina", String(SE.resolveScreen("blog")));
+check("pantalla desconocida no resuelve", SE.resolveScreen("no-existe") === null);
+check("arranca en la vista general", SE.defaultState().screen === "resumen");
+
+/* Un enlace viejo a la Landing sigue llevando a alguna parte */
+localStorage.setItem(SE.STORAGE_KEY, JSON.stringify({ version: 1, screen: "blog", mode: "light", presetId: "custom", decisions: {} }));
+SE.loadState();
+check("estado guardado con id viejo migra", SE.state.screen === "pagina", SE.state.screen);
+
+/* Toda dirección se sostiene: catálogos válidos y procedencia escrita */
+SE.data.presets.forEach(function (p) {
+  var pre = "dirección " + p.id + " ";
+  check(pre + "tiene procedencia", typeof p.origen === "string" && p.origen.length > 8, String(p.origen));
+  check(pre + "tiene descripción", typeof p.desc === "string" && p.desc.length > 30);
+  check(pre + "pareja existe", p.decisions.fontPair.type !== "pair" || !!SE.findIn(SE.data.pairs, p.decisions.fontPair.id), p.decisions.fontPair.id);
+  check(pre + "paleta existe", !!SE.findIn(SE.data.palettes, p.decisions.palette.id), p.decisions.palette.id);
+  check(pre + "espaciado existe", !!SE.findIn(SE.data.spacings, p.decisions.spacing));
+  check(pre + "radio existe", !!SE.findIn(SE.data.radii, p.decisions.radius));
+  check(pre + "sombra existe", !!SE.findIn(SE.data.shadows, p.decisions.shadow));
+});
+check("ocho direcciones", SE.data.presets.length === 8, String(SE.data.presets.length));
+check("la dirección por defecto existe", !!SE.findIn(SE.data.presets, SE.data.defaultPresetId), SE.data.defaultPresetId);
+
+/* Ninguna familia ni nivel se queda sin una dirección que lo enseñe:
+   si no se ve aplicado en algún sitio, no se elige. */
+["iconSets", "motions"].forEach(function (cat) {
+  var dim = cat === "iconSets" ? "icons" : "motion";
+  SE.data[cat].forEach(function (opt) {
+    var usada = SE.data.presets.some(function (p) { return p.decisions[dim] === opt.id; });
+    check("alguna dirección usa " + dim + ":" + opt.id, usada);
+  });
+});
+
+/* Las parejas del catálogo apuntan a fuentes que existen */
+SE.data.pairs.forEach(function (pair) {
+  check("pareja " + pair.id + " titular existe", !!SE.data.fonts[pair.heading], pair.heading);
+  check("pareja " + pair.id + " cuerpo existe", !!SE.data.fonts[pair.body], pair.body);
+  check("pareja " + pair.id + " tiene racional", typeof pair.rationale === "string" && pair.rationale.length > 40);
+});
+Object.keys(SE.data.fonts).forEach(function (id) {
+  var f = SE.data.fonts[id];
+  check("fuente " + id + " categoría válida", ["sans", "serif", "display", "mono"].indexOf(f.cat) >= 0, f.cat);
+  check("fuente " + id + " tiene css2", typeof f.css2 === "string" && f.css2.length > 0);
+  check("fuente " + id + " tiene fallback", typeof f.fallback === "string" && f.fallback.indexOf(",") > 0);
+  check("fuente " + id + " id coherente", f.id === id);
+});
+
+/* La monoespaciada entra en la pista de emparejamiento */
+check("mono en cuerpo avisa", SE.pairingHint("plex-sans", "jetbrains-mono").level === "arriesgada");
+check("mono en titular funciona", SE.pairingHint("jetbrains-mono", "plex-sans").level === "armonica");
+check("mono consigo misma es monofamilia", SE.pairingHint("jetbrains-mono", "jetbrains-mono").level === "armonica");
+
+/* La procedencia viaja al documento exportado */
+SE.applyPreset("suiza");
+var ctxSuiza = SE.exporter.context();
+check("contexto trae procedencia", ctxSuiza.presetOrigen.indexOf("suiza") >= 0, ctxSuiza.presetOrigen);
+check("doc nombra la procedencia", SE.exporter.buildDoc(ctxSuiza).indexOf(ctxSuiza.presetOrigen) >= 0);
+check("tokens.json trae la procedencia", JSON.parse(SE.exporter.buildTokensJson(ctxSuiza)).meta.origen === ctxSuiza.presetOrigen);
 
 /* ---------- resultado ---------- */
 if (fails.length) {

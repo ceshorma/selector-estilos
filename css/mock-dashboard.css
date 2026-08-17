@@ -182,7 +182,9 @@
 
 .db-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* minmax(0,·) y no 1fr: con espaciado amplio, el contenido de las
+     tarjetas fijaba un mínimo y la fila se salía del ancho. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-5);
 }

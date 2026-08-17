@@ -8,7 +8,7 @@ window.SE = window.SE || {};
 SE.data = (function () {
 
   /* ---------- Fuentes (Google Fonts) ----------
-     cat: sans | serif | display · tone: neutral | geometric | humanist | expressive
+     cat: sans | serif | display | mono · tone: neutral | geometric | humanist | expressive
      contrast: contraste de trazo · super: superfamilia diseñada junta */
   var fonts = {
     "inter":             { id: "inter", family: "Inter", css2: "Inter:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.02em", super: null },
@@ -27,7 +27,24 @@ SE.data = (function () {
     "plex-sans":         { id: "plex-sans", family: "IBM Plex Sans", css2: "IBM+Plex+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 600, tracking: "-0.01em", super: "plex" },
     "plex-serif":        { id: "plex-serif", family: "IBM Plex Serif", css2: "IBM+Plex+Serif:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "neutral", contrast: "medium", headingWeight: 600, tracking: "0", super: "plex" },
     "poppins":           { id: "poppins", family: "Poppins", css2: "Poppins:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "geometric", contrast: "low", headingWeight: 600, tracking: "-0.005em", super: null },
-    "open-sans":         { id: "open-sans", family: "Open Sans", css2: "Open+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.005em", super: null }
+    "open-sans":         { id: "open-sans", family: "Open Sans", css2: "Open+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.005em", super: null },
+
+    /* Segunda tanda: fuentes con más carácter, para salir del repertorio
+       por defecto (Inter · Poppins · Playfair) sin salir de Google Fonts. */
+    "instrument-serif":  { id: "instrument-serif", family: "Instrument Serif", css2: "Instrument+Serif", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 400, tracking: "-0.015em", super: null },
+    "bricolage":         { id: "bricolage", family: "Bricolage Grotesque", css2: "Bricolage+Grotesque:wght@400;600;800", fallback: "system-ui, sans-serif", cat: "sans", tone: "expressive", contrast: "medium", headingWeight: 800, tracking: "-0.025em", super: null },
+    "newsreader":        { id: "newsreader", family: "Newsreader", css2: "Newsreader:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "medium", headingWeight: 600, tracking: "-0.005em", super: null },
+    "spectral":          { id: "spectral", family: "Spectral", css2: "Spectral:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "neutral", contrast: "medium", headingWeight: 600, tracking: "0", super: null },
+    "eb-garamond":       { id: "eb-garamond", family: "EB Garamond", css2: "EB+Garamond:wght@400;600;700", fallback: "Georgia, serif", cat: "serif", tone: "humanist", contrast: "high", headingWeight: 600, tracking: "0", super: null },
+    "cormorant":         { id: "cormorant", family: "Cormorant Garamond", css2: "Cormorant+Garamond:wght@400;600;700", fallback: "Georgia, serif", cat: "display", tone: "expressive", contrast: "high", headingWeight: 400, tracking: "0.04em", super: null },
+    "karla":             { id: "karla", family: "Karla", css2: "Karla:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: null },
+    "work-sans":         { id: "work-sans", family: "Work Sans", css2: "Work+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 600, tracking: "-0.015em", super: null },
+    "archivo":           { id: "archivo", family: "Archivo", css2: "Archivo:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.03em", super: null },
+    "anton":             { id: "anton", family: "Anton", css2: "Anton", fallback: "Impact, system-ui, sans-serif", cat: "display", tone: "expressive", contrast: "low", headingWeight: 400, tracking: "-0.01em", super: null },
+    "hanken":            { id: "hanken", family: "Hanken Grotesk", css2: "Hanken+Grotesk:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "-0.02em", super: null },
+    "jetbrains-mono":    { id: "jetbrains-mono", family: "JetBrains Mono", css2: "JetBrains+Mono:wght@400;600;700", fallback: "ui-monospace, SFMono-Regular, Menlo, monospace", cat: "mono", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.04em", super: null },
+    "public-sans":       { id: "public-sans", family: "Public Sans", css2: "Public+Sans:wght@400;600;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "neutral", contrast: "low", headingWeight: 700, tracking: "-0.01em", super: null },
+    "atkinson":          { id: "atkinson", family: "Atkinson Hyperlegible", css2: "Atkinson+Hyperlegible:wght@400;700", fallback: "system-ui, sans-serif", cat: "sans", tone: "humanist", contrast: "low", headingWeight: 700, tracking: "0", super: null }
   };
 
   /* ---------- Parejas sugeridas ---------- */
@@ -41,7 +58,19 @@ SE.data = (function () {
     { id: "franklin-baskerville", label: "Periodístico", heading: "libre-franklin", body: "libre-baskerville", rationale: "Titulares sans contundentes y texto serif clásico: el esquema de prensa, ideal para lectura larga." },
     { id: "dmserif-dmsans", label: "Elegante contemporáneo", heading: "dm-serif", body: "dm-sans", rationale: "Superfamilia DM: una display de alto contraste y una sans geométrica dibujadas para convivir." },
     { id: "plex-plex", label: "Técnico institucional", heading: "plex-sans", body: "plex-serif", rationale: "Superfamilia IBM Plex: precisión técnica en titulares y una serif sobria para el cuerpo." },
-    { id: "poppins-open", label: "Geométrico amable", heading: "poppins", body: "open-sans", rationale: "Poppins da titulares redondos y simpáticos; Open Sans sostiene el texto sin robar atención." }
+    { id: "poppins-open", label: "Geométrico amable", heading: "poppins", body: "open-sans", rationale: "Poppins da titulares redondos y simpáticos; Open Sans sostiene el texto sin robar atención." },
+
+    /* Parejas de la segunda tanda: las que sostienen las ocho direcciones */
+    { id: "archivo-archivo", label: "Grotesca suiza", heading: "archivo", body: "archivo", rationale: "Una sola grotesca neutra en todos los niveles: la jerarquía la construyen el tamaño y la retícula, no el cambio de fuente. El esquema de la escuela suiza." },
+    { id: "instrument-newsreader", label: "Revista contemporánea", heading: "instrument-serif", body: "newsreader", rationale: "Display de alto contraste para el titular y una serif dibujada para pantalla en el cuerpo: la fórmula de la prensa digital actual." },
+    { id: "mono-plex", label: "Documento técnico", heading: "jetbrains-mono", body: "plex-sans", rationale: "Titular monoespaciado —preciso, casi de terminal— con una sans institucional para leer. Contraste de roles nítido sin recurrir a una serif." },
+    { id: "hanken-hanken", label: "Grotesca cálida", heading: "hanken", body: "hanken", rationale: "Grotesca de formas blandas y aberturas amplias: cercana sin caer en lo infantil, cómoda a tamaño pequeño." },
+    { id: "anton-work", label: "Cartel industrial", heading: "anton", body: "work-sans", rationale: "Condensada pesadísima en titulares, contra una sans neutra de cuerpo. El contraste es brutal a propósito: es lenguaje de cartel." },
+    { id: "cormorant-karla", label: "Lujo tipográfico", heading: "cormorant", body: "karla", rationale: "Garalda de trazo finísimo y mucho espaciado para el titular, con una grotesca de detalles peculiares abajo. Funciona en versalitas y tamaños grandes." },
+    { id: "bricolage-inter", label: "Neo-grotesca con carácter", heading: "bricolage", body: "inter", rationale: "Bricolage tiene irregularidades deliberadas que se notan a tamaño display; Inter debajo mantiene la interfaz funcionando." },
+    { id: "public-atkinson", label: "Servicio público", heading: "public-sans", body: "atkinson", rationale: "Dos fuentes diseñadas con la legibilidad como requisito, no como consecuencia: Public Sans para estructura y Atkinson Hyperlegible, dibujada para baja visión, en el cuerpo." },
+    { id: "spectral-work", label: "Informe sobrio", heading: "spectral", body: "work-sans", rationale: "Serif de pantalla con personalidad contenida y una sans neutra: tono de informe serio sin resultar frío." },
+    { id: "garamond-karla", label: "Clásico revisado", heading: "eb-garamond", body: "karla", rationale: "Una garalda del XVI para titulares y una grotesca contemporánea en el cuerpo: distancia histórica suficiente para que se lean como dos voces." }
   ];
 
   /* ---------- Escala tipográfica ---------- */
@@ -186,27 +215,73 @@ SE.data = (function () {
     { id: "alto-contraste", name: "Alto contraste", desc: "Máxima legibilidad AAA",
       rationale: "Blanco, negro y un azul intenso: prioriza legibilidad por encima de todo.",
       light: pal({ bg: "#ffffff", surface: "#ffffff", surfaceAlt: "#f0f0f0", text: "#000000", textMuted: "#3d3d3d", border: "#595959", primary: "#0033cc", primaryHover: "#002299", primarySoft: "#e0e8ff", onPrimary: "#ffffff", accent: "#a3005c" }, semLight),
-      dark:  pal({ bg: "#000000", surface: "#0d0d0d", surfaceAlt: "#1a1a1a", text: "#ffffff", textMuted: "#d4d4d4", border: "#6b6b6b", primary: "#99b3ff", primaryHover: "#bcd0ff", primarySoft: "#1a2966", onPrimary: "#000033", accent: "#ff66b3" }, semDark) }
+      dark:  pal({ bg: "#000000", surface: "#0d0d0d", surfaceAlt: "#1a1a1a", text: "#ffffff", textMuted: "#d4d4d4", border: "#6b6b6b", primary: "#99b3ff", primaryHover: "#bcd0ff", primarySoft: "#1a2966", onPrimary: "#000033", accent: "#ff66b3" }, semDark) },
+
+    /* Segunda tanda: paletas que sostienen las direcciones nuevas y que
+       sacan el catálogo del violeta y el azul de siempre. */
+    { id: "suiza", name: "Rojo señal", desc: "Blanco, negro y un rojo de aviso",
+      rationale: "Neutros puros y un único rojo saturado reservado para lo que importa: el esquema de la escuela suiza, donde el color es señal y no decoración.",
+      light: pal({ bg: "#ffffff", surface: "#ffffff", surfaceAlt: "#f2f2f2", text: "#111111", textMuted: "#5a5a5a", border: "#d6d6d6", primary: "#c8102e", primaryHover: "#a10c25", primarySoft: "#fbe3e6", onPrimary: "#ffffff", accent: "#111111" }, semLight),
+      dark:  pal({ bg: "#0a0a0a", surface: "#141414", surfaceAlt: "#1d1d1d", text: "#f5f5f5", textMuted: "#a3a3a3", border: "#2e2e2e", primary: "#ff4d63", primaryHover: "#ff7185", primarySoft: "#3d1119", onPrimary: "#1a0006", accent: "#f5f5f5" }, semDark) },
+
+    { id: "teal", name: "Teal mineral", desc: "Neutros minerales con teal profundo",
+      rationale: "Verde azulado profundo sobre grises fríos con algo de tierra, y un ocre quemado de contrapunto. El territorio al que se movió el color de producto cuando el violeta se agotó.",
+      light: pal({ bg: "#f4f7f7", surface: "#ffffff", surfaceAlt: "#e8efef", text: "#0e1c1c", textMuted: "#4c6060", border: "#d3e0e0", primary: "#0d6a6a", primaryHover: "#095252", primarySoft: "#d0e9e7", onPrimary: "#ffffff", accent: "#b4531a" }, semLight),
+      dark:  pal({ bg: "#08100f", surface: "#101b1a", surfaceAlt: "#182726", text: "#e6f0ef", textMuted: "#93aaa8", border: "#243634", primary: "#3ec8bb", primaryHover: "#69dbd0", primarySoft: "#0f3a37", onPrimary: "#00201d", accent: "#f0a868" }, semDark) },
+
+    { id: "oliva", name: "Oliva y piedra", desc: "Verde oliva sobre neutros de arcilla",
+      rationale: "Oliva, piedra caliza y cacao: la familia de neutros terrosos, que da calidez sin la saturación de un naranja.",
+      light: pal({ bg: "#f7f5ef", surface: "#fffdf8", surfaceAlt: "#efece1", text: "#22201a", textMuted: "#5c5949", border: "#ddd8c8", primary: "#4f6027", primaryHover: "#3d4b1d", primarySoft: "#e4e9d3", onPrimary: "#ffffff", accent: "#8a5a33" }, semLight),
+      dark:  pal({ bg: "#14140f", surface: "#1d1d16", surfaceAlt: "#26261c", text: "#eeece2", textMuted: "#a8a493", border: "#35342a", primary: "#a8c063", primaryHover: "#bfd483", primarySoft: "#2c3418", onPrimary: "#161c05", accent: "#d99b63" }, semDark) },
+
+    { id: "acido", name: "Tinta y ácido", desc: "Casi monocromo con un amarillo ácido",
+      rationale: "Tinta negra mandando y un amarillo ácido como único golpe de color. Un neutro apagado con un acento digital estridente: la fórmula del cartel contemporáneo.",
+      light: pal({ bg: "#fafaf7", surface: "#ffffff", surfaceAlt: "#efefe9", text: "#0d0d0b", textMuted: "#4f4f47", border: "#c9c9bf", primary: "#141410", primaryHover: "#33332a", primarySoft: "#e9ea9a", onPrimary: "#e8ff00", accent: "#7a7a00" }, semLight),
+      dark:  pal({ bg: "#0b0b09", surface: "#151511", surfaceAlt: "#1f1f19", text: "#f2f2ea", textMuted: "#a5a598", border: "#33332a", primary: "#e8ff00", primaryHover: "#f2ff5c", primarySoft: "#33380a", onPrimary: "#131400", accent: "#d4d400" }, semDark) },
+
+    { id: "oro-tinta", name: "Marfil y oro", desc: "Marfil, tinta y un oro apagado",
+      rationale: "Papel marfil, tinta casi negra y un oro sin brillo reservado a los detalles. La paleta del lujo discreto: el color no grita, la tipografía manda.",
+      light: pal({ bg: "#fbf9f4", surface: "#ffffff", surfaceAlt: "#f2eee4", text: "#191713", textMuted: "#57524a", border: "#e3ddcd", primary: "#1f1c17", primaryHover: "#3b352c", primarySoft: "#efe7d3", onPrimary: "#faf6ec", accent: "#8a6a1f" }, semLight),
+      dark:  pal({ bg: "#100f0c", surface: "#191713", surfaceAlt: "#22201a", text: "#f0ece2", textMuted: "#a89f8e", border: "#332f26", primary: "#e5cf9a", primaryHover: "#f0e0b8", primarySoft: "#2f2819", onPrimary: "#1a1509", accent: "#cbb26a" }, semDark) }
   ];
 
-  /* ---------- Presets: direcciones completas ----------
-     Siete puntos de partida deliberadamente distintos: cada uno
-     cierra las nueve decisiones de forma coherente entre sí. */
+  /* ---------- Direcciones completas ----------
+     Ocho puntos de partida, cada uno anclado a una tradición de diseño
+     reconocible y con su procedencia escrita: una dirección se defiende
+     mejor cuando se puede decir de dónde viene. Cada una cierra las
+     nueve decisiones de forma coherente entre sí. */
   var presets = [
-    { id: "editorial", name: "Editorial clásico", desc: "Papel, tinta y serifas de alto contraste. Iconos capilares y ni un gesto de más: manda el texto.",
-      decisions: { fontPair: { type: "pair", id: "playfair-lora" }, typeScale: { ratio: 1.333, base: 18 }, palette: { type: "curated", id: "tinta-papel" }, spacing: "normal", radius: "sutil", shadow: "ninguna", icons: "lineal-fino", motion: "ninguno", reading: { lineHeight: 1.65, measure: 65 } } },
-    { id: "tech-minimal", name: "Tech minimal", desc: "Neutro y funcional, sin ruido. Iconos de trazo estándar y un movimiento que solo confirma.",
-      decisions: { fontPair: { type: "pair", id: "inter-inter" }, typeScale: { ratio: 1.25, base: 16 }, palette: { type: "curated", id: "grafito" }, spacing: "normal", radius: "medio", shadow: "sutil", icons: "lineal-suave", motion: "sutil", reading: { lineHeight: 1.5, measure: 70 } } },
-    { id: "calido", name: "Cálido humano", desc: "Tierra, curvas y aire. Iconos gruesos y gestos suaves: cercano sin ser infantil.",
-      decisions: { fontPair: { type: "pair", id: "fraunces-nunito" }, typeScale: { ratio: 1.25, base: 17 }, palette: { type: "curated", id: "terracota" }, spacing: "amplia", radius: "redondeado", shadow: "difusa", icons: "grueso", motion: "suave", reading: { lineHeight: 1.6, measure: 62 } } },
-    { id: "corporativo", name: "Corporativo sobrio", desc: "Denso, azul y preciso. Iconos a escuadra y transiciones cortas: herramienta de trabajo.",
-      decisions: { fontPair: { type: "pair", id: "plex-plex" }, typeScale: { ratio: 1.2, base: 16 }, palette: { type: "curated", id: "azul-institucional" }, spacing: "compacta", radius: "sutil", shadow: "sutil", icons: "geometrico", motion: "sutil", reading: { lineHeight: 1.55, measure: 70 } } },
-    { id: "audaz", name: "Audaz contemporáneo", desc: "Geometría, violeta y saltos grandes de escala. Iconos macizos y movimiento con rebote.",
-      decisions: { fontPair: { type: "pair", id: "space-inter" }, typeScale: { ratio: 1.333, base: 16 }, palette: { type: "curated", id: "violeta" }, spacing: "normal", radius: "redondeado", shadow: "media", icons: "relleno", motion: "expresivo", reading: { lineHeight: 1.5, measure: 68 } } },
-    { id: "brutalista", name: "Brutalista", desc: "Esquinas vivas, cero sombras y máximo contraste. Iconos técnicos y ninguna animación: puro esqueleto.",
-      decisions: { fontPair: { type: "pair", id: "franklin-baskerville" }, typeScale: { ratio: 1.414, base: 16 }, palette: { type: "curated", id: "alto-contraste" }, spacing: "compacta", radius: "recto", shadow: "ninguna", icons: "geometrico", motion: "ninguno", reading: { lineHeight: 1.45, measure: 72 } } },
-    { id: "sereno", name: "Sereno premium", desc: "Verde profundo, mucho aire y sombras difusas. Iconos duotono y gestos largos: calma cara.",
-      decisions: { fontPair: { type: "pair", id: "dmserif-dmsans" }, typeScale: { ratio: 1.25, base: 17 }, palette: { type: "curated", id: "esmeralda" }, spacing: "amplia", radius: "redondeado", shadow: "difusa", icons: "duotono", motion: "suave", reading: { lineHeight: 1.62, measure: 64 } } }
+    { id: "neogrotesca", name: "Neo-grotesca con carácter", origen: "Grotesca contemporánea de las imperfecciones deliberadas",
+      desc: "Titular con irregularidades a propósito, cuerpo neutro y teal mineral en lugar del violeta de rigor.",
+      decisions: { fontPair: { type: "pair", id: "bricolage-inter" }, typeScale: { ratio: 1.25, base: 16 }, palette: { type: "curated", id: "teal" }, spacing: "normal", radius: "medio", shadow: "sutil", icons: "lineal-suave", motion: "sutil", reading: { lineHeight: 1.55, measure: 68 } } },
+
+    { id: "suiza", name: "Suiza internacional", origen: "Escuela suiza · Müller-Brockmann, Neue Grafik",
+      desc: "Una sola grotesca, retícula apretada, esquinas vivas y el rojo reservado para lo que de verdad avisa.",
+      decisions: { fontPair: { type: "pair", id: "archivo-archivo" }, typeScale: { ratio: 1.2, base: 16 }, palette: { type: "curated", id: "suiza" }, spacing: "compacta", radius: "recto", shadow: "ninguna", icons: "geometrico", motion: "ninguno", reading: { lineHeight: 1.45, measure: 72 } } },
+
+    { id: "revista", name: "Revista editorial", origen: "Serifas expresivas y retícula de revista",
+      desc: "Display de alto contraste sobre papel crema, saltos grandes de escala y cero sombras: manda el texto.",
+      decisions: { fontPair: { type: "pair", id: "instrument-newsreader" }, typeScale: { ratio: 1.414, base: 18 }, palette: { type: "curated", id: "tinta-papel" }, spacing: "normal", radius: "sutil", shadow: "ninguna", icons: "lineal-fino", motion: "sutil", reading: { lineHeight: 1.62, measure: 66 } } },
+
+    { id: "terminal", name: "Documento técnico", origen: "Revival del monoespaciado en producto",
+      desc: "Titulares de terminal, densidad alta y bordes finos. Precisión antes que calidez.",
+      decisions: { fontPair: { type: "pair", id: "mono-plex" }, typeScale: { ratio: 1.2, base: 15 }, palette: { type: "curated", id: "grafito" }, spacing: "compacta", radius: "sutil", shadow: "ninguna", icons: "geometrico", motion: "sutil", reading: { lineHeight: 1.55, measure: 74 } } },
+
+    { id: "bouba", name: "Grotesca cálida", origen: "Grotescas blandas y neutros terrosos",
+      desc: "Formas redondeadas, oliva y piedra, mucho aire y una curva con rebote. Cercano sin ser infantil.",
+      decisions: { fontPair: { type: "pair", id: "hanken-hanken" }, typeScale: { ratio: 1.25, base: 17 }, palette: { type: "curated", id: "oliva" }, spacing: "amplia", radius: "redondeado", shadow: "difusa", icons: "grueso", motion: "expresivo", reading: { lineHeight: 1.6, measure: 62 } } },
+
+    { id: "industrial", name: "Cartel industrial", origen: "Display brutalista y cartelería",
+      desc: "Condensada pesadísima, saltos de escala enormes, amarillo ácido y ni un gramo de suavidad.",
+      decisions: { fontPair: { type: "pair", id: "anton-work" }, typeScale: { ratio: 1.5, base: 16 }, palette: { type: "curated", id: "acido" }, spacing: "compacta", radius: "recto", shadow: "ninguna", icons: "relleno", motion: "ninguno", reading: { lineHeight: 1.45, measure: 70 } } },
+
+    { id: "versalitas", name: "Lujo en versalitas", origen: "Display ancho en versalitas espaciadas",
+      desc: "Garalda finísima sobre marfil, iconos duotono en oro apagado. El color calla para que hable la letra.",
+      decisions: { fontPair: { type: "pair", id: "cormorant-karla" }, typeScale: { ratio: 1.333, base: 17 }, palette: { type: "curated", id: "oro-tinta" }, spacing: "amplia", radius: "recto", shadow: "sutil", icons: "duotono", motion: "suave", reading: { lineHeight: 1.7, measure: 60 } } },
+
+    { id: "servicio", name: "Servicio público", origen: "Sistemas de diseño públicos · USWDS, GOV.UK",
+      desc: "Cuerpo grande, azul institucional y dos fuentes dibujadas para leerse. La accesibilidad como punto de partida.",
+      decisions: { fontPair: { type: "pair", id: "public-atkinson" }, typeScale: { ratio: 1.2, base: 17 }, palette: { type: "curated", id: "azul-institucional" }, spacing: "normal", radius: "sutil", shadow: "ninguna", icons: "lineal-suave", motion: "sutil", reading: { lineHeight: 1.6, measure: 66 } } }
   ];
 
   return {
@@ -222,7 +297,7 @@ SE.data = (function () {
     presets: presets,
     semLight: semLight,
     semDark: semDark,
-    defaultPresetId: "tech-minimal"
+    defaultPresetId: "neogrotesca"
   };
 })();
 
@@ -238,6 +313,10 @@ SE.pairingHint = function (headingId, bodyId) {
     return { level: "armonica", text: "Monofamilia: coherencia garantizada; la jerarquía dependerá del peso y el tamaño." };
   if (h.super && h.super === b.super)
     return { level: "armonica", text: "Superfamilia: estas dos fuentes fueron dibujadas para convivir." };
+  if (b.cat === "mono")
+    return { level: "arriesgada", text: "Una monoespaciada en texto largo cansa: todas las letras ocupan lo mismo y el ojo pierde el dibujo de la palabra. Mejor en titulares, datos o código." };
+  if (h.cat === "mono")
+    return { level: "armonica", text: "Titular monoespaciado sobre un cuerpo proporcional: contraste de roles nítido y un aire técnico difícil de conseguir de otro modo." };
   if (b.cat === "display")
     return { level: "arriesgada", text: "Una fuente display en texto largo cansa la lectura; mejor resérvala para titulares." };
   if (h.cat === "display")

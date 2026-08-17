@@ -10,8 +10,7 @@
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/mock-base.css">
 <link rel="stylesheet" href="css/mock-dashboard.css">
-<link rel="stylesheet" href="css/mock-landing.css">
-<link rel="stylesheet" href="css/mock-blog.css">
+<link rel="stylesheet" href="css/mock-pagina.css">
 <link rel="stylesheet" href="css/mock-colores.css">
 <link rel="stylesheet" href="css/mock-componentes.css">
 </head>
@@ -54,9 +53,9 @@
       <div class="tb-left">
         <span class="tb-brand">Selector<em>de</em>Estilos</span>
         <nav class="tb-tabs" id="screen-tabs" aria-label="Pantalla mock">
-          <button type="button" data-screen="dashboard" class="active" title="Densidad, colores semánticos, tamaños pequeños y estados (alerta, error, vacío)">Panel <kbd>1</kbd></button>
-          <button type="button" data-screen="landing" title="Tamaños display, jerarquía, botones grandes, radios y sombras">Landing <kbd>2</kbd></button>
-          <button type="button" data-screen="blog" title="Escala tipográfica completa, armonía título/cuerpo, interlineado y medida">Artículo <kbd>3</kbd></button>
+          <button type="button" data-screen="resumen" class="active" title="Las cuatro pantallas a la vez, en miniatura y en vivo">Vista general <kbd>1</kbd></button>
+          <button type="button" data-screen="dashboard" title="Densidad, colores semánticos, tamaños pequeños y estados (alerta, error, vacío)">Panel <kbd>2</kbd></button>
+          <button type="button" data-screen="pagina" title="Tamaños display, jerarquía, botones grandes y la escala tipográfica completa en texto largo">Página <kbd>3</kbd></button>
           <button type="button" data-screen="colores" title="Convivencia de la paleta: formas, proporciones y pares de uso">Colores <kbd>4</kbd></button>
           <button type="button" data-screen="componentes" title="Kit del sistema: iconos, estados de botón y campo, movimiento">Componentes <kbd>5</kbd></button>
         </nav>
@@ -75,7 +74,6 @@
             <button type="button" data-vision="baja-vision">Baja visión <small>borroso + poco contraste</small></button>
           </div>
         </div>
-        <button type="button" id="panel-toggle" title="Mostrar u ocultar el panel (P)">Ocultar panel</button>
         <button type="button" id="export-btn" class="tb-primary">Exportar</button>
       </div>
     </header>
@@ -83,8 +81,19 @@
     <div id="viewport-wrap">
       <div id="mock-viewport" data-mode="light">
 
+        <!-- ============ VISTA GENERAL · miniaturas vivas ============ -->
+        <section class="mock-screen active" data-screen="resumen">
+          <div class="ov-page">
+            <header class="ov-head">
+              <h1>Vista general</h1>
+              <p>Las cuatro pantallas con la dirección actual aplicada, a la vez. Pulsa cualquiera para verla a tamaño real.</p>
+            </header>
+            <div class="ov-grid" id="ov-grid"></div>
+          </div>
+        </section>
+
         <!-- ============ MOCK 1 · DASHBOARD ============ -->
-        <section class="mock-screen active" data-screen="dashboard">
+        <section class="mock-screen" data-screen="dashboard">
           <div class="db-layout">
             <aside class="db-sidenav">
               <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
@@ -237,8 +246,8 @@
           </div>
         </section>
 
-        <!-- ============ MOCK 2 · LANDING ============ -->
-        <section class="mock-screen" data-screen="landing">
+        <!-- ============ MOCK 2 · PÁGINA (marketing + editorial) ============ -->
+        <section class="mock-screen" data-screen="pagina">
           <div class="ld-announce"><span>Nuevo · Sensores Terrena v2 ya disponibles</span><a href="#">Conócelos →</a></div>
           <nav class="ld-nav">
             <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
@@ -297,7 +306,98 @@
             </div>
           </section>
 
-          <section class="ld-quote" data-enter style="--i:3">
+          <section class="pg-editorial" data-enter style="--i:3">
+            <article class="bg-article">
+              <header class="bg-head">
+                <a class="bg-category" href="#">Riego eficiente</a>
+                <h1>Cómo reducir un 30 % el consumo de agua sin sacrificar rendimiento</h1>
+                <p class="bg-standfirst">La mayoría de los invernaderos riegan por calendario. Las plantas no viven en un calendario: viven en el suelo. Medirlo lo cambia todo.</p>
+                <div class="bg-meta">
+                  <div class="avatar">JO</div>
+                  <div class="bg-meta-text"><strong>Julián Obando</strong><span>Ingeniero agrónomo · 14 de agosto de 2026 · 7 min de lectura</span></div>
+                </div>
+              </header>
+
+              <figure class="bg-figure">
+                <div class="bg-figure-art"></div>
+                <figcaption>Sonda de humedad a 20 cm de profundidad en un cultivo de tomate. La lectura continua sustituye a la intuición.</figcaption>
+              </figure>
+
+              <aside class="bg-keys">
+                <h2>Las tres claves</h2>
+                <ul>
+                  <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Entre el 25 % y el 35 % del agua aplicada nunca llega a la raíz.</li>
+                  <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Dos sondas por invernadero bastan para saber cuándo regar y cuándo parar.</li>
+                  <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Recortar la duración del riego rinde más que recortar la frecuencia.</li>
+                </ul>
+              </aside>
+
+              <div class="bg-body">
+                <p>Durante décadas, regar fue un acto de fe. Se abría la válvula a la misma hora, durante los mismos minutos, porque «siempre se ha hecho así». Y funcionaba, más o menos, porque el agua era barata y el margen de error, generoso. Ninguna de las dos cosas sigue siendo cierta.</p>
+                <p>El precio del agua para uso agrícola ha subido de forma sostenida en los últimos cinco años, y los <a href="#">planes de sequía</a> imponen recortes justo en los meses de mayor demanda. La buena noticia: en la mayoría de los invernaderos que auditamos, entre el 25 % y el 35 % del agua aplicada <em>no la usa la planta</em>. Se filtra por debajo de la zona de raíces o se evapora antes de llegar a ellas. Es margen puro.</p>
+
+                <h2>El problema del riego a ojo</h2>
+                <p>El riego por calendario tiene un defecto estructural: aplica la misma receta a días distintos. Un martes nublado de 19 °C y un martes despejado de 31 °C reciben los mismos litros. En el primero, la mitad sobra; en el segundo, quizá falta. El error no se ve, porque la planta tarda días en mostrar estrés, y para entonces nadie recuerda qué riego lo causó.</p>
+                <blockquote>
+                  <p>El dato más barato de toda la agricultura de precisión es una sonda de humedad de suelo. Cuesta menos que una temporada de agua desperdiciada.</p>
+                </blockquote>
+                <p>La alternativa no es regar menos: es regar <em>cuando toca</em>. Y para saber cuándo toca, hay que medir dónde están las raíces, no mirar el cielo.</p>
+
+                <aside class="bg-stat">
+                  <strong>27 %</strong>
+                  <span>menos agua en la primera temporada de <a href="#">Finca Roble</a>, con el mismo calibre de fruto y un 40 % menos de tratamientos fungicidas.</span>
+                </aside>
+
+                <h2>Medir antes de mover una válvula</h2>
+                <p>Antes de tocar nada, conviene tener a mano lo mínimo:</p>
+                <ul>
+                  <li>Dos sondas de humedad por invernadero.</li>
+                  <li>Un registro continuo de al menos siete días.</li>
+                  <li>El caudal real del gotero, medido, no el del catálogo.</li>
+                </ul>
+                <p>Con eso, una estrategia razonable para empezar, sin cambiar ninguna instalación, tiene tres pasos:</p>
+                <ol>
+                  <li><strong>Instala dos sondas por invernadero</strong>, una a 10 cm y otra a 20–30 cm según el cultivo. La superficial te dice cuándo regar; la profunda, cuándo parar.</li>
+                  <li><strong>Registra una semana sin cambiar nada.</strong> Verás el patrón real: casi siempre, picos de saturación tras cada riego y drenaje que se pierde por debajo de las raíces.</li>
+                  <li><strong>Recorta la duración, no la frecuencia.</strong> Riegos más cortos y algo más frecuentes mantienen la humedad en banda sin empujar agua fuera del alcance de la planta.</li>
+                </ol>
+                <p>El umbral que usamos por defecto es <code>humedad &lt; 22 % durante 30 min</code> a 20 cm de profundidad; por encima de <code>34 %</code> el sistema cancela el riego programado aunque toque por calendario.</p>
+
+                <figure class="bg-table-wrap">
+                  <table class="bg-table">
+                    <thead><tr><th>Invernadero</th><th class="num">Antes (L/día)</th><th class="num">Después</th><th class="num">Ahorro</th></tr></thead>
+                    <tbody>
+                      <tr><td>Tomate pera · I-7</td><td class="num">1.480</td><td class="num">1.062</td><td class="num">28 %</td></tr>
+                      <tr><td>Pimiento rojo · I-3</td><td class="num">1.210</td><td class="num">905</td><td class="num">25 %</td></tr>
+                      <tr><td>Fresa · I-5</td><td class="num">760</td><td class="num">524</td><td class="num">31 %</td></tr>
+                    </tbody>
+                  </table>
+                  <figcaption>Consumo medio por invernadero antes y después de pasar a riego por umbral. Temporada 2025-2026, misma superficie y cultivo.</figcaption>
+                </figure>
+
+                <h3>Qué esperar las primeras semanas</h3>
+                <p>Los primeros días, la tentación de volver al calendario es fuerte: el suelo «se ve» seco en superficie aunque la sonda profunda marque humedad de sobra. Confía en el dato. En los ensayos de Finca Roble, el equipo tardó dos semanas en dejar de añadir riegos manuales «por si acaso»; a la cuarta semana, el consumo había caído un 27 % y el calibre del fruto no se había movido.</p>
+                <p>A partir del primer mes, el sistema empieza a pagar la segunda parte del beneficio, la que casi nadie anticipa: menos hongos. Un suelo que no se encharca es un suelo que ventila, y la presión de botritis y mildiu baja con él. Menos agua, menos fungicida, misma cosecha.</p>
+
+                <h2>La regla de oro</h2>
+                <p>Si solo te llevas una idea de este artículo, que sea esta: <strong>ningún riego debería ejecutarse sin un dato que lo justifique</strong>. No hace falta automatizarlo todo el primer día; hace falta dejar de decidir a ciegas. La automatización llega sola cuando los datos te dan la confianza para soltar la válvula.</p>
+
+                <p class="bg-note">Metodología: los datos proceden de 34 invernaderos auditados entre marzo de 2025 y junio de 2026, con sondas calibradas cada 60 días. Los porcentajes comparan temporadas equivalentes en superficie y cultivo.</p>
+                <p class="bg-footnote">Publicado el 14 de agosto de 2026 · Actualizado el 16 de agosto de 2026 · <a href="#">Cómo trabajamos los datos</a></p>
+              </div>
+
+              <aside class="bg-author card">
+                <div class="avatar avatar-lg">JO</div>
+                <div>
+                  <strong>Julián Obando</strong>
+                  <p>Ingeniero agrónomo. Escribe sobre riego de precisión y gestión de cultivos protegidos. Antes de Terrena, 9 años asesorando cooperativas hortícolas.</p>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm">Seguir</button>
+              </aside>
+            </article>
+          </section>
+
+          <section class="ld-quote" data-enter style="--i:4">
             <blockquote>
               <p>«Bajamos el consumo de agua un 27 % la primera temporada. Ahora riego cuando la planta lo pide, no cuando a mí me parece.»</p>
               <footer>
@@ -307,7 +407,7 @@
             </blockquote>
           </section>
 
-          <section class="ld-cta-band" data-enter style="--i:4">
+          <section class="ld-cta-band" data-enter style="--i:5">
             <h2>Empieza a cultivar con datos hoy</h2>
             <p>Prueba Terrena gratis en tu primer invernadero. Sin compromiso.</p>
             <button type="button" class="btn btn-inverted btn-lg">Crear cuenta gratis</button>
@@ -324,106 +424,7 @@
               <div><h4>Soporte</h4><a href="#">Documentación</a><a href="#">Contacto</a><a href="#">Estado del servicio</a></div>
             </div>
             <p class="ld-footer-legal">© 2026 Terrena · Privacidad · Términos</p>
-          </footer>
-        </section>
-
-        <!-- ============ MOCK 3 · BLOG ============ -->
-        <section class="mock-screen" data-screen="blog">
-          <nav class="ld-nav bg-nav">
-            <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
-            <div class="ld-nav-links"><a href="#">Blog</a><a href="#">Guías</a><a href="#">Casos</a></div>
-            <button type="button" class="btn btn-primary">Prueba gratis</button>
-          </nav>
-
-          <article class="bg-article">
-            <header class="bg-head">
-              <a class="bg-category" href="#">Riego eficiente</a>
-              <h1>Cómo reducir un 30 % el consumo de agua sin sacrificar rendimiento</h1>
-              <p class="bg-standfirst">La mayoría de los invernaderos riegan por calendario. Las plantas no viven en un calendario: viven en el suelo. Medirlo lo cambia todo.</p>
-              <div class="bg-meta">
-                <div class="avatar">JO</div>
-                <div class="bg-meta-text"><strong>Julián Obando</strong><span>Ingeniero agrónomo · 14 de agosto de 2026 · 7 min de lectura</span></div>
-              </div>
-            </header>
-
-            <figure class="bg-figure">
-              <div class="bg-figure-art"></div>
-              <figcaption>Sonda de humedad a 20 cm de profundidad en un cultivo de tomate. La lectura continua sustituye a la intuición.</figcaption>
-            </figure>
-
-            <aside class="bg-keys">
-              <h2>Las tres claves</h2>
-              <ul>
-                <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Entre el 25 % y el 35 % del agua aplicada nunca llega a la raíz.</li>
-                <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Dos sondas por invernadero bastan para saber cuándo regar y cuándo parar.</li>
-                <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Recortar la duración del riego rinde más que recortar la frecuencia.</li>
-              </ul>
-            </aside>
-
-            <div class="bg-body">
-              <p>Durante décadas, regar fue un acto de fe. Se abría la válvula a la misma hora, durante los mismos minutos, porque «siempre se ha hecho así». Y funcionaba, más o menos, porque el agua era barata y el margen de error, generoso. Ninguna de las dos cosas sigue siendo cierta.</p>
-              <p>El precio del agua para uso agrícola ha subido de forma sostenida en los últimos cinco años, y los <a href="#">planes de sequía</a> imponen recortes justo en los meses de mayor demanda. La buena noticia: en la mayoría de los invernaderos que auditamos, entre el 25 % y el 35 % del agua aplicada <em>no la usa la planta</em>. Se filtra por debajo de la zona de raíces o se evapora antes de llegar a ellas. Es margen puro.</p>
-
-              <h2>El problema del riego a ojo</h2>
-              <p>El riego por calendario tiene un defecto estructural: aplica la misma receta a días distintos. Un martes nublado de 19 °C y un martes despejado de 31 °C reciben los mismos litros. En el primero, la mitad sobra; en el segundo, quizá falta. El error no se ve, porque la planta tarda días en mostrar estrés, y para entonces nadie recuerda qué riego lo causó.</p>
-              <blockquote>
-                <p>El dato más barato de toda la agricultura de precisión es una sonda de humedad de suelo. Cuesta menos que una temporada de agua desperdiciada.</p>
-              </blockquote>
-              <p>La alternativa no es regar menos: es regar <em>cuando toca</em>. Y para saber cuándo toca, hay que medir dónde están las raíces, no mirar el cielo.</p>
-
-              <aside class="bg-stat">
-                <strong>27 %</strong>
-                <span>menos agua en la primera temporada de <a href="#">Finca Roble</a>, con el mismo calibre de fruto y un 40 % menos de tratamientos fungicidas.</span>
-              </aside>
-
-              <h2>Medir antes de mover una válvula</h2>
-              <p>Antes de tocar nada, conviene tener a mano lo mínimo:</p>
-              <ul>
-                <li>Dos sondas de humedad por invernadero.</li>
-                <li>Un registro continuo de al menos siete días.</li>
-                <li>El caudal real del gotero, medido, no el del catálogo.</li>
-              </ul>
-              <p>Con eso, una estrategia razonable para empezar, sin cambiar ninguna instalación, tiene tres pasos:</p>
-              <ol>
-                <li><strong>Instala dos sondas por invernadero</strong>, una a 10 cm y otra a 20–30 cm según el cultivo. La superficial te dice cuándo regar; la profunda, cuándo parar.</li>
-                <li><strong>Registra una semana sin cambiar nada.</strong> Verás el patrón real: casi siempre, picos de saturación tras cada riego y drenaje que se pierde por debajo de las raíces.</li>
-                <li><strong>Recorta la duración, no la frecuencia.</strong> Riegos más cortos y algo más frecuentes mantienen la humedad en banda sin empujar agua fuera del alcance de la planta.</li>
-              </ol>
-              <p>El umbral que usamos por defecto es <code>humedad &lt; 22 % durante 30 min</code> a 20 cm de profundidad; por encima de <code>34 %</code> el sistema cancela el riego programado aunque toque por calendario.</p>
-
-              <figure class="bg-table-wrap">
-                <table class="bg-table">
-                  <thead><tr><th>Invernadero</th><th class="num">Antes (L/día)</th><th class="num">Después</th><th class="num">Ahorro</th></tr></thead>
-                  <tbody>
-                    <tr><td>Tomate pera · I-7</td><td class="num">1.480</td><td class="num">1.062</td><td class="num">28 %</td></tr>
-                    <tr><td>Pimiento rojo · I-3</td><td class="num">1.210</td><td class="num">905</td><td class="num">25 %</td></tr>
-                    <tr><td>Fresa · I-5</td><td class="num">760</td><td class="num">524</td><td class="num">31 %</td></tr>
-                  </tbody>
-                </table>
-                <figcaption>Consumo medio por invernadero antes y después de pasar a riego por umbral. Temporada 2025-2026, misma superficie y cultivo.</figcaption>
-              </figure>
-
-              <h3>Qué esperar las primeras semanas</h3>
-              <p>Los primeros días, la tentación de volver al calendario es fuerte: el suelo «se ve» seco en superficie aunque la sonda profunda marque humedad de sobra. Confía en el dato. En los ensayos de Finca Roble, el equipo tardó dos semanas en dejar de añadir riegos manuales «por si acaso»; a la cuarta semana, el consumo había caído un 27 % y el calibre del fruto no se había movido.</p>
-              <p>A partir del primer mes, el sistema empieza a pagar la segunda parte del beneficio, la que casi nadie anticipa: menos hongos. Un suelo que no se encharca es un suelo que ventila, y la presión de botritis y mildiu baja con él. Menos agua, menos fungicida, misma cosecha.</p>
-
-              <h2>La regla de oro</h2>
-              <p>Si solo te llevas una idea de este artículo, que sea esta: <strong>ningún riego debería ejecutarse sin un dato que lo justifique</strong>. No hace falta automatizarlo todo el primer día; hace falta dejar de decidir a ciegas. La automatización llega sola cuando los datos te dan la confianza para soltar la válvula.</p>
-
-              <p class="bg-note">Metodología: los datos proceden de 34 invernaderos auditados entre marzo de 2025 y junio de 2026, con sondas calibradas cada 60 días. Los porcentajes comparan temporadas equivalentes en superficie y cultivo.</p>
-              <p class="bg-footnote">Publicado el 14 de agosto de 2026 · Actualizado el 16 de agosto de 2026 · <a href="#">Cómo trabajamos los datos</a></p>
-            </div>
-
-            <aside class="bg-author card">
-              <div class="avatar avatar-lg">JO</div>
-              <div>
-                <strong>Julián Obando</strong>
-                <p>Ingeniero agrónomo. Escribe sobre riego de precisión y gestión de cultivos protegidos. Antes de Terrena, 9 años asesorando cooperativas hortícolas.</p>
-              </div>
-              <button type="button" class="btn btn-ghost btn-sm">Seguir</button>
-            </aside>
-          </article>
-        </section>
+          </footer>        </section>
 
         <!-- ============ MOCK 4 · COLORES (convivencia de la paleta) ============ -->
         <section class="mock-screen" data-screen="colores">
@@ -731,29 +732,29 @@
     <div class="panel-head">
       <div>
         <h1>Decisiones de diseño</h1>
-        <p id="panel-preset-label">Preset: Tech minimal</p>
       </div>
       <div class="panel-head-actions">
         <button type="button" id="undo-btn" title="Deshacer (Ctrl+Z)" aria-label="Deshacer" disabled><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M6 3.5 3 6.5l3 3"/><path d="M3 6.5h6.5a3.5 3.5 0 0 1 0 7H8"/></svg></button>
         <button type="button" id="redo-btn" title="Rehacer (Ctrl+Mayús+Z)" aria-label="Rehacer" disabled><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M10 3.5l3 3-3 3"/><path d="M13 6.5H6.5a3.5 3.5 0 0 0 0 7H8"/></svg></button>
-        <button type="button" id="reset-btn" title="Volver al preset por defecto">Restablecer</button>
+        <button type="button" id="reset-btn" title="Volver a la dirección por defecto">Restablecer</button>
+        <button type="button" id="panel-collapse" title="Plegar el panel (P)" aria-label="Plegar el panel" aria-expanded="true" aria-controls="panel"><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M6 3.5 10.5 8 6 12.5"/><path d="M12.5 3v10"/></svg></button>
       </div>
     </div>
     <div class="panel-scroll">
-      <section class="p-section">
-        <h2 class="p-title">Direcciones sugeridas</h2>
-        <div id="preset-list"></div>
-      </section>
+      <details class="p-acc p-acc-wide" id="sec-presets" open>
+        <summary><span>Direcciones</span><small id="panel-preset-label">Neo-grotesca con carácter</small></summary>
+        <div class="p-body" id="preset-list"></div>
+      </details>
 
-      <section class="p-section" id="sec-snapshots">
-        <h2 class="p-title">Direcciones guardadas</h2>
-        <div id="snap-list"></div>
+      <details class="p-acc p-acc-wide" id="sec-snapshots">
+        <summary><span>Direcciones guardadas</span></summary>
+        <div class="p-body" id="snap-list"></div>
         <div class="snap-actions">
           <button type="button" id="snap-save"><svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Guardar actual…</button>
           <button type="button" id="estado-export" title="Descarga estado.json para compartir o respaldar">Exportar estado</button>
           <button type="button" id="estado-import" title="Carga un estado.json o un tokens.json exportado">Importar…</button>
         </div>
-      </section>
+      </details>
 
       <details class="p-acc" data-dim="fontPair" open>
         <summary><span>Tipografía</span><button type="button" class="ab-btn" data-dim="fontPair">A/B</button></summary>
@@ -805,9 +806,15 @@
         <div class="p-body" id="body-a11y"></div>
       </details>
 
-      <p class="panel-foot">Atajos: <kbd>1·2·3·4·5</kbd> pantallas · <kbd>D</kbd> oscuro · <kbd>P</kbd> panel · <kbd>Ctrl+Z</kbd> deshacer<br>En A/B: <kbd>Espacio</kbd> alterna · <kbd>⏎</kbd> elige · <kbd>Esc</kbd> cancela</p>
+      <p class="panel-foot">Atajos: <kbd>1·2·3·4·5</kbd> pantallas · <kbd>D</kbd> oscuro · <kbd>P</kbd> plegar panel · <kbd>Ctrl+Z</kbd> deshacer<br>En A/B: <kbd>Espacio</kbd> alterna · <kbd>⏎</kbd> elige · <kbd>Esc</kbd> cancela</p>
     </div>
   </aside>
+
+  <!-- Con el panel plegado, la única puerta de vuelta -->
+  <button type="button" id="panel-rail" title="Desplegar el panel (P)" aria-label="Desplegar el panel de decisiones" aria-expanded="false" aria-controls="panel" hidden>
+    <svg class="icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M10 3.5 5.5 8 10 12.5"/><path d="M3.5 3v10"/></svg>
+    <span>Decisiones</span>
+  </button>
 </div>
 
 <!-- ============ MODAL DE EXPORTACIÓN ============ -->

@@ -7,8 +7,19 @@ window.SE = window.SE || {};
 
 SE.STORAGE_KEY = "selectorEstilos.v1";
 
-/* Pantallas mock disponibles (orden de las pestañas y de las teclas 1-5) */
-SE.SCREENS = ["dashboard", "landing", "blog", "colores", "componentes"];
+/* Pantallas disponibles (orden de las pestañas y de las teclas 1-5).
+   Única fuente de verdad: de aquí salen el deep-link, la persistencia,
+   los nombres del panel y los atajos. */
+SE.SCREENS = ["resumen", "dashboard", "pagina", "colores", "componentes"];
+
+/* Landing y Artículo se fundieron en «Página»: los enlaces ya compartidos
+   con los ids viejos siguen llevando al sitio correcto. */
+SE.SCREEN_ALIAS = { landing: "pagina", blog: "pagina" };
+
+SE.resolveScreen = function (id) {
+  var name = SE.SCREEN_ALIAS[id] || id;
+  return SE.SCREENS.indexOf(name) >= 0 ? name : null;
+};
 
 SE.clone = function (v) { return JSON.parse(JSON.stringify(v)); };
 
@@ -18,7 +29,7 @@ SE.defaultState = function () {
   var preset = SE.findPreset(SE.data.defaultPresetId);
   return {
     version: 1,
-    screen: "dashboard",
+    screen: "resumen",
     mode: "light",
     presetId: preset.id,
     decisions: SE.clone(preset.decisions),
@@ -57,7 +68,8 @@ SE.loadState = function () {
     try {
       var saved = JSON.parse(raw);
       if (saved && saved.version === 1) {
-        if (SE.SCREENS.indexOf(saved.screen) >= 0) state.screen = saved.screen;
+        var screen = SE.resolveScreen(saved.screen);
+        if (screen) state.screen = screen;
         if (saved.mode === "light" || saved.mode === "dark") state.mode = saved.mode;
         if (typeof saved.presetId === "string") state.presetId = saved.presetId;
         if (saved.decisions) SE.mergeValidDecisions(state.decisions, saved.decisions);
