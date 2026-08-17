@@ -28,17 +28,23 @@ Ordenadas por impacto dentro de cada bloque.
 
 ## Nuevas dimensiones de diseño
 
+- [ ] **Familias de iconos por dibujo** (M) — hoy las seis familias comparten trazado y
+  se distinguen por grosor, remates y relleno. Un segundo juego realmente redibujado
+  (esquinas vivas vs. redondeadas) daría más distancia entre opciones.
 - [ ] **Peso y contraste tipográfico** (S) — elegir peso de titulares (500/600/700/800)
   y de énfasis del cuerpo; cambia mucho la voz sin cambiar de fuente.
 - [ ] **Grosor de bordes** (S) — 1px / 1.5px / 2px como token `--border-width`; combinado
   con "sombra: ninguna" define estilos muy distintos (fino elegante vs. brutalist).
 - [ ] **Estilo de botones** (M) — relleno / outline / texto, y tamaño de controles
   (bajo/medio/alto). Hoy el estilo de botón está fijado en el CSS de los mocks.
-- [ ] **Movimiento** (M) — ninguno / sutil / expresivo como token de duración+curva
-  (`--motion-*`), aplicado a hovers y transiciones de los mocks. Respetar
-  `prefers-reduced-motion` en el export.
-- [ ] **Estilo de iconos** (M) — trazo fino / medio / relleno. Requiere duplicar los SVG
-  de los mocks por variante; alto costo, impacto medio.
+- [x] **Movimiento** (M) — cuatro niveles (ninguno · sutil · suave · expresivo) como
+  tokens `--motion-duration/-slow/-ease/-lift/-stagger`, aplicados a hovers, foco, filas
+  y a la entrada escalonada de cada pantalla. El panel reproduce cada curva con un glifo,
+  y el export incluye el bloque `prefers-reduced-motion`.
+- [x] **Estilo de iconos** (M) — seis familias (lineal fino, lineal suave, geométrico
+  recto, trazo grueso, duotono, relleno) sobre un registro único en `js/icons.js`: grosor,
+  remates y relleno viajan como tokens `--icon-*` y solo el salto contorno↔relleno repinta
+  el DOM. Sin duplicar los SVG de los mocks.
 
 ## Color
 
@@ -52,6 +58,10 @@ Ordenadas por impacto dentro de cada bloque.
 
 ## Páginas mock
 
+- [x] **Pantalla «Componentes»** (M) — kit del sistema con los estados forzados
+  (`.is-hover` / `.is-focus`): los 24 iconos del registro a tres tamaños, matriz de
+  botones, campos, chips, avisos, progreso, esqueletos, pestañas, menú y diálogo. Es el
+  lugar donde iconos y movimiento se juzgan de verdad.
 - [ ] **Vista responsive** (M) — previsualizar cada mock a 390px (móvil) y 768px (tablet)
   dentro de un marco; los mocks hoy asumen escritorio (min 1024px). Implica media queries
   completas en los tres mocks.

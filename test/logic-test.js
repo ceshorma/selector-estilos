@@ -24,7 +24,7 @@ global.location = { hash: "" };
 var fs = require("fs");
 var path = require("path");
 var jsDir = path.join(__dirname, "..", "js");
-["data.js", "color.js", "fonts.js", "state.js", "export.js"].forEach(function (f) {
+["data.js", "color.js", "fonts.js", "icons.js", "state.js", "export.js"].forEach(function (f) {
   (0, eval)(fs.readFileSync(path.join(jsDir, f), "utf8"));
 });
 
@@ -316,6 +316,129 @@ SE.applyPreset("tech-minimal");
 var res3 = SE.exporter.importEstado(tokens2);
 check("tokens generada importa", !!res3.ok, res3.error);
 check("tokens generada → custom", SE.state.decisions.palette.type === "custom", SE.state.decisions.palette.type);
+
+/* ---------- 11. Iconos y movimiento ---------- */
+
+/* Catálogos bien formados */
+SE.data.iconSets.forEach(function (fam) {
+  var pre = "familia " + fam.id + " ";
+  check(pre + "trazado válido", fam.paths === "outline" || fam.paths === "solid", fam.paths);
+  check(pre + "grosor numérico", typeof fam.stroke === "number" && fam.stroke >= 0, String(fam.stroke));
+  check(pre + "remate válido", ["round", "butt", "square"].indexOf(fam.cap) >= 0, fam.cap);
+  check(pre + "unión válida", ["round", "miter", "bevel"].indexOf(fam.join) >= 0, fam.join);
+  check(pre + "tiene racional", typeof fam.rationale === "string" && fam.rationale.length > 20);
+  check(pre + "muestra existe", !!SE.icons.set[fam.sample], fam.sample);
+});
+
+SE.data.motions.forEach(function (m) {
+  var pre = "movimiento " + m.id + " ";
+  check(pre + "duración válida", typeof m.duration === "number" && m.duration >= 0 && m.duration <= 600, String(m.duration));
+  check(pre + "curva", typeof m.ease === "string" && m.ease.length > 0);
+  check(pre + "elevación", typeof m.lift === "number" && m.lift >= 0 && m.lift <= 8, String(m.lift));
+  check(pre + "escalonado", typeof m.stagger === "number" && m.stagger >= 0);
+  check(pre + "tiene racional", typeof m.rationale === "string" && m.rationale.length > 20);
+});
+check("«ninguno» no se mueve", SE.findIn(SE.data.motions, "ninguno").duration === 0);
+
+/* Registro de iconos: los dos juegos y la lista de presentación */
+var iconNames = Object.keys(SE.icons.set);
+check("registro con iconos suficientes", iconNames.length >= 20, String(iconNames.length));
+iconNames.forEach(function (n) {
+  var def = SE.icons.set[n];
+  check("icono " + n + " outline", typeof def.outline === "string" && def.outline.indexOf("<") === 0);
+  check("icono " + n + " solid", typeof def.solid === "string" && def.solid.indexOf("<") === 0);
+});
+SE.icons.order.forEach(function (it) {
+  check("orden: " + it[0] + " existe en el registro", !!SE.icons.set[it[0]]);
+  check("orden: " + it[0] + " tiene etiqueta", typeof it[1] === "string" && it[1].length > 0);
+});
+check("markup lleva clase ic", SE.icons.markup("riego", SE.data.iconSets[0]).indexOf('class="ic"') > 0);
+check("markup solid usa el juego solid",
+  SE.icons.markup("check", SE.findIn(SE.data.iconSets, "relleno")).indexOf(SE.icons.set.check.solid) > 0);
+check("markup de icono inexistente es vacío", SE.icons.markup("no-existe", SE.data.iconSets[0]) === "");
+
+/* Todos los presets cierran las dos dimensiones nuevas */
+SE.data.presets.forEach(function (p) {
+  check("preset " + p.id + " tiene iconos válidos", !!SE.findIn(SE.data.iconSets, p.decisions.icons), String(p.decisions.icons));
+  check("preset " + p.id + " tiene movimiento válido", !!SE.findIn(SE.data.motions, p.decisions.motion), String(p.decisions.motion));
+});
+
+/* Validación al cargar: lo inválido se descarta, lo válido se conserva */
+var base = SE.clone(SE.findPreset("tech-minimal").decisions);
+SE.mergeValidDecisions(base, { icons: "no-existe", motion: "ni-idea" });
+check("icons inválido se descarta", base.icons === "lineal-suave", base.icons);
+check("motion inválido se descarta", base.motion === "sutil", base.motion);
+SE.mergeValidDecisions(base, { icons: "relleno", motion: "expresivo" });
+check("icons válido se conserva", base.icons === "relleno");
+check("motion válido se conserva", base.motion === "expresivo");
+
+/* writeTokens escribe los nueve tokens nuevos */
+var written = {};
+var spy = { style: { setProperty: function (k, v) { written[k] = v; } } };
+SE.writeTokens(spy, SE.clone(SE.findPreset("audaz").decisions), "light");
+check("token icon-stroke", written["--icon-stroke"] === "0", written["--icon-stroke"]);
+check("token icon-cap", written["--icon-cap"] === "round");
+check("token icon-join", written["--icon-join"] === "round");
+check("token icon-fill", written["--icon-fill"] === "currentColor", written["--icon-fill"]);
+check("token motion-duration", written["--motion-duration"] === "340ms", written["--motion-duration"]);
+check("token motion-duration-slow", written["--motion-duration-slow"] === "544ms", written["--motion-duration-slow"]);
+check("token motion-ease", (written["--motion-ease"] || "").indexOf("cubic-bezier") === 0);
+check("token motion-lift", written["--motion-lift"] === "4px");
+check("token motion-stagger", written["--motion-stagger"] === "70ms");
+
+/* Decisiones incompletas no revientan writeTokens */
+var incompleta = SE.clone(SE.findPreset("tech-minimal").decisions);
+delete incompleta.icons;
+delete incompleta.motion;
+var written2 = {};
+SE.writeTokens({ style: { setProperty: function (k, v) { written2[k] = v; } } }, incompleta, "dark");
+check("sin icons cae al valor por defecto", written2["--icon-stroke"] === "1.6", written2["--icon-stroke"]);
+check("sin motion cae al valor por defecto", written2["--motion-duration"] === "120ms", written2["--motion-duration"]);
+
+/* Export: tokens.css, tokens.json y documento */
+SE.applyPreset("sereno");
+var ctx3 = SE.exporter.context();
+var css3 = SE.exporter.buildTokensCss(ctx3);
+check("css trae icon-stroke", css3.indexOf("--icon-stroke: 1.5;") >= 0);
+check("css trae icon-fill duotono", css3.indexOf("--icon-fill: var(--color-primary-soft);") >= 0);
+check("css trae motion-duration", css3.indexOf("--motion-duration: 220ms;") >= 0);
+check("css trae reduced-motion", css3.indexOf("@media (prefers-reduced-motion: reduce)") >= 0);
+var json3 = JSON.parse(SE.exporter.buildTokensJson(ctx3));
+check("json trae familia de iconos", json3.icons.familia === "duotono", json3.icons.familia);
+check("json trae nivel de movimiento", json3.motion.nivel === "suave", json3.motion.nivel);
+check("json trae duración lenta", json3.motion.durationSlowMs === 352, String(json3.motion.durationSlowMs));
+var doc3 = SE.exporter.buildDoc(ctx3);
+check("doc tiene sección de iconos", doc3.indexOf("Iconos y movimiento") >= 0);
+check("doc dibuja los iconos", doc3.indexOf('class="icon-sheet"') >= 0);
+check("doc lista las dos decisiones nuevas", doc3.indexOf("<th>Iconos</th>") >= 0 && doc3.indexOf("<th>Movimiento</th>") >= 0);
+
+/* Ida y vuelta por tokens.json y por URL */
+SE.applyPreset("brutalista");
+var tokens3 = SE.exporter.buildTokensJson(SE.exporter.context());
+SE.applyPreset("tech-minimal");
+SE.exporter.importEstado(tokens3);
+check("tokens roundtrip iconos", SE.state.decisions.icons === "geometrico", SE.state.decisions.icons);
+check("tokens roundtrip movimiento", SE.state.decisions.motion === "ninguno", SE.state.decisions.motion);
+SE.applyPreset("calido");
+var url3 = SE.encodeState();
+SE.applyPreset("tech-minimal");
+SE.applyEncodedState(url3);
+check("URL roundtrip iconos", SE.state.decisions.icons === "grueso", SE.state.decisions.icons);
+check("URL roundtrip movimiento", SE.state.decisions.motion === "suave", SE.state.decisions.motion);
+
+/* Persistencia en localStorage */
+SE.applyPreset("audaz");
+SE.saveState();
+SE.loadState();
+check("localStorage conserva iconos", SE.state.decisions.icons === "relleno", SE.state.decisions.icons);
+check("localStorage conserva movimiento", SE.state.decisions.motion === "expresivo", SE.state.decisions.motion);
+
+/* La lista de pantallas es la única fuente de verdad */
+check("cinco pantallas", SE.SCREENS.length === 5, SE.SCREENS.join(","));
+check("componentes está en la lista", SE.SCREENS.indexOf("componentes") >= 0);
+localStorage.setItem(SE.STORAGE_KEY, JSON.stringify({ version: 1, screen: "componentes", mode: "light", presetId: "custom", decisions: {} }));
+SE.loadState();
+check("pantalla componentes se restaura", SE.state.screen === "componentes", SE.state.screen);
 
 /* ---------- resultado ---------- */
 if (fails.length) {

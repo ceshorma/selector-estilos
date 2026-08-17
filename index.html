@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/mock-landing.css">
 <link rel="stylesheet" href="css/mock-blog.css">
 <link rel="stylesheet" href="css/mock-colores.css">
+<link rel="stylesheet" href="css/mock-componentes.css">
 </head>
 <body>
 
@@ -57,6 +58,7 @@
           <button type="button" data-screen="landing" title="Tamaños display, jerarquía, botones grandes, radios y sombras">Landing <kbd>2</kbd></button>
           <button type="button" data-screen="blog" title="Escala tipográfica completa, armonía título/cuerpo, interlineado y medida">Artículo <kbd>3</kbd></button>
           <button type="button" data-screen="colores" title="Convivencia de la paleta: formas, proporciones y pares de uso">Colores <kbd>4</kbd></button>
+          <button type="button" data-screen="componentes" title="Kit del sistema: iconos, estados de botón y campo, movimiento">Componentes <kbd>5</kbd></button>
         </nav>
       </div>
       <div class="tb-right">
@@ -87,12 +89,12 @@
             <aside class="db-sidenav">
               <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
               <nav class="db-nav">
-                <a href="#" class="active"><svg aria-hidden="true" viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1"/><rect x="9" y="9" width="5.5" height="5.5" rx="1"/></svg>Panel general</a>
-                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M8 14V8M8 8C8 5 6 3 2.5 2.5 3 6 5 8 8 8ZM8 8c0-3 2-5 5.5-5.5C13 6 11 8 8 8Z"/></svg>Cultivos</a>
-                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M8 2C8 2 3.5 7 3.5 10a4.5 4.5 0 0 0 9 0C12.5 7 8 2 8 2Z"/></svg>Riego</a>
-                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M2 12l3-4 3 2 3-5 3 4"/><path d="M1.5 14.5h13"/></svg>Sensores</a>
-                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M3 1.5h7l3 3v10H3z"/><path d="M5.5 8h5M5.5 11h5"/></svg>Informes</a>
-                <a href="#"><svg aria-hidden="true" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4"/></svg>Ajustes</a>
+                <a href="#" class="active"><svg class="ic" data-icon="panel" viewBox="0 0 16 16" aria-hidden="true"></svg>Panel general</a>
+                <a href="#"><svg class="ic" data-icon="cultivo" viewBox="0 0 16 16" aria-hidden="true"></svg>Cultivos</a>
+                <a href="#"><svg class="ic" data-icon="riego" viewBox="0 0 16 16" aria-hidden="true"></svg>Riego</a>
+                <a href="#"><svg class="ic" data-icon="sensores" viewBox="0 0 16 16" aria-hidden="true"></svg>Sensores</a>
+                <a href="#"><svg class="ic" data-icon="informes" viewBox="0 0 16 16" aria-hidden="true"></svg>Informes</a>
+                <a href="#"><svg class="ic" data-icon="ajustes" viewBox="0 0 16 16" aria-hidden="true"></svg>Ajustes</a>
               </nav>
               <div class="db-sidenav-foot">
                 <div class="avatar">MV</div>
@@ -101,8 +103,8 @@
             </aside>
 
             <div class="db-main">
-              <div class="db-banner">
-                <svg class="db-banner-icon" aria-hidden="true" viewBox="0 0 20 20"><path d="M10 2.5 18 17H2Z"/><path d="M10 8v3.5"/><circle cx="10" cy="14" r="0.6" fill="currentColor" stroke="none"/></svg>
+              <div class="db-banner" data-enter style="--i:0">
+                <svg class="ic db-banner-icon" data-icon="aviso" viewBox="0 0 16 16" aria-hidden="true"></svg>
                 <div class="db-banner-text">
                   <strong>Dos invernaderos llevan más de 40 min fuera de rango</strong>
                   <span>Invernadero 3 (pimiento rojo) e Invernadero 7 (tomate pera). El riego automático está en pausa hasta que lo revises.</span>
@@ -110,42 +112,55 @@
                 <button type="button" class="btn btn-ghost btn-sm">Ver detalle</button>
               </div>
 
-              <header class="db-header">
+              <header class="db-header" data-enter style="--i:1">
                 <div>
                   <h1>Panel general</h1>
                   <p class="db-sub">Resumen de los 8 invernaderos · actualizado hace 4 min</p>
                 </div>
                 <div class="db-header-tools">
-                  <input class="input db-search" type="search" placeholder="Buscar invernadero, cultivo…">
-                  <button type="button" class="btn btn-ghost">Esta semana</button>
-                  <button type="button" class="btn btn-primary">+ Nueva programación</button>
+                  <div class="db-search-wrap">
+                    <svg class="ic db-search-icon" data-icon="buscar" viewBox="0 0 16 16" aria-hidden="true"></svg>
+                    <input class="input db-search" type="search" placeholder="Buscar invernadero, cultivo…">
+                  </div>
+                  <button type="button" class="btn btn-ghost"><svg class="ic" data-icon="calendario" viewBox="0 0 16 16" aria-hidden="true"></svg>Esta semana</button>
+                  <button type="button" class="btn btn-primary"><svg class="ic" data-icon="mas" viewBox="0 0 16 16" aria-hidden="true"></svg>Nueva programación</button>
                 </div>
               </header>
 
-              <div class="db-stats">
-                <div class="card stat-card">
+              <div class="db-toolbar" data-enter style="--i:2">
+                <span class="switch switch-on"><span class="switch-track"></span>Riego automático</span>
+                <span class="db-toolbar-sep"></span>
+                <span class="chip chip-on">Todos</span>
+                <span class="chip">Con alerta</span>
+                <span class="chip">En pausa</span>
+                <span class="db-toolbar-spacer"></span>
+                <span class="db-toolbar-note"><svg class="ic" data-icon="reloj" viewBox="0 0 16 16" aria-hidden="true"></svg>Última sincronización 12:04</span>
+              </div>
+
+              <div class="db-stats" data-enter style="--i:3">
+                <div class="card card-lift stat-card">
                   <span class="stat-label">Humedad media del suelo</span>
                   <div class="stat-row"><span class="stat-value">64<small>%</small></span><span class="badge badge-success">▲ 2,1 %</span></div>
                   <span class="stat-note">Objetivo: 60–70 %</span>
                 </div>
-                <div class="card stat-card">
+                <div class="card card-lift stat-card">
                   <span class="stat-label">Temperatura media</span>
                   <div class="stat-row"><span class="stat-value">23,4<small>°C</small></span><span class="badge badge-success">▼ 0,8 °C</span></div>
                   <span class="stat-note">Dentro del rango óptimo</span>
                 </div>
-                <div class="card stat-card">
+                <div class="card card-lift stat-card">
                   <span class="stat-label">Consumo de agua · hoy</span>
                   <div class="stat-row"><span class="stat-value">1.240<small>L</small></span><span class="badge badge-warning">▲ 5,4 %</span></div>
                   <span class="stat-note">Por encima de la media semanal</span>
                 </div>
-                <div class="card stat-card">
+                <div class="card card-lift stat-card">
                   <span class="stat-label">Alertas activas</span>
                   <div class="stat-row"><span class="stat-value">3</span><span class="badge badge-danger">2 críticas</span></div>
                   <span class="stat-note">Invernaderos 3 y 7</span>
                 </div>
               </div>
 
-              <div class="db-grid">
+              <div class="db-grid" data-enter style="--i:4">
                 <div class="card db-table-card">
                   <div class="card-head">
                     <h2>Estado por invernadero</h2>
@@ -236,7 +251,7 @@
             </div>
           </nav>
 
-          <header class="ld-hero">
+          <header class="ld-hero" data-enter style="--i:0">
             <h1>Cultiva con <span class="ld-mark">datos</span>,<br>no con corazonadas.</h1>
             <p class="ld-sub">Terrena conecta tus invernaderos, aprende de cada cultivo y te dice exactamente cuándo regar, ventilar o actuar. Menos agua, más cosecha.</p>
             <div class="ld-hero-ctas">
@@ -246,7 +261,7 @@
             <p class="ld-hero-note">Sin tarjeta · Configuración en 15 minutos · Cancela cuando quieras</p>
           </header>
 
-          <div class="ld-logos">
+          <div class="ld-logos" data-enter style="--i:1">
             <span class="ld-logos-label">Confían en Terrena</span>
             <div class="ld-logos-row">
               <span class="ld-logo-item">AgroSur</span>
@@ -257,32 +272,32 @@
             </div>
           </div>
 
-          <section class="ld-features">
+          <section class="ld-features" data-enter style="--i:2">
             <h2>Todo tu invernadero, en una pantalla</h2>
             <p class="ld-features-sub">Tres piezas que trabajan juntas para que tú no tengas que estar en tres sitios a la vez.</p>
             <div class="ld-feature-grid">
-              <div class="card ld-feature">
-                <span class="ld-feature-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3C12 3 5.5 10 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 10 12 3 12 3Z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/></svg></span>
+              <div class="card card-lift ld-feature">
+                <span class="ld-feature-icon"><svg class="ic" data-icon="riego" viewBox="0 0 16 16" aria-hidden="true"></svg></span>
                 <h3>Riego inteligente</h3>
                 <p>Programaciones que se ajustan solas según humedad, clima y etapa del cultivo. El agua justa, ni una gota más.</p>
-                <a class="ld-feature-link" href="#">Cómo funciona →</a>
+                <a class="ld-feature-link" href="#">Cómo funciona<svg class="ic" data-icon="flecha" viewBox="0 0 16 16" aria-hidden="true"></svg></a>
               </div>
-              <div class="card ld-feature">
-                <span class="ld-feature-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4a6 6 0 0 0-6 6v3.5L4.5 16h15L18 13.5V10a6 6 0 0 0-6-6Z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span>
+              <div class="card card-lift ld-feature">
+                <span class="ld-feature-icon"><svg class="ic" data-icon="campana" viewBox="0 0 16 16" aria-hidden="true"></svg></span>
                 <h3>Alertas al instante</h3>
                 <p>Si una válvula falla o la temperatura se dispara de madrugada, lo sabes en segundos, no al día siguiente.</p>
-                <a class="ld-feature-link" href="#">Ver ejemplo →</a>
+                <a class="ld-feature-link" href="#">Ver ejemplo<svg class="ic" data-icon="flecha" viewBox="0 0 16 16" aria-hidden="true"></svg></a>
               </div>
-              <div class="card ld-feature">
-                <span class="ld-feature-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19l4.5-6 4 3 4-6.5 3.5 5"/><path d="M3 21.5h18"/></svg></span>
+              <div class="card card-lift ld-feature">
+                <span class="ld-feature-icon"><svg class="ic" data-icon="sensores" viewBox="0 0 16 16" aria-hidden="true"></svg></span>
                 <h3>Informes claros</h3>
                 <p>Consumo, rendimiento y costes por cultivo, listos para compartir con tu equipo o tu cooperativa.</p>
-                <a class="ld-feature-link" href="#">Ver informe →</a>
+                <a class="ld-feature-link" href="#">Ver informe<svg class="ic" data-icon="flecha" viewBox="0 0 16 16" aria-hidden="true"></svg></a>
               </div>
             </div>
           </section>
 
-          <section class="ld-quote">
+          <section class="ld-quote" data-enter style="--i:3">
             <blockquote>
               <p>«Bajamos el consumo de agua un 27 % la primera temporada. Ahora riego cuando la planta lo pide, no cuando a mí me parece.»</p>
               <footer>
@@ -292,7 +307,7 @@
             </blockquote>
           </section>
 
-          <section class="ld-cta-band">
+          <section class="ld-cta-band" data-enter style="--i:4">
             <h2>Empieza a cultivar con datos hoy</h2>
             <p>Prueba Terrena gratis en tu primer invernadero. Sin compromiso.</p>
             <button type="button" class="btn btn-inverted btn-lg">Crear cuenta gratis</button>
@@ -336,6 +351,15 @@
               <figcaption>Sonda de humedad a 20 cm de profundidad en un cultivo de tomate. La lectura continua sustituye a la intuición.</figcaption>
             </figure>
 
+            <aside class="bg-keys">
+              <h2>Las tres claves</h2>
+              <ul>
+                <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Entre el 25 % y el 35 % del agua aplicada nunca llega a la raíz.</li>
+                <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Dos sondas por invernadero bastan para saber cuándo regar y cuándo parar.</li>
+                <li><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Recortar la duración del riego rinde más que recortar la frecuencia.</li>
+              </ul>
+            </aside>
+
             <div class="bg-body">
               <p>Durante décadas, regar fue un acto de fe. Se abría la válvula a la misma hora, durante los mismos minutos, porque «siempre se ha hecho así». Y funcionaba, más o menos, porque el agua era barata y el margen de error, generoso. Ninguna de las dos cosas sigue siendo cierta.</p>
               <p>El precio del agua para uso agrícola ha subido de forma sostenida en los últimos cinco años, y los <a href="#">planes de sequía</a> imponen recortes justo en los meses de mayor demanda. La buena noticia: en la mayoría de los invernaderos que auditamos, entre el 25 % y el 35 % del agua aplicada <em>no la usa la planta</em>. Se filtra por debajo de la zona de raíces o se evapora antes de llegar a ellas. Es margen puro.</p>
@@ -353,12 +377,31 @@
               </aside>
 
               <h2>Medir antes de mover una válvula</h2>
-              <p>Una estrategia razonable para empezar, sin cambiar ninguna instalación, tiene tres pasos:</p>
+              <p>Antes de tocar nada, conviene tener a mano lo mínimo:</p>
               <ul>
+                <li>Dos sondas de humedad por invernadero.</li>
+                <li>Un registro continuo de al menos siete días.</li>
+                <li>El caudal real del gotero, medido, no el del catálogo.</li>
+              </ul>
+              <p>Con eso, una estrategia razonable para empezar, sin cambiar ninguna instalación, tiene tres pasos:</p>
+              <ol>
                 <li><strong>Instala dos sondas por invernadero</strong>, una a 10 cm y otra a 20–30 cm según el cultivo. La superficial te dice cuándo regar; la profunda, cuándo parar.</li>
                 <li><strong>Registra una semana sin cambiar nada.</strong> Verás el patrón real: casi siempre, picos de saturación tras cada riego y drenaje que se pierde por debajo de las raíces.</li>
                 <li><strong>Recorta la duración, no la frecuencia.</strong> Riegos más cortos y algo más frecuentes mantienen la humedad en banda sin empujar agua fuera del alcance de la planta.</li>
-              </ul>
+              </ol>
+              <p>El umbral que usamos por defecto es <code>humedad &lt; 22 % durante 30 min</code> a 20 cm de profundidad; por encima de <code>34 %</code> el sistema cancela el riego programado aunque toque por calendario.</p>
+
+              <figure class="bg-table-wrap">
+                <table class="bg-table">
+                  <thead><tr><th>Invernadero</th><th class="num">Antes (L/día)</th><th class="num">Después</th><th class="num">Ahorro</th></tr></thead>
+                  <tbody>
+                    <tr><td>Tomate pera · I-7</td><td class="num">1.480</td><td class="num">1.062</td><td class="num">28 %</td></tr>
+                    <tr><td>Pimiento rojo · I-3</td><td class="num">1.210</td><td class="num">905</td><td class="num">25 %</td></tr>
+                    <tr><td>Fresa · I-5</td><td class="num">760</td><td class="num">524</td><td class="num">31 %</td></tr>
+                  </tbody>
+                </table>
+                <figcaption>Consumo medio por invernadero antes y después de pasar a riego por umbral. Temporada 2025-2026, misma superficie y cultivo.</figcaption>
+              </figure>
 
               <h3>Qué esperar las primeras semanas</h3>
               <p>Los primeros días, la tentación de volver al calendario es fuerte: el suelo «se ve» seco en superficie aunque la sonda profunda marque humedad de sobra. Confía en el dato. En los ensayos de Finca Roble, el equipo tardó dos semanas en dejar de añadir riegos manuales «por si acaso»; a la cuarta semana, el consumo había caído un 27 % y el calibre del fruto no se había movido.</p>
@@ -442,6 +485,21 @@
               </div>
             </div>
 
+            <div class="card cl-icons">
+              <h2>Iconos en la paleta</h2>
+              <div class="cl-icon-row">
+                <span class="cl-icon-cell" style="color:var(--color-text)"><svg class="ic" data-icon="cultivo" viewBox="0 0 16 16" aria-hidden="true"></svg><small>Texto</small></span>
+                <span class="cl-icon-cell" style="color:var(--color-text-muted)"><svg class="ic" data-icon="reloj" viewBox="0 0 16 16" aria-hidden="true"></svg><small>Atenuado</small></span>
+                <span class="cl-icon-cell" style="color:var(--color-primary)"><svg class="ic" data-icon="riego" viewBox="0 0 16 16" aria-hidden="true"></svg><small>Primario</small></span>
+                <span class="cl-icon-cell" style="color:var(--color-accent)"><svg class="ic" data-icon="estrella" viewBox="0 0 16 16" aria-hidden="true"></svg><small>Acento</small></span>
+                <span class="cl-icon-cell" style="color:var(--color-success)"><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg><small>Éxito</small></span>
+                <span class="cl-icon-cell" style="color:var(--color-warning)"><svg class="ic" data-icon="aviso" viewBox="0 0 16 16" aria-hidden="true"></svg><small>Alerta</small></span>
+                <span class="cl-icon-cell" style="color:var(--color-danger)"><svg class="ic" data-icon="papelera" viewBox="0 0 16 16" aria-hidden="true"></svg><small>Peligro</small></span>
+                <span class="cl-icon-cell cl-icon-onprimary"><svg class="ic" data-icon="escudo" viewBox="0 0 16 16" aria-hidden="true"></svg><small>S/ primario</small></span>
+              </div>
+              <p>El relleno de la familia duotono usa el primario suave: aquí se ve si ese tinte aguanta sobre cada fondo.</p>
+            </div>
+
             <div class="card cl-band">
               <h2>Proporción 60 · 30 · 10</h2>
               <div class="cl-band-bar">
@@ -479,6 +537,173 @@
                 <div class="cl-col"><span class="cl-swatch" style="background:var(--color-danger-soft)"></span><strong>Peligro suave</strong><code data-hexof="dangerSoft"></code></div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <!-- ============ MOCK 5 · COMPONENTES ============ -->
+        <section class="mock-screen" data-screen="componentes">
+          <div class="cp-page">
+
+            <header class="cp-head" data-enter style="--i:0">
+              <div class="db-logo"><span class="db-logo-mark"></span>Terrena</div>
+              <h1>Kit del sistema</h1>
+              <p>Todas las piezas con sus estados a la vez. Aquí se decide la familia de iconos y el nivel de movimiento: pasa el puntero por los botones, las filas y las tarjetas.</p>
+            </header>
+
+            <!-- Iconos -->
+            <section class="cp-block" data-enter style="--i:1">
+              <div class="cp-block-head">
+                <h2>Iconos</h2>
+                <span class="cp-note">24 iconos · un mismo trazado, seis familias</span>
+              </div>
+              <div class="cp-icons" id="cp-icon-grid"></div>
+              <div class="cp-icon-sizes">
+                <div class="cp-icon-size"><svg class="ic" data-icon="riego" viewBox="0 0 16 16" aria-hidden="true"></svg><span>16 px · en línea con el texto</span></div>
+                <div class="cp-icon-size cp-icon-md"><svg class="ic" data-icon="riego" viewBox="0 0 16 16" aria-hidden="true"></svg><span>24 px · botones y menús</span></div>
+                <div class="cp-icon-size cp-icon-lg"><svg class="ic" data-icon="riego" viewBox="0 0 16 16" aria-hidden="true"></svg><span>40 px · encabezados y estados vacíos</span></div>
+              </div>
+            </section>
+
+            <!-- Botones -->
+            <section class="cp-block" data-enter style="--i:2">
+              <div class="cp-block-head">
+                <h2>Botones</h2>
+                <span class="cp-note">Los estados se muestran forzados: no hace falta apuntar</span>
+              </div>
+              <table class="cp-matrix">
+                <thead>
+                  <tr><th>Variante</th><th>Reposo</th><th>Puntero</th><th>Foco</th><th>En curso</th><th>Deshabilitado</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>Primario</th>
+                    <td><button type="button" class="btn btn-primary"><svg class="ic" data-icon="mas" viewBox="0 0 16 16" aria-hidden="true"></svg>Nuevo lote</button></td>
+                    <td><button type="button" class="btn btn-primary is-hover">Nuevo lote</button></td>
+                    <td><button type="button" class="btn btn-primary is-focus">Nuevo lote</button></td>
+                    <td><button type="button" class="btn btn-primary btn-loading"><span class="spinner"></span>Guardando</button></td>
+                    <td><button type="button" class="btn btn-primary" disabled>Nuevo lote</button></td>
+                  </tr>
+                  <tr>
+                    <th>Fantasma</th>
+                    <td><button type="button" class="btn btn-ghost"><svg class="ic" data-icon="descargar" viewBox="0 0 16 16" aria-hidden="true"></svg>Exportar</button></td>
+                    <td><button type="button" class="btn btn-ghost is-hover">Exportar</button></td>
+                    <td><button type="button" class="btn btn-ghost is-focus">Exportar</button></td>
+                    <td><button type="button" class="btn btn-ghost btn-loading"><span class="spinner"></span>Exportando</button></td>
+                    <td><button type="button" class="btn btn-ghost" disabled>Exportar</button></td>
+                  </tr>
+                  <tr>
+                    <th>Peligro</th>
+                    <td><button type="button" class="btn btn-danger"><svg class="ic" data-icon="papelera" viewBox="0 0 16 16" aria-hidden="true"></svg>Eliminar</button></td>
+                    <td><button type="button" class="btn btn-danger is-hover">Eliminar</button></td>
+                    <td><button type="button" class="btn btn-danger is-focus">Eliminar</button></td>
+                    <td><button type="button" class="btn btn-danger btn-loading"><span class="spinner"></span>Eliminando</button></td>
+                    <td><button type="button" class="btn btn-danger" disabled>Eliminar</button></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="cp-row cp-row-sizes">
+                <button type="button" class="btn btn-primary btn-sm">Pequeño</button>
+                <button type="button" class="btn btn-primary">Medio</button>
+                <button type="button" class="btn btn-primary btn-lg">Grande<svg class="ic" data-icon="flecha" viewBox="0 0 16 16" aria-hidden="true"></svg></button>
+                <span class="tooltip"><span class="tooltip-bubble">Solo lectura en tu rol</span><button type="button" class="btn btn-ghost" disabled>Con tooltip</button></span>
+              </div>
+            </section>
+
+            <!-- Campos -->
+            <section class="cp-block" data-enter style="--i:3">
+              <div class="cp-block-head"><h2>Campos</h2><span class="cp-note">Reposo · foco · válido · error · deshabilitado</span></div>
+              <div class="cp-fields">
+                <label class="field"><span>Invernadero</span><input class="input" value="Invernadero 3" readonly></label>
+                <label class="field"><span>Con el foco puesto</span><input class="input is-focus" value="Pimiento rojo" readonly></label>
+                <label class="field"><span>Validado</span><input class="input input-ok" value="27,4 °C" readonly></label>
+                <label class="field field-invalid"><span>Umbral de riego</span><input class="input input-error" value="-8" readonly><span class="field-error">Debe estar entre 0 y 100.</span></label>
+                <label class="field"><span>Deshabilitado</span><input class="input" value="Heredado del sector" disabled></label>
+                <label class="field"><span>Selección</span>
+                  <select class="input"><option>Riego por goteo</option><option>Aspersión</option></select>
+                </label>
+              </div>
+              <div class="cp-fields cp-fields-wide">
+                <label class="field"><span>Nota de la visita</span><textarea class="input" readonly>Sustrato seco en la fila 4; se adelanta el riego de la tarde.</textarea></label>
+                <div class="cp-controls">
+                  <label class="check"><input type="checkbox" checked>Avisarme fuera de rango</label>
+                  <label class="check"><input type="checkbox">Incluir sensores en pausa</label>
+                  <label class="check"><input type="radio" name="cp-r" checked>Media diaria</label>
+                  <label class="check"><input type="radio" name="cp-r">Lectura instantánea</label>
+                  <span class="switch switch-on"><span class="switch-track"></span>Riego automático</span>
+                  <span class="switch"><span class="switch-track"></span>Modo vacaciones</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Etiquetas y estados -->
+            <section class="cp-block" data-enter style="--i:4">
+              <div class="cp-block-head"><h2>Etiquetas, avisos y estado</h2></div>
+              <div class="cp-row">
+                <span class="badge badge-success"><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Óptimo</span>
+                <span class="badge badge-warning"><svg class="ic" data-icon="aviso" viewBox="0 0 16 16" aria-hidden="true"></svg>Atención</span>
+                <span class="badge badge-danger"><svg class="ic" data-icon="aviso" viewBox="0 0 16 16" aria-hidden="true"></svg>Crítico</span>
+                <span class="badge badge-primary"><svg class="ic" data-icon="estrella" viewBox="0 0 16 16" aria-hidden="true"></svg>Destacado</span>
+                <span class="chip chip-on"><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg>Tomate</span>
+                <span class="chip">Pimiento</span>
+                <span class="chip">Pepino</span>
+                <span class="avatar">MV</span>
+                <span class="avatar avatar-lg">JR</span>
+              </div>
+              <div class="cp-alerts">
+                <div class="alert alert-info"><svg class="ic" data-icon="campana" viewBox="0 0 16 16" aria-hidden="true"></svg><span><strong>Informe semanal listo</strong>Ya puedes descargar el resumen de los siete invernaderos.</span></div>
+                <div class="alert alert-success"><svg class="ic" data-icon="check" viewBox="0 0 16 16" aria-hidden="true"></svg><span><strong>Riego restablecido</strong>Los sectores 1 a 4 han vuelto al programa habitual.</span></div>
+                <div class="alert alert-warning"><svg class="ic" data-icon="aviso" viewBox="0 0 16 16" aria-hidden="true"></svg><span><strong>Humedad por debajo del umbral</strong>Invernadero 7, desde hace 42 minutos.</span></div>
+                <div class="alert alert-danger"><svg class="ic" data-icon="aviso" viewBox="0 0 16 16" aria-hidden="true"></svg><span><strong>Sensor sin respuesta</strong>El nodo B-12 no envía datos desde las 06:15.</span></div>
+              </div>
+              <div class="cp-progress">
+                <div><span class="cp-label">Campaña de recolección</span><div class="progress"><span style="width:68%"></span></div><span class="cp-note">68 % · 12 de 18 sectores</span></div>
+                <div><span class="cp-label">Cargando lecturas</span>
+                  <div class="cp-skeletons"><span class="skeleton" style="width:100%"></span><span class="skeleton" style="width:78%"></span><span class="skeleton" style="width:54%"></span></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Navegación y superficies -->
+            <section class="cp-block" data-enter style="--i:5">
+              <div class="cp-block-head"><h2>Navegación y superficies</h2></div>
+              <div class="cp-nav-row">
+                <div class="tabs">
+                  <button type="button" class="active">Resumen</button>
+                  <button type="button">Sensores</button>
+                  <button type="button">Riego</button>
+                  <button type="button">Histórico</button>
+                </div>
+                <div class="segmented">
+                  <button type="button" class="active">Día</button>
+                  <button type="button">Semana</button>
+                  <button type="button">Mes</button>
+                </div>
+              </div>
+              <div class="cp-surfaces">
+                <article class="card card-lift cp-card">
+                  <div class="cp-card-icon"><svg class="ic" data-icon="riego" viewBox="0 0 16 16" aria-hidden="true"></svg></div>
+                  <h3>Tarjeta accionable</h3>
+                  <p>Se eleva al pasar el puntero: radio, sombra y movimiento actuando juntos.</p>
+                  <a href="#">Ver sector<svg class="ic" data-icon="flecha" viewBox="0 0 16 16" aria-hidden="true"></svg></a>
+                </article>
+                <nav class="menu">
+                  <a href="#"><svg class="ic" data-icon="informes" viewBox="0 0 16 16" aria-hidden="true"></svg>Ver informe</a>
+                  <a href="#" class="is-hover"><svg class="ic" data-icon="descargar" viewBox="0 0 16 16" aria-hidden="true"></svg>Descargar CSV</a>
+                  <a href="#"><svg class="ic" data-icon="candado" viewBox="0 0 16 16" aria-hidden="true"></svg>Hacer privado</a>
+                  <hr>
+                  <a href="#" class="danger"><svg class="ic" data-icon="papelera" viewBox="0 0 16 16" aria-hidden="true"></svg>Eliminar lote</a>
+                </nav>
+                <div class="card cp-dialog">
+                  <h3>¿Pausar el riego automático?</h3>
+                  <p>Los siete invernaderos quedarán en modo manual hasta que vuelvas a activarlo.</p>
+                  <div class="cp-dialog-actions">
+                    <button type="button" class="btn btn-ghost">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Pausar riego</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
           </div>
         </section>
 
@@ -560,6 +785,16 @@
         <div class="p-body" id="body-shadow"></div>
       </details>
 
+      <details class="p-acc" data-dim="icons">
+        <summary><span>Iconos</span><button type="button" class="ab-btn" data-dim="icons">A/B</button></summary>
+        <div class="p-body" id="body-icons"></div>
+      </details>
+
+      <details class="p-acc" data-dim="motion">
+        <summary><span>Movimiento</span><button type="button" class="ab-btn" data-dim="motion">A/B</button></summary>
+        <div class="p-body" id="body-motion"></div>
+      </details>
+
       <details class="p-acc" data-dim="reading">
         <summary><span>Lectura</span><button type="button" class="ab-btn" data-dim="reading">A/B</button></summary>
         <div class="p-body" id="body-reading"></div>
@@ -570,7 +805,7 @@
         <div class="p-body" id="body-a11y"></div>
       </details>
 
-      <p class="panel-foot">Atajos: <kbd>1·2·3·4</kbd> pantallas · <kbd>D</kbd> oscuro · <kbd>P</kbd> panel · <kbd>Ctrl+Z</kbd> deshacer<br>En A/B: <kbd>Espacio</kbd> alterna · <kbd>⏎</kbd> elige · <kbd>Esc</kbd> cancela</p>
+      <p class="panel-foot">Atajos: <kbd>1·2·3·4·5</kbd> pantallas · <kbd>D</kbd> oscuro · <kbd>P</kbd> panel · <kbd>Ctrl+Z</kbd> deshacer<br>En A/B: <kbd>Espacio</kbd> alterna · <kbd>⏎</kbd> elige · <kbd>Esc</kbd> cancela</p>
     </div>
   </aside>
 </div>
@@ -614,6 +849,7 @@
 <script src="js/data.js"></script>
 <script src="js/color.js"></script>
 <script src="js/fonts.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/state.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/export.js"></script>
